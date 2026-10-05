@@ -131,59 +131,13 @@ function monthTicks(d0,d1){
   return out;
 }
 
-/* ---------- picks: every bet on this game, ranked by its own realistic edge ----------
-   edge = expected profit per $1 at the price you'd pay. Wind unders and model leans use the market's fair
-   chance shifted by what that kind of bet has really returned (weekly.py: real_edge); price gaps use the
-   sportsbooks' fair price. One bet suggested by two signals is listed once with both reasons. */
+/* ---------- picks: built in Python (picks.py) so the same list feeds the cards, the log and the scoreboard ----------
+   Each game's g.picks: best first by realistic edge (edge = expected profit per $1 at that price). Finished games
+   show the suggestions logged before kickoff, graded at the price first shown (p.grade: units, beat the close). */
 const EVID={wind:['under','Wind · tested'],roof:['roof','Wind · roof must be open'],gap:['gap','Price gap · unproven'],
   lean:['lean','Model pick · no proven edge'],spread:['lean','Model pick · no proven edge']};
-const EDGE_FROM={wind:0,roof:0,gap:1,lean:2,spread:2};  // whose edge number to show when two signals merge
-/* Model picks (moneyline and spread) are suggested when the model's own edge is at least D.modelMinEdge (5%),
-   shown with that number and their real record, and ranked by their realistic edge like everything else. */
-function picks(g){
-  const out=[], team=s=>s==='home'?g.homeName:g.awayName, f=g.status==='final', MIN=D.modelMinEdge??5;
-  const add=p=>{const e=out.find(x=>x.key===p.key);
-    if(!e){out.push(p); return;}
-    e.src.push(...p.src); e.why.push(...p.why); if(e.result==null) e.result=p.result;
-    if(p.model!=null&&e.model==null){e.model=p.model; e.rec=p.rec;}
-    e.suggested=e.suggested||p.suggested;
-    if(EDGE_FROM[p.src[0]]<EDGE_FROM[e.edgeFrom]){e.edge=p.edge; e.price=p.price; e.edgeFrom=p.src[0];}};
-  const has=key=>out.some(x=>x.key===key);
-  const wp=g.windPick;
-  if(wp&&(g.signal==='under'||g.signal==='roof'))
-    add({key:`total|under|${wp.point}`,text:`Under ${wp.point}`,edge:wp.edge,edgeFrom:g.signal==='roof'?'roof':'wind',src:[g.signal==='roof'?'roof':'wind'],
-      price:wp.cents!=null?`${wp.cents.toFixed(0)}¢ on ${esc(wp.book)}`:`${odds(wp.odds)} at sportsbooks`,
-      why:[`${g.wind.toFixed(0)} mph wind ${f?'forecast at kickoff':'forecast'}${g.signal==='roof'?', only if the roof is open':''}`],
-      result:'underUnits' in g?g.underUnits:null});
-  if(!f) (g.gaps||[]).forEach(x=>add({key:`${x.mk}|${x.side}|${x.mk==='ml'?'':x.point}`,
-    text:x.mk==='total'?`${x.side==='over'?'Over':'Under'} ${x.point}`:team(x.side)+(x.mk==='spread'?` ${x.point>0?'+':''}${x.point}`:' to win'),
-    edge:x.ev,edgeFrom:'gap',src:['gap'],price:`${x.cents.toFixed(0)}¢ on ${esc(x.book)}`,
-    why:[`${x.ev.toFixed(1)}% cheaper than the sportsbooks’ fair price`],result:null}));
-  const rec=k=>(D.modelRecord||{})[k];
-  const m=g.mkt;
-  if(m&&m.lean&&m.leanEdge!=null){
-    const key=`ml|${m.lean}|`, pm=m.lean==='home'?g.pElo:1-g.pElo, fair=m.lean==='home'?m.fair:1-m.fair;
-    if(m.leanEv>=MIN||has(key))
-      add({key,text:`${team(m.lean)} to win`,edge:m.leanEdge,edgeFrom:'lean',src:['lean'],model:m.leanEv,rec:rec('ml'),
-        suggested:m.leanEv>=MIN,
-        price:m.leanCents!=null?`${m.leanCents.toFixed(0)}¢ on ${esc(m.leanBook)}`:`${odds(m.leanOdds)} at sportsbooks`,
-        why:[`our model gives them ${pct(pm)} to win, the market ${pct(fair)}`],
-        result:'leanUnits' in m?m.leanUnits:null});
-  }
-  const sl=g.spreadLean;
-  if(sl){
-    const pt=`${sl.point>0?'+':''}${sl.point}`, key=`spread|${sl.side}|${sl.point}`;
-    const myMargin=g.eloLine*(sl.side==='home'?1:-1), lineMargin=-sl.point;
-    if(sl.ev>=MIN||has(key))
-      add({key,text:`${team(sl.side)} ${pt}`,edge:sl.edge,edgeFrom:'spread',src:['spread'],model:sl.ev,rec:rec('spread'),
-        suggested:sl.ev>=MIN,
-        price:sl.cents!=null?`${sl.cents.toFixed(0)}¢ on ${esc(sl.book)}`:`${odds(sl.odds)} at sportsbooks`,
-        why:[`our model has them ${myMargin>=0?'winning':'losing'} by ${Math.abs(myMargin).toFixed(1)}; the line says ${lineMargin>=0?'winning':'losing'} by ${Math.abs(lineMargin)}`],
-        result:'units' in sl?sl.units:null});
-  }
-  out.sort((a,b)=>b.edge-a.edge);
-  return out;
-}
+const fmtLogged=s=>{const d=new Date(s+':00'); return isNaN(d)?s:`${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}, ${((d.getHours()+11)%12)+1}:${String(d.getMinutes()).padStart(2,'0')} ${d.getHours()<12?'AM':'PM'} CT`;};
+const priceTxt=pr=>!pr?'':pr.cents!=null?`${Number(pr.cents).toFixed(0)}¢ on ${esc(pr.book)}`:`${odds(pr.odds)} at sportsbooks`;
 /* ======================= week page ======================= */
 function weekPage(){
   let week=D.currentWeek, filter='all';
@@ -244,27 +198,32 @@ function weekPage(){
     return `${esc(who)} at ${x.cents.toFixed(0)}¢ on ${esc(x.book)}`;
   }
   function picksBlock(g){
-    const P=picks(g), f=g.status==='final';
-    const good=P.filter(p=>p.edge>0||p.suggested), weak=P.filter(p=>!(p.edge>0||p.suggested));
-    const head=`<div class="bh">${f?'Picks before kickoff':g.status==='live'?'Picks (locked at kickoff)':'Bets to take'}
+    const P=g.picks||[], f=g.status==='final', started=g.status!=='upcoming';
+    const good=P.filter(p=>p.good), weak=P.filter(p=>!p.good);
+    const head=`<div class="bh">${f?'Picks before kickoff':started?'Picks (locked at kickoff)':'Bets to take'}
       <span class="why">best first, by each kind of bet’s real record · edge = expected profit per $1 at that price</span></div>`;
     const res=u=>u==null?'':`<span class="pill ${cls(u)}">${u>0?'Won':u<0?'Lost':'Push'} ${per100(u)}</span>`;
+    const clv=gr=>!gr||gr.beat==null?'':gr.clv!=null
+      ?`<span class="pill ${gr.beat?'ok':'no'}">${gr.beat?'Beat':'Worse than'} the closing price ${signed(gr.clv)}%</span>`
+      :`<span class="pill ${gr.beat?'ok':'no'}">${Math.abs(gr.clvPts)} pt ${gr.beat?'better':'worse'} than the closing line</span>`;
     const modelOnly=p=>p.edgeFrom==='lean'||p.edgeFrom==='spread';
-    const edgeTxt=p=>modelOnly(p)
+    const edgeTxt=p=>modelOnly(p)&&p.model!=null
       ?`<span class="pedge model">${signed(p.model)}%<small> model edge</small></span>`
       :`<span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span>`;
-    const recTxt=p=>p.rec&&p.rec.n?`<div class="prec">Model picks this strong have returned <b class="${cls(p.rec.roi)}">${signed(p.rec.roi)}%</b>
-      over ${p.rec.n.toLocaleString('en-US')} bets (${esc(p.rec.seasons.replace('-','–'))}). Small stake or skip.</div>`:'';
+    const recTxt=p=>{const r=(D.modelRecord||{})[p.rec]; return r&&r.n?`<div class="prec">Model picks this strong have returned
+      <b class="${cls(r.roi)}">${signed(r.roi)}%</b> over ${r.n.toLocaleString('en-US')} bets (${esc(r.seasons.replace('-','–'))}). Small stake or skip.</div>`:'';};
     const row=(p,i)=>`<div class="pick ${i===0?'top':''}"><span class="rank">${i+1}</span><div class="pmain">
-      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${p.price}</span>${edgeTxt(p)}</div>
-      <div class="pwhy">${[...new Set(p.src)].map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}
-        <span>${esc(p.why.join(' · '))}</span>${f?res(p.result):''}</div>${modelOnly(p)?recTxt(p):''}</div></div>`;
+      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${priceTxt(p.price)}</span>${edgeTxt(p)}</div>
+      <div class="pwhy">${(p.src||[]).map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}
+        <span>${esc((p.why||[]).join(' · '))}</span>${p.grade?res(p.grade.units)+clv(p.grade):''}</div>${modelOnly(p)?recTxt(p):''}</div></div>`;
     const conflict=new Set(good.map(p=>p.key.split('|')[0])).size<good.length?
       '<div class="why">Two picks bet against each other on the same market: take the higher one, or pass.</div>':'';
-    const none=!good.length?`<div class="nobet"><b>No bet${f?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':'Nothing on this game showed a real edge at the available prices, so pass.'}</div>`:'';
-    const skip=weak.length?`<div class="skips"><span class="why">Not worth it at this price:</span> ${weak.map(p=>
-      `<span class="skip">${esc(p.text)} <span class="no">${signed(p.edge)}%</span> <span class="tag ${EVID[p.src[0]][0]}">${EVID[p.src[0]][1]}</span>${f?' '+res(p.result):''}</span>`).join('')}</div>`:'';
-    return `<div class="block picks">${head}${good.map(row).join('')}${conflict}${none}${skip}</div>`;
+    const none=!good.length?`<div class="nobet"><b>No bet${started?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':started?'Nothing on this game showed a real edge before kickoff.':'Nothing on this game shows a real edge at the available prices, so pass.'}</div>`:'';
+    const skip=weak.length&&!started?`<div class="skips"><span class="why">Not worth it at this price:</span> ${weak.map(p=>
+      `<span class="skip">${esc(p.text)} <span class="no">${signed(p.edge)}%</span> <span class="tag ${EVID[p.src[0]][0]}">${EVID[p.src[0]][1]}</span></span>`).join('')}</div>`:'';
+    const note=good.some(p=>p.reconstructed)?'<div class="why">Reconstructed at closing prices: this game was played before the site started saving its suggestions.</div>'
+      :good.some(p=>p.logged)?`<div class="why">As first shown ${esc(fmtLogged(good.map(p=>p.logged).sort()[0]))}, graded at that price.</div>`:'';
+    return `<div class="block picks">${head}${good.map(row).join('')}${conflict}${none}${skip}${started?note:''}</div>`;
   }
   function results(g){
     if(g.status!=='final') return '';
@@ -274,10 +233,6 @@ function weekPage(){
       out.push(`<span class="pill ${g.eloRight?'ok':'no'}">${g.eloRight?'✓':'✗'} Model picked ${esc(pick)}</span>`); }
     if(g.mkt&&'mktRight' in g.mkt){ const fav=g.mkt.fair>=0.5?g.homeName:g.awayName;
       out.push(`<span class="pill ${g.mkt.mktRight?'ok':'no'}">${g.mkt.mktRight?'✓':'✗'} Market favored ${esc(fav)}</span>`); }
-    if(g.mkt&&'leanUnits' in g.mkt){ const u=g.mkt.leanUnits;
-      out.push(`<span class="pill ${cls(u)}">Lean bet ${u>0?'won':u<0?'lost':'pushed'} ${per100(u)}</span>`); }
-    if('underUnits' in g){ const u=g.underUnits;
-      out.push(`<span class="pill ${cls(u)}">Under bet ${u>0?'won':u<0?'lost':'pushed'} ${per100(u)}</span>`); }
     const head=winner?`${esc(winner)} won by ${Math.abs(g.hs-g.as)}`:'Tie game';
     return `<div class="results"><div class="rhead">${head}${g.windRecorded!=null?` <span class="why">· actual wind ${g.windRecorded} mph</span>`:''}</div>
       ${out.length?`<div class="pills">${out.join('')}</div><div class="why">Bet results are per $100 bet.</div>`:''}</div>`;
@@ -573,6 +528,24 @@ function seasonPage(){
     <div class="kpi"><div class="v">${s.eloAcc!=null?pct(s.eloAcc):'n/a'} <small>vs ${s.mktAcc!=null?pct(s.mktAcc):'n/a'}</small></div><div class="l">Winners picked<br><span>our model vs the betting market (${s.withLines} games)</span></div></div>
     <div class="kpi"><div class="v small-v">${better||'n/a'}</div><div class="l">More accurate overall<br><span>judged by how confident each was, not just picks</span></div></div>`;
 
+  /* Scoreboard: every suggestion graded at the price first shown, and whether that price beat the close */
+  const B=s.picks;
+  if(B&&$('#pickBoard')){
+    const KIND=[['wind','Wind unders','under'],['gap','Price gaps','gap'],['lean','Model picks · moneyline','lean'],['spread','Model picks · spread','lean']];
+    const line=(label,o,tag)=>`<tr${tag===null?' class="sel"':''}><td>${tag?`<span class="tag ${tag}">${label}</span>`:`<b>${label}</b>`}</td>
+      <td class="n">${o.n}</td><td>${o.n?`${o.won}–${o.lost}${o.push?`–${o.push}`:''}`:'<span class="push">none yet</span>'}</td>
+      <td class="n ${cls(o.units)}">${o.n?per100(o.units):'—'}</td><td class="n ${cls(o.units)}">${o.n?signed(o.units/o.n*100)+'%':'—'}</td>
+      <td>${o.judged?`<b class="${o.beat/o.judged>0.5?'ok':'no'}">${o.beat} of ${o.judged}</b>${o.clvAvg!=null?` <span class="push">· ${signed(o.clvAvg)}% avg</span>`:''}`:'<span class="push">once logged picks finish</span>'}</td></tr>`;
+    $('#pickBoard').innerHTML=`<thead><tr><th>Kind of bet</th><th class="n">Bets</th><th>Won–lost</th><th class="n">Profit on $100 each</th><th class="n">Return</th><th>Beat the closing price</th></tr></thead>
+      <tbody>${KIND.map(([k,l,t])=>line(l,B[k],t)).join('')}${line('All suggestions',B.all,null)}</tbody>`;
+    const st=s.pickLogStarted;
+    $('#pickBoardNote').textContent=`Every bet the “Bets to take” boxes suggested, graded at the price shown when it first appeared.`
+      +` “Beat the closing price” compares that price with the final line before kickoff: beating it more than half the time is`
+      +` the best early sign of a real edge, long before wins and losses mean anything.`
+      +(st?` The site started saving its suggestions ${fmtLogged(st)}; games before that are reconstructed at closing prices,`
+        +` so they count in wins and losses but can’t test the closing price.`:'');
+  }
+
   const bets=seasonBets();
   const series=[{name:'Wind unders',n:1,type:'wind'},{name:'Model leans',n:2,type:'lean'}].map(se=>{
     let cum=0; const pts=[];
@@ -673,7 +646,7 @@ function methodPage(){
   }
 }
 
-window.EDGE_TEST={betMath,fairNow,feePer,betText,picks};   // for tests/tracker_test.html
+window.EDGE_TEST={betMath,fairNow,feePer,betText};   // for tests/tracker_test.html
 chrome();
 const page=($('main')||{}).dataset?.page;
 ({week:weekPage,season:seasonPage,teams:teamsPage,method:methodPage}[page]||(()=>{}))();

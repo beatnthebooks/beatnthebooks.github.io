@@ -45,6 +45,7 @@ from pathlib import Path
 from statistics import NormalDist
 
 import alerts
+import picks as P
 from edge_lab import DEV, _inverse, _solve, devig, fit_sigma, load, logit, sigmoid
 from odds import EXCHANGE_FEE, add_live_exchanges, get_odds, log_snapshots, match_games
 from qb_model import Model as QBModel, ensure_stats
@@ -308,7 +309,8 @@ def wind_pick(g, s: dict | None, wind_shift: float) -> dict | None:
         point, pf, dec, price = g["tot"], 1 - devig(g["oo"], g["uo"]), am_to_dec(g["uo"]), {"odds": int(g["uo"])}
     else:
         return None
-    return {"point": point, "fairUnder": round(pf, 4), "edge": real_edge(pf, wind_shift, dec), **price}
+    return {"point": point, "fairUnder": round(pf, 4), "edge": real_edge(pf, wind_shift, dec), "dec": round(dec, 4),
+            **price}
 
 
 def ko_label(ko: datetime) -> str:
@@ -388,6 +390,7 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shift
             side = "home" if evh >= eva else "away"
             m["lean"] = side
             m["leanEv"] = round(max(evh, eva) * 100, 1)          # the model's own estimate
+            m["leanDec"] = round(dh if side == "home" else da, 4)
             if shifts:                                             # what leans like this have really returned
                 m["leanEdge"] = real_edge(fair if side == "home" else 1 - fair, shifts["lean"]["shift"],
                                           dh if side == "home" else da)
@@ -449,7 +452,7 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shift
             evs = {"home": pc * opts["home"][0] - 1, "away": (1 - pc) * opts["away"][0] - 1}
             side = max(evs, key=evs.get)
             dec, price = opts[side]
-            sl = {"side": side, "point": -L if side == "home" else L, "ev": round(evs[side] * 100, 1),
+            sl = {"side": side, "point": -L if side == "home" else L, "ev": round(evs[side] * 100, 1), "dec": round(dec, 4),
                   "edge": real_edge(pm if side == "home" else 1 - pm, shifts["spread"]["shift"], dec), **price}
             if final:
                 margin = g["hs"] - g["as"]
@@ -474,6 +477,8 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shift
                 row["underUnits"] = round(settle(won, am_to_dec(g["uo"])), 3)
     if g["wind"] is not None and final:
         row["windRecorded"] = g["wind"]
+    if shifts:
+        row["picks"] = P.game_picks(row, MODEL_MIN_EDGE)
     return row
 
 
@@ -586,6 +591,9 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
               "spread": fit_spread_shift(recs, blend_w, sigma, season), "sigma": sigma}
     record = model_record(recs, blend_w, sigma, season)
     rows = [game_row(r, blend_w, wind_log, shop, now, shifts) for r in recs if r["g"]["season"] == season]
+    # every suggestion is logged the first time it's shown, then graded at that price (picks.py)
+    pick_log = P.update_log(rows, now.isoformat(timespec="minutes"))
+    P.apply_log(rows, {g["gid"]: g for g in games}, pick_log)
     unplayed = [x for x in rows if x["status"] != "final"]
     current = unplayed[0]["wk"] if unplayed else rows[-1]["wk"]
     teams, last_wk = team_table(games, model_run, season, ratings)
@@ -601,7 +609,9 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
         "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live), "pickShifts": shifts,
         "modelMinEdge": MODEL_MIN_EDGE, "modelRecord": record,
         "fees": EXCHANGE_FEE,
-        "games": rows, "summary": season_summary(rows), "teams": teams,
+        "games": rows, "summary": dict(season_summary(rows), picks=P.scoreboard(rows),
+                                       pickLogStarted=pick_log.get("_meta", {}).get("started")),
+        "teams": teams,
     }
 
 

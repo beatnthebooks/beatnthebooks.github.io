@@ -84,32 +84,7 @@ check("Upcoming: no close yet", undefined, m.beat);
 check("Text: spread", "Bears +3", T.betText({mk: "spread", side: "away", point: 3}, window.EDGE.games[0]));
 check("Text: total", "Under 44", T.betText({mk: "total", side: "under", point: 44}, null));
 
-// 8. Picks: each game ranked by its own edge; one bet from two signals listed once
-const G = (o) => Object.assign({status: "upcoming", homeName: "Packers", awayName: "Bears", pElo: 0.6, eloLine: 4, wind: 16}, o);
-let P = T.picks(G({signal: "under", windPick: {point: 44.5, edge: 3.1, cents: 52, book: "Kalshi"},
-  gaps: [{mk: "ml", side: "away", ev: 6.2, cents: 40, book: "Polymarket"}],
-  mkt: {lean: "away", fair: 0.58, leanEv: 9.9, leanEdge: 1.4, leanCents: 40, leanBook: "Polymarket"}}));
-check("Bigger edge ranks first (gap beats wind here)", "Bears to win", P[0].text);
-check("Gap + model pick on one bet: listed once", 2, P.length);
-check("Merged pick shows the gap's edge, not the model's", 6.2, P[0].edge);
-check("Merged pick keeps both reasons", "gap,lean", P[0].src.join(","));
-check("Wind under second", "Under 44.5", P[1].text);
-check("Wind under labelled as the tested wind signal", "wind", P[1].src.join(","));
-P = T.picks(G({signal: "under", windPick: {point: 41, edge: 7.5, odds: -110},
-  mkt: {lean: "home", fair: 0.55, leanEv: 12.0, leanEdge: -4.2, leanOdds: -130}}));
-check("Wind first when it has the bigger edge", "Under 41", P[0].text);
-check("Model pick ranked by its real edge, not its own 12% claim", -4.2, P[1].edge);
-P = T.picks(G({mkt: {fair: 0.5, lean: null}}));
-check("No signals: no picks", 0, P.length);
-P = T.picks(G({mkt: {lean: "home", fair: 0.55, leanEv: 3.0, leanEdge: -4.0, leanOdds: -130}}));
-check("Model pick under 5% model edge: not suggested", 0, P.length);
-P = T.picks(G({mkt: {lean: "home", fair: 0.55, leanEv: 6.0, leanEdge: -4.0, leanOdds: -130},
-  spreadLean: {side: "home", point: -3.5, ev: 7.5, edge: -2.5, odds: -110}}));
-check("Strong model picks are suggested (ML + spread)", 2, P.length);
-check("Spread pick text", "Packers -3.5", P[0].text);
-check("Ranked by real edge: spread (-2.5) above ML (-4.0)", -2.5, P[0].edge);
-check("Shows the model's own edge too", 7.5, P[0].model);
-check("Marked as suggested", true, P[0].suggested);
+// (Pick ranking, grading and the pick log are tested in Python: tests/test_picks.py)
 
 document.getElementById("out").insertAdjacentHTML("beforeend", rows.join(""));
 const sum = document.getElementById("sum");

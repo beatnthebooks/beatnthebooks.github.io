@@ -83,5 +83,114 @@ class WindPickPrice(unittest.TestCase):
         self.assertEqual((wp.get("odds"), wp["point"]), (-110, 44.5))
 
 
+import json  # noqa: E402
+import tempfile  # noqa: E402
+from unittest import mock  # noqa: E402
+
+import picks as PK  # noqa: E402
+
+
+def card(status="upcoming", **kw):
+    base = {"id": "g1", "status": status, "koIso": "2026-10-11T12:00", "homeName": "Packers", "awayName": "Bears",
+            "pElo": 0.6, "eloLine": 4.0, "wind": 16.0, "gaps": []}
+    return dict(base, **kw)
+
+
+WIND = {"point": 44.5, "edge": 3.1, "dec": 1.92, "cents": 52.0, "book": "Kalshi"}
+
+
+class Ranking(unittest.TestCase):
+    def test_bigger_edge_first_and_one_bet_listed_once(self):
+        r = card(signal="under", windPick=WIND,
+                 gaps=[{"mk": "ml", "side": "away", "point": None, "ev": 6.2, "dec": 2.4, "cents": 40.0, "book": "Polymarket"}],
+                 mkt={"lean": "away", "fair": 0.58, "leanEv": 9.9, "leanEdge": 1.4, "leanDec": 2.4, "leanCents": 40.0,
+                      "leanBook": "Polymarket"})
+        P = PK.game_picks(r, 5.0)
+        self.assertEqual([p["text"] for p in P], ["Bears to win", "Under 44.5"])   # gap (6.2) beats wind (3.1)
+        self.assertEqual(P[0]["edge"], 6.2)                                        # merged: the gap's edge shows
+        self.assertEqual(P[0]["src"], ["gap", "lean"])
+        self.assertEqual(P[1]["src"], ["wind"])
+
+    def test_model_picks_need_5pct_model_edge(self):
+        weak = card(mkt={"lean": "home", "fair": 0.55, "leanEv": 3.0, "leanEdge": -4.0, "leanDec": 1.77, "leanOdds": -130})
+        self.assertEqual(PK.game_picks(weak, 5.0), [])
+        strong = card(mkt={"lean": "home", "fair": 0.55, "leanEv": 6.0, "leanEdge": -4.0, "leanDec": 1.77, "leanOdds": -130},
+                      spreadLean={"side": "home", "point": -3.5, "ev": 7.5, "edge": -2.5, "dec": 1.91, "odds": -110})
+        P = PK.game_picks(strong, 5.0)
+        self.assertEqual([p["text"] for p in P], ["Packers -3.5", "Packers to win"])   # ranked by real edge
+        self.assertTrue(all(p["good"] and p["suggested"] for p in P))
+
+
+class Grading(unittest.TestCase):
+    g = {"hs": 24, "as": 20, "hml": -150.0, "aml": 130.0, "spread": 3.0, "hso": -110.0, "aso": -110.0,
+         "tot": 44.5, "oo": -110.0, "uo": -110.0}
+
+    def test_results(self):
+        self.assertEqual(PK.grade({"mk": "ml", "side": "away", "dec": 2.3}, self.g)["units"], -1.0)
+        self.assertEqual(PK.grade({"mk": "spread", "side": "home", "point": -3.5, "dec": 1.9}, self.g)["units"], 0.9)
+        self.assertEqual(PK.grade({"mk": "spread", "side": "home", "point": -4.0, "dec": 1.9}, self.g)["won"], None)
+        self.assertEqual(PK.grade({"mk": "total", "side": "under", "point": 44.5, "dec": 1.9}, self.g)["units"], 0.9)
+
+    def test_closing_price(self):
+        gr = PK.grade({"mk": "total", "side": "under", "point": 44.5, "dec": 2.05}, self.g)    # +105 vs fair 50%
+        self.assertAlmostEqual(gr["clv"], 2.5)
+        self.assertTrue(gr["beat"])
+        gr = PK.grade({"mk": "total", "side": "under", "point": 46.0, "dec": 1.9}, self.g)     # 1.5 pts better
+        self.assertEqual((gr["clvPts"], gr["beat"]), (1.5, True))
+        gr = PK.grade({"mk": "spread", "side": "away", "point": 2.5, "dec": 1.9}, self.g)      # close was +3
+        self.assertEqual((gr["clvPts"], gr["beat"]), (-0.5, False))
+
+
+class PickLog(unittest.TestCase):
+    def run_log(self, rows, now, path):
+        with mock.patch.object(PK, "LOG", path):
+            return PK.update_log(rows, now)
+
+    def test_first_price_kept_and_frozen_at_kickoff(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "pick_log.json"
+            r = card(signal="under", windPick=WIND)
+            r["picks"] = PK.game_picks(r, 5.0)
+            self.run_log([r], "2026-10-08T09:00", path)
+            r2 = card(signal="under", windPick=dict(WIND, cents=56.0, dec=1.75))
+            r2["picks"] = PK.game_picks(r2, 5.0)
+            log = self.run_log([r2], "2026-10-09T09:00", path)
+            e = log["g1"]["total|under|44.5"]
+            self.assertEqual((e["first"]["price"]["cents"], e["last"]["price"]["cents"]), (52.0, 56.0))
+            r3 = dict(r2, status="live", picks=PK.game_picks(card(signal="under", windPick=dict(WIND, cents=70.0)), 5.0))
+            log = self.run_log([r3], "2026-10-11T12:30", path)
+            self.assertEqual(log["g1"]["total|under|44.5"]["last"]["price"]["cents"], 56.0)   # no changes after kickoff
+            self.assertEqual(log["_meta"]["started"], "2026-10-08T09:00")
+
+    def test_finished_games_graded_at_first_price_or_reconstructed(self):
+        g = {"hs": 10, "as": 13, "hml": -150.0, "aml": 130.0, "spread": 3.0, "hso": -110.0, "aso": -110.0,
+             "tot": 44.5, "oo": -110.0, "uo": -110.0}
+        log = {"_meta": {"started": "2026-10-08T09:00"},
+               "g1": {"total|under|44.5": {"pick": {"mk": "total", "side": "under", "point": 44.5, "text": "Under 44.5",
+                                                    "src": ["wind"], "edgeFrom": "wind", "why": []},
+                                           "first": {"ts": "2026-10-08T09:00", "dec": 1.92, "price": {}, "edge": 3.1},
+                                           "last": {"ts": "2026-10-10T09:00", "dec": 1.75, "price": {}, "edge": 1.0}}}}
+        logged = card("final")
+        PK.apply_log([logged], {"g1": g}, log)
+        self.assertEqual(logged["picks"][0]["grade"]["units"], 0.92)          # graded at the FIRST price
+        after = card("final", id="g2", koIso="2026-10-12T12:00",
+                     picks=[{"good": True, "mk": "ml", "side": "home", "dec": 1.7, "edgeFrom": "lean"}])
+        PK.apply_log([after], {"g2": g}, log)
+        self.assertEqual(after["picks"], [])                                   # log running, nothing shown: no pick
+        before = card("final", id="g3", koIso="2026-10-04T12:00",
+                      picks=[{"good": True, "mk": "ml", "side": "home", "dec": 1.7, "edgeFrom": "lean"}])
+        PK.apply_log([before], {"g3": g}, log)
+        self.assertTrue(before["picks"][0]["reconstructed"])
+        self.assertNotIn("beat", before["picks"][0]["grade"])                 # no closing-line test at the close
+
+    def test_scoreboard_counts_by_main_reason(self):
+        rows = [{"picks": [{"edgeFrom": "roof", "grade": {"units": 0.9, "won": True, "clv": 2.0, "beat": True}},
+                           {"edgeFrom": "lean", "reconstructed": True, "grade": {"units": -1.0, "won": False}}]}]
+        b = PK.scoreboard(rows)
+        self.assertEqual((b["wind"]["won"], b["wind"]["beat"], b["wind"]["clvAvg"]), (1, 1, 2.0))
+        self.assertEqual((b["lean"]["lost"], b["lean"]["judged"]), (1, 0))
+        self.assertEqual(b["all"]["n"], 2)
+
+
 if __name__ == "__main__":
     unittest.main()

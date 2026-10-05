@@ -55,6 +55,7 @@ After about a minute the site is live at `https://<your-username>.github.io/edge
 | `injury_watch.py` | Phone alerts when a key player is ruled out, with a Kalshi/Polymarket price check |
 | `alerts.py` | Phone alerts for new wind unders and price gaps (ntfy app; channel name in `ntfy_topic.txt`) |
 | `odds.py` | Best price per bet across sportsbooks (The Odds API; needs a free key) |
+| `picks.py` | Each game's ranked "Bets to take", the log of every suggestion (`data/pick_log.json`) and the season scoreboard |
 | `exchanges.py` | Kalshi and Polymarket prices from their free public feeds (no key); `--backfill` + `--test` check past prices |
 | `line_move.py` | Tests whether the opening-to-closing line move can be predicted (it mostly can't) |
 | `rift_real.py` | Walk-forward Elo model and the real backtest (2016–2025 at closing lines) |
