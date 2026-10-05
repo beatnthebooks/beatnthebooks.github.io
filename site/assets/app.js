@@ -131,6 +131,39 @@ function monthTicks(d0,d1){
   return out;
 }
 
+/* ---------- picks: every bet on this game, ranked by its own realistic edge ----------
+   edge = expected profit per $1 at the price you'd pay. Wind unders and model leans use the market's fair
+   chance shifted by what that kind of bet has really returned (weekly.py: real_edge); price gaps use the
+   sportsbooks' fair price. One bet suggested by two signals is listed once with both reasons. */
+const EVID={wind:['under','Wind · tested'],roof:['roof','Wind · roof must be open'],gap:['gap','Price gap · unproven'],lean:['lean','Model pick · no proven edge']};
+const EDGE_FROM={wind:0,roof:0,gap:1,lean:2};          // whose edge number to show when two signals merge
+function picks(g){
+  const out=[], team=s=>s==='home'?g.homeName:g.awayName, f=g.status==='final';
+  const add=p=>{const e=out.find(x=>x.key===p.key);
+    if(!e){out.push(p); return;}
+    e.src.push(...p.src); e.why.push(...p.why); if(e.result==null) e.result=p.result;
+    if(EDGE_FROM[p.src[0]]<EDGE_FROM[e.edgeFrom]){e.edge=p.edge; e.price=p.price; e.edgeFrom=p.src[0];}};
+  const wp=g.windPick;
+  if(wp&&(g.signal==='under'||g.signal==='roof'))
+    add({key:`total|under|${wp.point}`,text:`Under ${wp.point}`,edge:wp.edge,edgeFrom:g.signal==='roof'?'roof':'wind',src:[g.signal==='roof'?'roof':'wind'],
+      price:wp.cents!=null?`${wp.cents.toFixed(0)}¢ on ${esc(wp.book)}`:`${odds(wp.odds)} at sportsbooks`,
+      why:[`${g.wind.toFixed(0)} mph wind ${f?'forecast at kickoff':'forecast'}${g.signal==='roof'?', only if the roof is open':''}`],
+      result:'underUnits' in g?g.underUnits:null});
+  if(!f) (g.gaps||[]).forEach(x=>add({key:`${x.mk}|${x.side}|${x.mk==='ml'?'':x.point}`,
+    text:x.mk==='total'?`${x.side==='over'?'Over':'Under'} ${x.point}`:team(x.side)+(x.mk==='spread'?` ${x.point>0?'+':''}${x.point}`:' to win'),
+    edge:x.ev,edgeFrom:'gap',src:['gap'],price:`${x.cents.toFixed(0)}¢ on ${esc(x.book)}`,
+    why:[`${x.ev.toFixed(1)}% cheaper than the sportsbooks’ fair price`],result:null}));
+  const m=g.mkt;
+  if(m&&m.lean&&m.leanEdge!=null){
+    const pm=m.lean==='home'?g.pElo:1-g.pElo, fair=m.lean==='home'?m.fair:1-m.fair;
+    add({key:`ml|${m.lean}|`,text:`${team(m.lean)} to win`,edge:m.leanEdge,edgeFrom:'lean',src:['lean'],
+      price:m.leanCents!=null?`${m.leanCents.toFixed(0)}¢ on ${esc(m.leanBook)}`:`${odds(m.leanOdds)} at sportsbooks`,
+      why:[`our model ${pct(pm)} vs the market’s ${pct(fair)} (model’s own estimate ${signed(m.leanEv)}%)`],
+      result:'leanUnits' in m?m.leanUnits:null});
+  }
+  out.sort((a,b)=>b.edge-a.edge);
+  return out;
+}
 /* ======================= week page ======================= */
 function weekPage(){
   let week=D.currentWeek, filter='all';
@@ -190,6 +223,23 @@ function weekPage(){
       :(x.side==='home'?g.homeName:g.awayName)+(x.mk==='spread'?' '+(x.point>0?'+':'')+x.point:' to win');
     return `${esc(who)} at ${x.cents.toFixed(0)}¢ on ${esc(x.book)}`;
   }
+  function picksBlock(g){
+    const P=picks(g), f=g.status==='final', good=P.filter(p=>p.edge>0), weak=P.filter(p=>p.edge<=0);
+    const head=`<div class="bh">${f?'Picks before kickoff':g.status==='live'?'Picks (locked at kickoff)':'Bets to take'}
+      <span class="why">best edge first · edge = expected profit per $1 at that price</span></div>`;
+    const res=u=>u==null?'':`<span class="pill ${cls(u)}">${u>0?'Won':u<0?'Lost':'Push'} ${per100(u)}</span>`;
+    const row=(p,i)=>`<div class="pick ${i===0?'top':''}"><span class="rank">${i+1}</span><div class="pmain">
+      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${p.price}</span>
+        <span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span></div>
+      <div class="pwhy">${[...new Set(p.src)].map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}
+        <span>${esc(p.why.join(' · '))}</span>${f?res(p.result):''}</div></div></div>`;
+    const conflict=new Set(good.map(p=>p.key.split('|')[0])).size<good.length?
+      '<div class="why">Two picks bet against each other on the same market: take the higher one, or pass.</div>':'';
+    const none=!good.length?`<div class="nobet"><b>No bet${f?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':'Nothing on this game showed a real edge at the available prices, so pass.'}</div>`:'';
+    const skip=weak.length?`<div class="skips"><span class="why">Not worth it at this price:</span> ${weak.map(p=>
+      `<span class="skip">${esc(p.text)} <span class="no">${signed(p.edge)}%</span> <span class="tag ${EVID[p.src[0]][0]}">${EVID[p.src[0]][1]}</span>${f?' '+res(p.result):''}</span>`).join('')}</div>`:'';
+    return `<div class="block picks">${head}${good.map(row).join('')}${conflict}${none}${skip}</div>`;
+  }
   function results(g){
     if(g.status!=='final') return '';
     const winner=g.hs>g.as?g.homeName:g.as>g.hs?g.awayName:null;
@@ -221,6 +271,7 @@ function weekPage(){
         <div class="why">${esc(g.awayName)} at ${esc(g.homeName)}</div>
       </header>
       <div class="gbody">
+        ${picksBlock(g)}
         <div class="block"><div class="bh">Chance to win</div>
           ${chanceRow('Our model',1-g.pElo,g.pElo,'var(--away)','var(--home)',g)}
           ${mk?chanceRow('Betting market',1-mk.fair,mk.fair,'var(--mkt-away)','var(--mkt-home)',g):'<div class="crow"><span class="clab">Betting market</span><span class="why">No betting line yet</span></div>'}
@@ -589,7 +640,7 @@ function methodPage(){
   $$('[data-season]').forEach(el=>el.textContent=D.season);
 }
 
-window.EDGE_TEST={betMath,fairNow,feePer,betText};   // for tests/tracker_test.html
+window.EDGE_TEST={betMath,fairNow,feePer,betText,picks};   // for tests/tracker_test.html
 chrome();
 const page=($('main')||{}).dataset?.page;
 ({week:weekPage,season:seasonPage,teams:teamsPage,method:methodPage}[page]||(()=>{}))();

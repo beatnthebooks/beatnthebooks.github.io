@@ -44,7 +44,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import alerts
-from edge_lab import devig, load
+from edge_lab import _inverse, _solve, devig, load, logit, sigmoid
 from odds import EXCHANGE_FEE, add_live_exchanges, get_odds, log_snapshots, match_games
 from qb_model import Model as QBModel, ensure_stats
 from rift_real import TEAM_NAME, am_to_dec, run
@@ -140,6 +140,108 @@ def update_wind_log(games, season: int, now: datetime) -> dict:
 # Page data
 # ----------------------------------------------------------------------
 
+WIND_FIT_FROM = 2006
+
+
+def _fit_offset_logit(X, offset, y, iters=40):
+    """Logistic regression with a fixed offset (the market's own log-odds). Returns (coefs, std errors).
+    No data: zeros (= no shift from the market)."""
+    if not y:
+        return [0.0], [0.0]
+    k = len(X[0])
+    beta = [0.0] * k
+    H = None
+    for _ in range(iters):
+        grad, H = [0.0] * k, [[0.0] * k for _ in range(k)]
+        for x, o, t in zip(X, offset, y):
+            p = sigmoid(o + sum(b * v for b, v in zip(beta, x)))
+            w = p * (1 - p)
+            for i in range(k):
+                grad[i] += (t - p) * x[i]
+                for j in range(k):
+                    H[i][j] += w * x[i] * x[j]
+        step = _solve(H, grad)
+        beta = [b + s for b, s in zip(beta, step)]
+        if max(abs(s) for s in step) < 1e-10:
+            break
+    cov = _inverse(H)
+    return beta, [math.sqrt(max(cov[i][i], 0.0)) for i in range(k)]
+
+
+# Realistic edges for ranking a game's bets (Oct 5, 2026). Each bet type's chance of winning is the market's
+# fair chance shifted by what that type of bet ACTUALLY did in past seasons:
+#     logit P(win) = logit(p_market) + shift
+# then edge = P(win) x decimal price - 1 at the price you'd pay. Why not the raw model numbers: at closing prices
+# 2016-2025, wind unders were predicted +2.2% by a wind-speed model but returned +11.8%; model leans were predicted
+# +5.1% and returned -5.4%, and the biggest predicted lean edges did worst (-7.3%). Wind speed above 10 mph didn't
+# separate better unders from worse ones, so one shift per bet type.
+PICKS_FIT_FROM = 2006
+LEAN_FIT_FROM = 2016   # the model's settings were tuned on 2006-2015, so leans only count from its first unseen season
+
+
+def fit_wind_shift(games: list, season: int) -> dict:
+    """How much more often unders won than the closing price said, in outdoor/open-roof games with recorded
+    wind >= 10 mph, 2006 to last season."""
+    off, y = [], []
+    for g in games:
+        if not (PICKS_FIT_FROM <= g["season"] < season) or g["hs"] is None or g["roof"] not in OUTDOOR:
+            continue
+        if g["wind"] is None or g["wind"] < WIND_MPH or g["tot"] is None or not g["oo"] or not g["uo"]:
+            continue
+        pts = g["hs"] + g["as"]
+        if pts == g["tot"]:
+            continue
+        off.append(logit(1 - devig(g["oo"], g["uo"])))
+        y.append(1.0 if pts < g["tot"] else 0.0)
+    beta, se = _fit_offset_logit([[1.0]] * len(y), off, y)
+    return {"shift": round(beta[0], 5), "se": round(se[0], 5), "n": len(y), "won": int(sum(y)),
+            "seasons": f"{PICKS_FIT_FROM}-{season - 1}"}
+
+
+def fit_lean_shift(recs: list, blend_w: float, season: int, start: int = LEAN_FIT_FROM) -> dict:
+    """How often the model's lean side won compared with the closing fair price, from the model's first
+    unseen season to last season (walk-forward; lean = the side with a positive expected return at the
+    closing price). Training seasons are left out: the model was tuned to look good on them."""
+    off, y = [], []
+    for r in recs:
+        g = r["g"]
+        if not (start <= g["season"] < season) or g["hs"] is None or not g["hml"] or not g["aml"]:
+            continue
+        if g["hs"] == g["as"]:
+            continue
+        f = devig(g["hml"], g["aml"])
+        bl = blend_w * r["p"] + (1 - blend_w) * f
+        evh, eva = bl * am_to_dec(g["hml"]) - 1, (1 - bl) * am_to_dec(g["aml"]) - 1
+        if max(evh, eva) <= 0:
+            continue
+        home = evh >= eva
+        off.append(logit(f if home else 1 - f))
+        y.append(1.0 if (g["hs"] > g["as"]) == home else 0.0)
+    beta, se = _fit_offset_logit([[1.0]] * len(y), off, y)
+    return {"shift": round(beta[0], 5), "se": round(se[0], 5), "n": len(y), "won": int(sum(y)),
+            "seasons": f"{start}-{season - 1}"}
+
+
+def real_edge(p_fair: float, shift: float, dec: float) -> float:
+    """Edge in % at decimal price dec, using the market's fair chance shifted by the bet type's record."""
+    return round((sigmoid(logit(p_fair) + shift) * dec - 1) * 100, 1)
+
+
+def wind_pick(g, s: dict | None, wind_shift: float) -> dict | None:
+    """The under to bet on a wind signal: line, the price you'd pay (your best Kalshi/Polymarket offer when it
+    matches the sportsbooks' line, else sportsbook odds; finished games: the closing price, as in the
+    backtests) and its realistic edge in %."""
+    u = (s or {}).get("total", {}).get("under")
+    fair = (s or {}).get("fair", {})
+    if u and "over" in fair and u.get("point") == fair.get("totalPoint"):
+        point, pf, dec, price = u["point"], 1 - fair["over"], u["dec"], {"cents": u["cents"], "book": u["book"]}
+    elif g["tot"] is not None and g["oo"] and g["uo"]:
+        point, pf, dec, price = g["tot"], 1 - devig(g["oo"], g["uo"]), am_to_dec(g["uo"]), {"odds": int(g["uo"])}
+    else:
+        return None
+    return {"point": point, "fairUnder": round(pf, 4), "edge": real_edge(pf, wind_shift, dec), **price}
+
+
 def ko_label(ko: datetime) -> str:
     return f"{ko:%a} {ko:%b} {ko.day} · {ko.strftime('%I:%M').lstrip('0')} {ko:%p} CT"
 
@@ -149,7 +251,8 @@ def settle(won, dec: float) -> float:
     return 0.0 if won is None else (dec - 1.0 if won else -1.0)
 
 
-def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime) -> dict:
+def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shifts: dict | None = None) -> dict:
+    """shifts: {"wind": fit_wind_shift(...), "lean": fit_lean_shift(...)} for realistic pick edges."""
     g = r["g"]
     p = r["p"]
     ko = kickoff_ct(g)
@@ -213,7 +316,10 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime) -> di
         if max(evh, eva) > 0:
             side = "home" if evh >= eva else "away"
             m["lean"] = side
-            m["leanEv"] = round(max(evh, eva) * 100, 1)
+            m["leanEv"] = round(max(evh, eva) * 100, 1)          # the model's own estimate
+            if shifts:                                             # what leans like this have really returned
+                m["leanEdge"] = real_edge(fair if side == "home" else 1 - fair, shifts["lean"]["shift"],
+                                          dh if side == "home" else da)
             if side in mine:
                 m["leanBook"], m["leanCents"] = mine[side]["book"], mine[side]["cents"]
             else:
@@ -258,6 +364,10 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime) -> di
         row["windAsof"] = w["asof"]
         if w["wind"] >= WIND_MPH:
             row["signal"] = "under" if g["roof"] in OUTDOOR else "roof"
+            if shifts:
+                wp = wind_pick(g, s, shifts["wind"]["shift"])
+                if wp:
+                    row["windPick"] = wp
             if row["signal"] == "under" and final and g["tot"] is not None and g["uo"]:
                 tot = g["hs"] + g["as"]
                 won = None if tot == g["tot"] else tot < g["tot"]
@@ -371,7 +481,8 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
     if shop:
         log_snapshots(shop, games)
 
-    rows = [game_row(r, blend_w, wind_log, shop, now) for r in recs if r["g"]["season"] == season]
+    shifts = {"wind": fit_wind_shift(games, season), "lean": fit_lean_shift(recs, blend_w, season)}
+    rows = [game_row(r, blend_w, wind_log, shop, now, shifts) for r in recs if r["g"]["season"] == season]
     unplayed = [x for x in rows if x["status"] != "final"]
     current = unplayed[0]["wk"] if unplayed else rows[-1]["wk"]
     teams, last_wk = team_table(games, model_run, season, ratings)
@@ -384,7 +495,7 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
         "season": season, "currentWeek": current, "deltaWeek": last_wk,
         "blendW": blend_w, "hfa": round(hfa, 1), "windMph": WIND_MPH, "model": model_name,
         "oddsFetched": odds["fetched"] if odds else None, "oddsGames": len(shop), "gapEv": GAP_EV,
-        "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live),
+        "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live), "pickShifts": shifts,
         "fees": EXCHANGE_FEE,
         "games": rows, "summary": season_summary(rows), "teams": teams,
     }

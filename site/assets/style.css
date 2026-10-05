@@ -155,6 +155,32 @@ section{margin-top:30px}
 .bh{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
 .bh .why{font-weight:500;text-transform:none;letter-spacing:0;font-size:13.5px}
 
+/* ranked picks: the first block on every card */
+.picks{background:linear-gradient(180deg,rgba(40,30,70,.5),rgba(18,16,25,.55));border:1px solid var(--edge);border-radius:18px;padding:14px 14px 10px;gap:0}
+.picks .bh{margin-bottom:6px}
+.pick{display:flex;gap:12px;align-items:flex-start;padding:10px 2px;border-top:1px solid var(--line-2)}
+.picks .bh + .pick{border-top:none}
+.pick .rank{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin-top:1px;
+  font:700 12.5px/1 var(--font-display);background:var(--raise);color:var(--fg-2);box-shadow:inset 0 0 0 1px var(--line)}
+.pick.top .rank{background:var(--grad);color:#fff;box-shadow:var(--glow)}
+.pmain{flex:1;min-width:0}
+.pline{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
+.pline b{font-family:var(--font-display);font-size:15.5px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:var(--fg)}
+.pick.top .pline b{font-size:17px}
+.pprice{color:var(--fg-2);font-size:14.5px;font-weight:600}
+.pedge{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:17px;white-space:nowrap}
+.pedge small{font-family:var(--font-body);font-size:12.5px;font-weight:600;color:var(--muted);margin-left:3px}
+.pwhy{font-size:13.5px;color:var(--muted);margin-top:5px;display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center}
+.pwhy .tag{font-size:10.5px;padding:2px 8px}
+.pwhy .pill{font-size:12.5px;padding:2px 9px}
+.nobet{font-size:15px;color:var(--fg-2);padding:4px 2px 6px}
+.nobet b{font-family:var(--font-display);font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:var(--fg);margin-right:4px}
+.skips{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13.5px;color:var(--fg-2);
+  padding:9px 2px 4px;border-top:1px dashed var(--line)}
+.skip{display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.skip .tag{font-size:10px;padding:1px 7px}
+.skip .pill{font-size:12px;padding:1px 8px}
+
 .crow{display:grid;grid-template-columns:118px minmax(0,1fr);grid-template-areas:"lab bar" "lab val";gap:5px 14px;align-items:center}
 .clab{grid-area:lab;font-size:14.5px;font-weight:600;color:var(--fg-2)}
 .crow .track{grid-area:bar}
@@ -268,6 +294,7 @@ footer .fbrand{display:inline-flex;align-items:center;gap:10px;margin-bottom:6px
 footer .fbrand img{width:28px;height:28px}
 footer .fbrand em{font-style:normal;color:var(--purple-soft)}
 
+@media (max-width:960px){.bar .stamp{display:none}}   /* would wrap onto its own line; the footer has it too */
 @media (max-width:860px){
   .games,.split{grid-template-columns:minmax(0,1fr)}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}

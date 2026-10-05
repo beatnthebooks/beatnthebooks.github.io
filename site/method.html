@@ -173,7 +173,31 @@
       <li>The site now reads Kalshi and Polymarket prices directly from the exchanges on every update.</li>
     </ul>
 
-    <h2>9. Data and updates</h2>
+    <h2>9. How each game’s bets are ranked</h2>
+    <p>Every game card starts with its bets, best edge first. Edge is the expected profit per $1 at the price you’d
+      actually pay. Each game is ranked on its own, so a cheap price gap can outrank a wind under, and the other way
+      round. A model's own edge numbers can’t be trusted as-is, so each bet's chance of winning starts from the market’s
+      fair price and is adjusted by what that kind of bet has really done:</p>
+  </section>
+  <div class="tablebox" style="margin-top:4px"><table>
+    <thead><tr><th>Bet</th><th>Edge comes from</th><th class="n">Model’s own estimate</th><th class="n">What it really returned</th></tr></thead>
+    <tbody>
+      <tr><td>Wind under</td><td>How often windy unders beat the market, 2006 on</td><td class="n">+2.2%</td><td class="n ok">+11.8%</td></tr>
+      <tr><td>Model pick</td><td>How the model’s picks did in seasons it never saw, 2016 on</td><td class="n">+5.1%</td><td class="n no">−5.4%</td></tr>
+      <tr><td>Price gap</td><td>The sportsbooks’ fair price (no long record yet)</td><td class="n">—</td><td class="n">39 bets, too few</td></tr>
+    </tbody></table></div>
+  <section class="prose" style="margin-top:8px">
+    <ul>
+      <li>The table covers 2016–2025 at final prices. The model’s biggest predicted edges did worst (−7.3%), so ranking by
+        them would put the worst bet first.</li>
+      <li>Checked on seasons they weren’t fitted on: the model-pick estimate (−5.0%) matched what happened (−6.3%,
+        2021–25). The wind estimate runs low (+2.7% vs +11.8%), which is the safe direction.</li>
+      <li>Bets with an edge of zero or less are listed under “not worth it at this price”. A game with none says
+        pass. Each bet also shows how strong its evidence is: wind is tested, price gaps are unproven, model picks have
+        no proven edge.</li>
+    </ul>
+
+    <h2>10. Data and updates</h2>
     <ul>
       <li>Games, scores, lines and projected starters: nflverse <span class="num">games.csv</span>. Lines usually appear a day or two before kickoff.</li>
       <li>Wind: Open-Meteo forecasts for each stadium, refreshed on every update and frozen at kickoff.</li>
