@@ -664,6 +664,13 @@ function teamsPage(){
 /* ======================= method page ======================= */
 function methodPage(){
   $$('[data-season]').forEach(el=>el.textContent=D.season);
+  /* Top tile: this season's model picks at the final line (Mason's request), with the long-run record under it */
+  const L=(D.summary||{}).lean, tile=$('#modelYear');
+  if(tile&&L&&L.n){
+    const r=L.units/L.n*100;
+    tile.innerHTML=`<div class="v ${r>0?'good':r<0?'bad':''}">${signed(r)}%</div><div class="l">Our model’s picks this season, at the final line<br>
+      <span>${D.season}: ${L.won} won, ${L.lost} lost (${plural(L.n,'bet')}), ${per100(L.units)} on $100 bets · 2016–2025: −5.5%, so a hot start isn’t proof</span></div>`;
+  }
 }
 
 window.EDGE_TEST={betMath,fairNow,feePer,betText,picks};   // for tests/tracker_test.html
