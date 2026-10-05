@@ -41,6 +41,21 @@ class WindLogFreezes(unittest.TestCase):
         self.assertEqual(out["g_up"]["wind"], 20.0)         # still refreshing
 
 
+class OddsLog(unittest.TestCase):
+    def test_exchange_only_prices_log_twice(self):
+        """On GitHub there's no odds key: prices come only from the exchanges' feeds (no "fetched").
+        The second run used to crash with KeyError: 'fetched' (Oct 5, 2026)."""
+        import odds
+        g = {"gid": "g1"}
+        snap = lambda t: {"books": 0, "fair": {"home": 0.5}, "ml": {}, "live": t}
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(odds, "LOG", Path(tmp) / "odds_log.json"):
+            odds.log_snapshots({"g1": snap("2026-10-05T12:00:00+00:00")}, [g])
+            odds.log_snapshots({"g1": snap("2026-10-05T15:00:00+00:00")}, [g])
+            log = json.loads(odds.LOG.read_text(encoding="utf-8"))
+        self.assertEqual(log["g1"]["first"]["live"], "2026-10-05T12:00:00+00:00")
+        self.assertEqual(log["g1"]["last"]["live"], "2026-10-05T15:00:00+00:00")
+
+
 def data(signals, now="2026-10-09T12:00"):
     games = []
     for gid, sig in signals.items():

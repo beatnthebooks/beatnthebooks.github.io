@@ -291,6 +291,12 @@ def add_live_exchanges(shop: dict, live: dict, games: list) -> dict:
     return shop
 
 
+def _stamp(s: dict) -> tuple:
+    """When a snapshot's prices were read: the odds service ("fetched") and/or the exchanges' own
+    feeds ("live"). Either can be missing (e.g. on GitHub there's no odds key, only "live")."""
+    return s.get("fetched"), s.get("live")
+
+
 def log_snapshots(shop: dict, games: list) -> None:
     """Per game, the FIRST snapshot seen and the LAST one before kickoff (frozen once the
     game starts), so early-week prices can be compared with the close on Mason's exchanges."""
@@ -306,7 +312,7 @@ def log_snapshots(shop: dict, games: list) -> None:
             changed = True
         if e is None:
             e = {"first": s, "last": s}
-        elif e["last"].get("fetched") == s["fetched"]:
+        elif _stamp(e["last"]) == _stamp(s):
             continue
         else:
             e["last"] = s
