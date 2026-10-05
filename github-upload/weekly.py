@@ -45,7 +45,7 @@ from pathlib import Path
 
 import alerts
 from edge_lab import devig, load
-from odds import EXCHANGE_FEE, get_odds, log_snapshots, match_games
+from odds import EXCHANGE_FEE, add_live_exchanges, get_odds, log_snapshots, match_games
 from qb_model import Model as QBModel, ensure_stats
 from rift_real import TEAM_NAME, am_to_dec, run
 from update_board import now_central
@@ -60,6 +60,8 @@ ARTIFACT_INDEX = ROOT / "build" / "artifact-index.html"
 SOURCE = "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
 OUTDOOR = ("outdoors", "open")
 GAP_EV = 2.0       # flag an exchange price this many % better than the sportsbooks' fair price, after fees
+GAP_MIN_BOOKS = 5  # ...but only when that fair price comes from this many books. Early in the week only a
+                   # few post lines, and their median strayed 2-5 win-% pts from the consensus (Oct 4, 2026)
 
 
 # ----------------------------------------------------------------------
@@ -188,7 +190,8 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime) -> di
     if s:
         row["shop"] = s
         row["gaps"] = [dict(o, mk=mk, side=side) for mk in ("ml", "spread", "total")
-                       for side, o in s[mk].items() if o.get("ev") is not None and o["ev"] >= GAP_EV]
+                       for side, o in s[mk].items() if o.get("ev") is not None and o["ev"] >= GAP_EV
+                       and s["books"] >= GAP_MIN_BOOKS]
     mine = (s or {}).get("ml", {})
     fair = (s or {}).get("fair", {}).get("home")
     src = "books" if fair is not None else "nflverse"
@@ -361,6 +364,10 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
     wind_log = update_wind_log(games, season, now)
     odds = get_odds()                      # None unless ODDS_API_KEY is set or a cache exists
     shop = match_games(odds, games, TEAM_NAME)
+    # Kalshi/Polymarket moneylines straight from their free feeds (no key, so GitHub gets them too)
+    import exchanges
+    live = exchanges.current(games, TEAM_NAME)
+    add_live_exchanges(shop, live, games)
     if shop:
         log_snapshots(shop, games)
 
@@ -377,6 +384,7 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
         "season": season, "currentWeek": current, "deltaWeek": last_wk,
         "blendW": blend_w, "hfa": round(hfa, 1), "windMph": WIND_MPH, "model": model_name,
         "oddsFetched": odds["fetched"] if odds else None, "oddsGames": len(shop), "gapEv": GAP_EV,
+        "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live),
         "fees": EXCHANGE_FEE,
         "games": rows, "summary": season_summary(rows), "teams": teams,
     }

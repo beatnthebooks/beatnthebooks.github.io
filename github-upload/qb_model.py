@@ -102,14 +102,18 @@ def load_injuries() -> dict:
 def run_qb(games, stats, k=20.0, hfa=55.0, regress=0.5, mov=True, rest_pts=6.0, qb_pen=0.0,
            val="box", mult=0.0, alpha=0.1, team_alpha=0.1, prior_sd=0.5,
            team_epa=None, epa_mult=0.0, epa_alpha=0.15,
-           inj=None, w_off=0.0, w_def=0.0, w_q=0.0, **_ignored):
+           inj=None, w_off=0.0, w_def=0.0, w_q=0.0, qb_at_open=False, **_ignored):
     """Like rift_real.run, plus the QB adjustment and (optionally) team EPA efficiency.
+    qb_at_open=True predicts each game as of when its line opens: a team's starter is assumed to
+    be whoever started its previous game this season (week 1 uses the actual starter, since
+    offseason moves are known by then). Ratings still update with the real starters.
     Returns (records, ratings)."""
     Rt = defaultdict(lambda: 1500.0)
     qb_val, team_val = {}, {}
     off, dfn = defaultdict(float), defaultdict(float)   # EMA offensive EPA made / allowed per game
     lg = [0.0, 0.0, 0]                      # running sum, sum of squares, n of starter values
     season, qb_hist, recs = None, {}, []
+    last_qb = {}                            # team -> most recent starter this season
 
     def league():
         n = lg[2]
@@ -129,8 +133,11 @@ def run_qb(games, stats, k=20.0, hfa=55.0, regress=0.5, mov=True, rest_pts=6.0, 
                 for t in list(off):
                     off[t] *= 0.67
                     dfn[t] *= 0.67
-            season, qb_hist = g["season"], {}
+            season, qb_hist, last_qb = g["season"], {}, {}
         h, a = g["home"], g["away"]
+        hqb, aqb = g["hqb"], g["aqb"]
+        if qb_at_open:
+            hqb, aqb = last_qb.get(h, hqb), last_qb.get(a, aqb)
         m, sd = league()
 
         def adj_for(team, qb):
@@ -139,11 +146,11 @@ def run_qb(games, stats, k=20.0, hfa=55.0, regress=0.5, mov=True, rest_pts=6.0, 
             v = qb_val.get(qb, m - prior_sd * sd)
             return mult * (v - team_val.get(team, m))
 
-        hflag, aflag = R._qb_flag(qb_hist, h, g["hqb"]), R._qb_flag(qb_hist, a, g["aqb"])
+        hflag, aflag = R._qb_flag(qb_hist, h, hqb), R._qb_flag(qb_hist, a, aqb)
         adj = 0.0 if g["neutral"] else hfa
         adj += max(-35.0, min(35.0, rest_pts * (g["hrest"] - g["arest"])))
         adj += qb_pen * (aflag - hflag)
-        adj += adj_for(h, g["hqb"]) - adj_for(a, g["aqb"])
+        adj += adj_for(h, hqb) - adj_for(a, aqb)
         if epa_mult:
             adj += epa_mult * ((off[h] - dfn[h]) - (off[a] - dfn[a]))
         if inj is not None and (w_off or w_def or w_q):
@@ -173,6 +180,7 @@ def run_qb(games, stats, k=20.0, hfa=55.0, regress=0.5, mov=True, rest_pts=6.0, 
                 off[a] += epa_alpha * (ea - off[a]); dfn[a] += epa_alpha * (eh - dfn[a])
         for team, qb in ((h, g["hqb"]), (a, g["aqb"])):
             if qb:
+                last_qb[team] = qb
                 qb_hist.setdefault(team, []).append(qb)
                 st = stats.get((qb, g["season"], g["week"]))
                 if st is not None:

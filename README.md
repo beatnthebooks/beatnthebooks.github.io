@@ -39,7 +39,8 @@ After about a minute the site is live at `https://<your-username>.github.io/edge
    On GitHub, add it under **Settings → Secrets and variables → Actions → New repository secret**
    with the same name.
 3. By default the site prices your bets on **Kalshi and Polymarket** (fees included) against the
-   fair price from the sportsbooks. To change where you bet, set `ODDS_BOOKS`, e.g.
+   fair price from the sportsbooks. Kalshi and Polymarket moneylines come straight from the exchanges
+   (free, no key), so the public site shows them too; price gaps need at least 5 sportsbooks. To change where you bet, set `ODDS_BOOKS`, e.g.
    `kalshi,polymarket,draftkings` (on GitHub: the **Variables** tab on the same page).
 4. Run `py odds.py` to see a line-shopping table. Each fetch costs 3 credits and is cached for 6 hours.
    Use the key in one place only (your PC or GitHub), or the two will share the monthly credits.
@@ -54,6 +55,8 @@ After about a minute the site is live at `https://<your-username>.github.io/edge
 | `injury_watch.py` | Phone alerts when a key player is ruled out, with a Kalshi/Polymarket price check |
 | `alerts.py` | Phone alerts for new wind unders and price gaps (ntfy app; channel name in `ntfy_topic.txt`) |
 | `odds.py` | Best price per bet across sportsbooks (The Odds API; needs a free key) |
+| `exchanges.py` | Kalshi and Polymarket prices from their free public feeds (no key); `--backfill` + `--test` check past prices |
+| `line_move.py` | Tests whether the opening-to-closing line move can be predicted (it mostly can't) |
 | `rift_real.py` | Walk-forward Elo model and the real backtest (2016–2025 at closing lines) |
 | `edge_lab.py` | Tests 37 signals against the market's own price, out of sample |
 | `injuries.py` | Tests injury-report signals (snap share out) against the closing line; none passed |

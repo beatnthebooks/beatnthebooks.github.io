@@ -39,9 +39,9 @@
 
   <section class="kpis" style="margin-top:16px">
     <div class="kpi"><div class="v bad">−5.5%</div><div class="l">Our model alone, betting every edge at the final line<br><span>2016–2025 · it can’t beat the closing line</span></div></div>
-    <div class="kpi"><div class="v good">63%</div><div class="l">Lines moved toward our model’s picks<br><span>bet365 opening lines, 2018–2024 (772 games)</span></div></div>
+    <div class="kpi"><div class="v">1 pt</div><div class="l">Kalshi and Polymarket vs the sportsbooks’ final price<br><span>average gap in win chance an hour before kickoff, 331 games</span></div></div>
     <div class="kpi"><div class="v good">+14.2%</div><div class="l">Wind unders using forecasts, 2022–2025 (168 bets)</div></div>
-    <div class="kpi"><div class="v">45</div><div class="l">Signals tested against the market; one survived</div></div>
+    <div class="kpi"><div class="v">49</div><div class="l">Signals tested against the market; one survived</div></div>
   </section>
 
   <section class="prose">
@@ -83,9 +83,10 @@
         less luck-driven than final scores.</li>
       <li><b>Result:</b> more accurate than before (and lost less at the final line: −5.5% instead of −6.4%), but
         still not as accurate as the closing betting line.</li>
-      <li><b>The useful part:</b> betting lines moved toward the model’s picks 63% of the time during the week
-        (bet365 openers, 2018–2024), and its picks made money at the opening price in every period tested
-        (+2.5% bet365, +5.1% Pinnacle, +10.7% betr). If the model has an edge, it’s in betting early.</li>
+      <li><b>A correction:</b> a first check said lines moved toward the model’s picks 63% of the time during
+        the week. That check accidentally knew each game’s starting QB before the line opened. Redone with only
+        what’s known when lines open, it’s 56% (bet365) and 54% (Pinnacle), and the picks didn’t beat the opening
+        price once the bookmaker’s margin is counted. See section 7.</li>
       <li><b>Injuries at every position were tested too</b> (official reports 2013–2025, each player valued by how
         much he plays). They didn’t make the model more accurate on the test seasons, so they aren’t used: by
         kickoff the market has already priced them. Instead, the site watches injury news live and alerts you when
@@ -126,33 +127,61 @@
   <section class="prose" style="margin-top:8px">
     <div class="callout">
       <p style="margin:0"><b>Promising, not proven.</b> About 40 bets a season, borderline statistical significance,
-        a losing 2024, and 45 ideas tested to find it. Recorded wind isn't known before kickoff, which is why the
+        a losing 2024, and 49 ideas tested to find it. Recorded wind isn't known before kickoff, which is why the
         forecast test matters. Stakes stay flat at 1% of bankroll, and the 10 mph threshold won't be tuned on these
         results. The <a href="season.html">Season</a> page tracks it live.</p>
     </div>
 
     <h2>7. Betting earlier in the week</h2>
     <p>A second historical dataset (opening and closing prices, 2014–2025) shows the market learns during
-      the week, and the two signals here point the same way it moves:</p>
+      the week. Can we get there first?</p>
     <ul>
       <li><b>Closing lines are sharper than openers,</b> slightly at Pinnacle and clearly at the softer books
         (bet365, betr).</li>
-      <li><b>Lines moved toward the model’s leans</b> 63% of the time against bet365's openers (772 moved lines) and 75%
-        against betr's (111), using the upgraded model. Leans that lose money at the final line made money at the open.</li>
+      <li><b>Lines moved toward the model’s leans</b> 54% of the time at Pinnacle and 56% at bet365, using only
+        what’s known when lines open (each team’s previous starting QB). After the bookmaker’s margin, the leans
+        were worth about the same as the final price (value −0.2% and −0.7%). betr’s 2025 openers did better
+        (70%, +5.5%), but that’s one season and 96 bets.</li>
+      <li><b>Predicting the move directly didn’t work.</b> A model of where lines close (our model’s disagreement,
+        favorites, last week against the spread, rest) explained under 1% of the movement in 2020–2025. Only
+        rest passed the screen (lines drift toward the better-rested team), and it’s too small to bet.</li>
       <li><b>Windy-game totals drop more during the week</b> (about −1.0 point vs −0.4 for calm games at bet365),
         and unders paid more at the open than at the close in every period. This uses recorded wind, which
         nobody has days ahead, so it overstates what a bettor could get.</li>
-      <li>The site now records the first and last Kalshi/Polymarket price for every game, to measure this on
-        the markets you can actually use.</li>
     </ul>
 
-    <h2>8. Data and updates</h2>
+    <h2>8. Kalshi and Polymarket</h2>
+    <p>Both exchanges publish their full price history, so the 2025 season and 2026 so far (347 games) could be
+      tested at the prices you’d actually have paid, fees included.</p>
+  </section>
+  <div class="tablebox" style="margin-top:4px"><table>
+    <thead><tr><th>Test</th><th class="n">Kalshi</th><th class="n">Polymarket</th></tr></thead>
+    <tbody>
+      <tr><td>Accuracy an hour before kickoff (sportsbooks’ final price: 0.6104, lower is better)</td><td class="n">0.6120</td><td class="n">0.6118</td></tr>
+      <tr><td>Model leans bought 6 days before: value vs the final price</td><td class="n no">−1.8% (150)</td><td class="n no">−0.5% (160)</td></tr>
+      <tr><td>Model leans bought 1 hour before: value vs the final price</td><td class="n no">−4.1% (143)</td><td class="n no">−3.3% (167)</td></tr>
+      <tr><td>Price gaps an hour before kickoff (2%+ better than the sportsbooks): actual return</td><td class="n">+50% (15 bets)</td><td class="n">+40% (24 bets)</td></tr>
+    </tbody></table></div>
+  <section class="prose" style="margin-top:8px">
+    <ul>
+      <li><b>The exchanges are almost as sharp as the sportsbooks.</b> An hour before kickoff they were within
+        1 point of win chance of the sportsbooks’ final price on average.</li>
+      <li><b>Buying the model’s leans early doesn’t pay.</b> Lines moved a little toward them, but less than the
+        fees and the bid-ask spread cost (about 3–4 cents on the dollar).</li>
+      <li><b>Price gaps are rare and unproven.</b> About one or two a week across both exchanges. They won, but on 39 bets
+        that could easily be luck. The site keeps flagging them and the phone alerts keep firing so the record grows.</li>
+      <li>The site now reads Kalshi and Polymarket prices directly from the exchanges on every update.</li>
+    </ul>
+
+    <h2>9. Data and updates</h2>
     <ul>
       <li>Games, scores, lines and projected starters: nflverse <span class="num">games.csv</span>. Lines usually appear a day or two before kickoff.</li>
       <li>Wind: Open-Meteo forecasts for each stadium, refreshed on every update and frozen at kickoff.</li>
-      <li>Best prices (when set up): The Odds API, every major US sportsbook. For upcoming games the market
-        number is the median no-vig price across books, and leans are priced at the best book. Finished games
-        are always scored at the nflverse closing line, the same way the backtests were.</li>
+      <li>Kalshi and Polymarket: moneyline prices straight from each exchange’s public feed (what you’d pay, before
+        fees), refreshed on every update.</li>
+      <li>Sportsbook prices (on the private version): The Odds API. For upcoming games the market number is the
+        median no-vig price across books; without it, the nflverse betting line. Finished games are always scored at
+        the nflverse closing line, the same way the backtests were.</li>
       <li>The site rebuilds from fresh data several times a day. Every number on it is computed by the same Python
         code that ran the backtests.</li>
     </ul>

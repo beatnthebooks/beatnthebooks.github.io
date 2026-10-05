@@ -1,0 +1,25 @@
+﻿Finished games with exchange history: 347 (Kalshi 345, Polymarket 338)
+
+Q1. ACCURACY AN HOUR BEFORE KICKOFF (log loss, lower is better; same games)
+  331 games · Kalshi 0.6120 · Polymarket 0.6118 · sportsbooks' close 0.6104
+  average distance from the sportsbooks' close: Kalshi 0.9 win-% pts, Polymarket 1.0
+
+Q2. PRICE GAPS AN HOUR BEFORE KICKOFF (exchange price >= 2% better than the books' close)
+  kalshi      15 bets · value vs close  +6.2% (t = +6.1) · actual return  +50.1% (t = +1.0)
+  poly        24 bets · value vs close  +5.8% (t = +7.1) · actual return  +40.3% (t = +1.0)
+
+Q3. MODEL LEANS BOUGHT EARLY (28% model + 72% exchange price)
+  Kalshi
+    6 days before   150 bets · value vs close  -1.8% (t = -1.6) · actual return  +11.6% (t = +1.0)
+    3 days before   159 bets · value vs close  -3.2% (t = -4.5) · actual return  +11.1% (t = +1.0)
+    1 day before    161 bets · value vs close  -3.8% (t = -7.7) · actual return  +11.0% (t = +1.0)
+    1 hour before   143 bets · value vs close  -4.1% (t = -12.7) · actual return   -0.9% (t = -0.1)
+  Polymarket
+    6 days before   160 bets · value vs close  -0.5% (t = -0.4) · actual return   +4.8% (t = +0.5)
+    3 days before   187 bets · value vs close  -2.2% (t = -3.7) · actual return   +3.4% (t = +0.3)
+    1 day before    190 bets · value vs close  -2.5% (t = -5.6) · actual return   +3.8% (t = +0.4)
+    1 hour before   167 bets · value vs close  -3.3% (t = -11.8) · actual return   +6.4% (t = +0.6)
+
+Q4. REST SIGNAL (line_move.py, fit on 2014-2024 only) · 6 days before
+  kalshi       7 bets · value vs close  -6.2% (t = -1.6) · actual return  +58.9% (t = +0.6)
+  poly         8 bets · value vs close  -5.4% (t = -1.8) · actual return  +10.5% (t = +0.2)

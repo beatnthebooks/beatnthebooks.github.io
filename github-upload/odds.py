@@ -247,6 +247,50 @@ def match_games(odds: dict | None, games: list, team_name: dict) -> dict:
     return out
 
 
+EXCHANGE_TITLE = {"kalshi": "Kalshi", "polymarket": "Polymarket"}
+
+
+def _ask_offer(venue: str, ask: float) -> dict:
+    """An exchange ask (dollars per $1 contract) as an offer, fee included."""
+    fee = EXCHANGE_FEE.get(venue, 0.0) * ask * (1 - ask)
+    raw = 1 / ask
+    price = (raw - 1) * 100 if raw >= 2 else -100 / (raw - 1)
+    return {"book": EXCHANGE_TITLE.get(venue, venue), "key": venue, "price": round(price), "point": None,
+            "cents": round(ask * 100, 1), "fee": round(fee * 100, 2), "dec": round(1 / (ask + fee), 4),
+            "live": True}
+
+
+def add_live_exchanges(shop: dict, live: dict, games: list) -> dict:
+    """Swap in moneyline prices read straight from Kalshi and Polymarket (exchanges.current: free,
+    the real asks, and fresher than the odds service's copy). A game with no sportsbook fair price
+    (no Odds API key, e.g. on GitHub) is compared with nflverse's current line instead (books = 0)."""
+    mine = my_books()
+    by_gid = {g["gid"]: g for g in games}
+    for gid, venues in live.items():
+        g = by_gid.get(gid)
+        venues = {v: q for v, q in venues.items() if v in mine}
+        if g is None or g["hs"] is not None or not venues:
+            continue
+        s = shop.get(gid)
+        if s is None:
+            if not (g["hml"] and g["aml"]):
+                continue
+            s = shop[gid] = {"books": 0, "mine": 0, "fair": {"home": round(_fair2(g["hml"], g["aml"]), 4)},
+                             "ml": {}, "spread": {}, "total": {}, "updated": None}
+        for side in ("home", "away"):
+            old = s["ml"].get(side)
+            cands = [old] if old and old["key"] not in venues else []
+            cands += [_ask_offer(v, q[side]) for v, q in venues.items() if side in q]
+            pf = _fair_prob(s["fair"], "ml", side, None)
+            for o in cands:
+                o["ev"] = None if pf is None else round((pf * o["dec"] - 1) * 100, 1)
+            if cands:
+                s["ml"][side] = max(cands, key=lambda o: (o["ev"] is not None, o["ev"] or 0, o["dec"]))
+        s["mine"] = max(s.get("mine", 0), len(venues))
+        s["live"] = _utc_now().isoformat(timespec="seconds")
+    return shop
+
+
 def log_snapshots(shop: dict, games: list) -> None:
     """Per game, the FIRST snapshot seen and the LAST one before kickoff (frozen once the
     game starts), so early-week prices can be compared with the close on Mason's exchanges."""

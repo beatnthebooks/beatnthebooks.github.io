@@ -155,7 +155,7 @@ function weekPage(){
     const t=g.mkt.lean==='home'?g.homeName:g.awayName;
     const price=g.mkt.leanCents!=null?`${g.mkt.leanCents.toFixed(0)}¢ on ${esc(g.mkt.leanBook)}`:odds(g.mkt.leanOdds);
     return `<div class="sig lean"><span class="tag lean">Model lean</span><span><b>${esc(t)}</b> at ${price}, expected return ${signed(g.mkt.leanEv)}%.
-      Best bet early in the week: lines moved toward these leans 63% of the time, but they lost about 5% when bet at the final price. Check injuries and news first.</span></div>`;
+      No proven edge: in testing, lines moved toward these leans only slightly more often than not, which wasn’t enough to beat the price, early or late, on sportsbooks or on Kalshi and Polymarket.</span></div>`;
   }
   function shopBlock(g){
     const s=g.shop; if(!s) return '';
@@ -168,7 +168,7 @@ function weekPage(){
         return `<tr><td>${esc(lab)}</td><td class="n">${x.cents.toFixed(0)}¢</td><td>${esc(x.book)}</td><td>${vsFair(x.ev)}</td></tr>`;
       }).join('');
     if(!rows) return '';
-    return `<div class="block"><div class="bh">Kalshi &amp; Polymarket prices <span class="why">(fees included) compared with the fair price from ${plural(s.books,'sportsbook')}</span></div>
+    return `<div class="block"><div class="bh">Kalshi &amp; Polymarket prices <span class="why">(fees included) compared with the fair price from ${s.books?plural(s.books,'sportsbook'):'the betting line'}${D.gapBooks&&s.books<D.gapBooks?`, too few to flag price gaps (needs ${D.gapBooks})`:''}</span></div>
       <div class="tablebox flat"><table class="mini"><thead><tr><th>Bet</th><th class="n">Price</th><th>Where</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   }
   function gapTxt(g,x){
@@ -237,8 +237,8 @@ function weekPage(){
     $('#kpis').innerHTML=`
       <div class="kpi"><div class="v">${gs.length}</div><div class="l">Games<br><span>${fin} finished, ${gs.length-fin} to play</span></div></div>
       <div class="kpi"><div class="v ${sig.length?'good':''}">${sig.length}</div><div class="l">Under signals<br><span>windy outdoor games</span></div></div>
-      <div class="kpi"><div class="v ${gaps.length?'good':''}">${D.oddsFetched?gaps.length:'n/a'}</div><div class="l">Price gaps<br><span>${D.oddsFetched?`Kalshi/Polymarket ${D.gapEv}%+ better than fair`:'live prices are on the private version'}</span></div></div>
-      <div class="kpi"><div class="v">${leans}</div><div class="l">Model leans<br><span>best bet early in the week</span></div></div>`;
+      <div class="kpi"><div class="v ${gaps.length?'good':''}">${D.oddsFetched?gaps.length:'n/a'}</div><div class="l">Price gaps<br><span>${D.oddsFetched?`Kalshi/Polymarket ${D.gapEv}%+ better than fair`:'needs sportsbook prices (private version)'}</span></div></div>
+      <div class="kpi"><div class="v">${leans}</div><div class="l">Model leans<br><span>no proven edge</span></div></div>`;
     const open=sig.filter(g=>g.status==='upcoming');
     $('#playsWrap').hidden=!(open.length||gaps.length);
     $('#plays').innerHTML=open.map(g=>`<div class="play"><span class="tag under">Under signal</span>
