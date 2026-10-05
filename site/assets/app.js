@@ -22,6 +22,20 @@ const wkName=w=>PLAYOFF[w]||('Week '+w);
 const wkShort=w=>SHORT[w]||('Wk '+w);
 const NAME={}; (D.teams||[]).forEach(t=>NAME[t.team]=t.name);
 const teamHref=t=>`teams.html#${encodeURIComponent(t)}`;
+/* Team logos: ESPN's public dark-background set, on a round badge in the team's color. If a logo is
+   blocked or fails, the image is dropped and the badge shows the team's letters. (No NFL shield: on a
+   betting site it would look like an official NFL product.) */
+const ESPN={LA:'lar',WAS:'wsh'};
+const TCOLOR={ARI:'#97233F',ATL:'#A71930',BAL:'#5b3fb5',BUF:'#00338D',CAR:'#0085CA',CHI:'#C83803',CIN:'#FB4F14',CLE:'#FF3C00',
+  DAL:'#869397',DEN:'#FB4F14',DET:'#0076B6',GB:'#2f5a45',HOU:'#A71930',IND:'#2a5fa8',JAX:'#006778',KC:'#E31837',LV:'#A5ACAF',
+  LAC:'#0080C6',LA:'#003594',MIA:'#008E97',MIN:'#4F2683',NE:'#C60C30',NO:'#D3BC8D',NYG:'#0B2265',NYJ:'#125740',PHI:'#004C54',
+  PIT:'#FFB612',SF:'#AA0000',SEA:'#69BE28',TB:'#D50A0A',TEN:'#4B92DB',WAS:'#773141'};
+const logo=(code,size='')=>`<span class="tl ${size}" style="--tc:${TCOLOR[code]||'#4c3a8f'}" aria-hidden="true"><b>${esc(code)}</b>`+
+  `<img src="https://a.espncdn.com/i/teamlogos/nfl/500-dark/${esc((ESPN[code]||code).toLowerCase())}.png" alt="" loading="lazy" decoding="async"></span>`;
+const withLogo=(code,name,size='xs')=>`<span class="tteam">${logo(code,size)}${esc(name)}</span>`;
+const inBadge=t=>t&&t.tagName==='IMG'&&t.parentElement&&t.parentElement.classList.contains('tl');
+document.addEventListener('load',e=>{if(inBadge(e.target)) e.target.parentElement.classList.add('ok');},true);    // letters until the logo arrives
+document.addEventListener('error',e=>{if(inBadge(e.target)) e.target.remove();},true);
 const day=s=>{const [y,m,d]=s.split('-').map(Number); return Date.UTC(y,m-1,d)/864e5;};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const fmtDay=s=>{const [,m,d]=s.split('-').map(Number); return `${MONTHS[m-1]} ${d}`;};
@@ -199,7 +213,7 @@ function weekPage(){
     const mk=g.mkt, sp=g.spread, tt=g.total;
     const fav=sp?favorite(sp.line,g):null, modelFav=favorite(g.eloLine,g);
     const notes=(g.notes||[]).map(n=>`<div class="note">${esc(n)}</div>`).join('');
-    const team=(code,name,score,win)=>`<div class="trow ${f?(win?'win':'lose'):''}"><a href="${teamHref(code)}">${esc(name)}</a>${f?`<span class="score">${score}</span>`:''}</div>`;
+    const team=(code,name,score,win)=>`<div class="trow ${f?(win?'win':'lose'):''}"><span class="tname">${logo(code)}<a href="${teamHref(code)}">${esc(name)}</a></span>${f?`<span class="score">${score}</span>`:''}</div>`;
     return `<article class="game ${g.signal==='under'?'sig-card':''}" id="g-${esc(g.id)}">
       <header class="ghead">
         <div class="gmeta"><span>${esc(g.ko)}</span>${status}${intl?`<span class="chip venue">${esc(g.stadium)}</span>`:''}</div>
@@ -231,7 +245,7 @@ function weekPage(){
     const fin=gs.filter(g=>g.status==='final').length;
     const sig=gs.filter(g=>g.signal==='under'), leans=gs.filter(g=>g.mkt&&g.mkt.lean).length;
     const gaps=gs.filter(g=>g.status==='upcoming'&&g.gaps&&g.gaps.length);
-    $('#weekEyebrow').textContent=`${D.season} season${week===D.currentWeek?' · this week':''}`;
+    $('#weekEyebrow').textContent=`NFL · ${D.season} season${week===D.currentWeek?' · this week':''}`;
     $('#weekTitle').textContent=wkName(week);
     $('#weekSub').textContent=gs.length?`${gs[0].ko.split(' · ')[0]} to ${gs[gs.length-1].ko.split(' · ')[0]}`:'';
     $('#kpis').innerHTML=`
@@ -242,11 +256,11 @@ function weekPage(){
     const open=sig.filter(g=>g.status==='upcoming');
     $('#playsWrap').hidden=!(open.length||gaps.length);
     $('#plays').innerHTML=open.map(g=>`<div class="play"><span class="tag under">Under signal</span>
-      <span class="what">${esc(g.awayName)} at ${esc(g.homeName)}</span>
+      <span class="what"><span class="duo">${logo(g.away,'sm')}${logo(g.home,'sm')}</span>${esc(g.awayName)} at ${esc(g.homeName)}</span>
       <span class="why">${g.wind.toFixed(0)} mph wind forecast · ${esc(g.ko)} · re-check the forecast before kickoff</span>
       <a href="#g-${esc(g.id)}">See game</a></div>`).join('')
       +gaps.flatMap(g=>g.gaps.map(x=>`<div class="play"><span class="tag gap">Price gap</span>
-      <span class="what">${gapTxt(g,x)}</span><span class="ok">${x.ev.toFixed(1)}% better than fair</span>
+      <span class="what"><span class="duo">${logo(g.away,'sm')}${logo(g.home,'sm')}</span>${gapTxt(g,x)}</span><span class="ok">${x.ev.toFixed(1)}% better than fair</span>
       <span class="why">${esc(g.awayName)} at ${esc(g.homeName)} · not yet proven · check the live price first</span>
       <a href="#g-${esc(g.id)}">See game</a></div>`)).join('');
     const shown=gs.filter(g=>filter==='all'||(filter==='wind'&&g.signal)||(filter==='gap'&&g.gaps&&g.gaps.length)||(filter==='lean'&&g.mkt&&g.mkt.lean)||(filter==='final'&&g.status==='final'));
@@ -436,7 +450,7 @@ function betsView(){
       <tbody>${rows.map(r=>{const b=r.b,g=r.g;
         const res=r.result?`<span class="${r.pl>0?'ok':r.pl<0?'no':'push'}">${r.result==='won'?'Won':r.result==='lost'?'Lost':'Push'} ${money(r.pl)}</span>`
           :`<span class="push">${g?(g.status==='live'?'In progress':'Not played yet'):'Unknown game'}</span>`;
-        return `<tr><td>${g?`${wkShort(g.wk)} · ${esc(g.awayName)} at ${esc(g.homeName)}`:esc(b.gid)}</td>
+        return `<tr><td>${g?`${wkShort(g.wk)} · ${withLogo(g.away,g.awayName)} at ${withLogo(g.home,g.homeName)}`:esc(b.gid)}</td>
           <td>${esc(betText(b,g))}${b.note?`<div class="push small">${esc(b.note)}</div>`:''}</td>
           <td>${esc(VENUE[b.venue]||b.venue)}</td><td class="n">${Number(b.cents).toFixed(0)}¢ × ${b.n}</td>
           <td class="n">${money(r.cost).replace('+','')}</td><td>${esc(REASON[b.reason]||b.reason)}</td>
@@ -512,7 +526,7 @@ function seasonPage(){
     const rows=bets.filter(b=>f==='all'||b.type===f).slice().reverse();
     $('#betLog').innerHTML=`<thead><tr><th>Date</th><th>Game and final score</th><th>Bet</th><th class="n">Odds</th><th>Why</th><th>Result on $100</th></tr></thead>
       <tbody>${rows.map(b=>`<tr><td>${fmtDay(b.g.date)} <span class="push">· ${wkShort(b.g.wk)}</span></td>
-        <td>${esc(b.g.awayName)} ${b.g.as}, ${esc(b.g.homeName)} ${b.g.hs}</td>
+        <td>${withLogo(b.g.away,b.g.awayName)} ${b.g.as}, ${withLogo(b.g.home,b.g.homeName)} ${b.g.hs}</td>
         <td><span class="tag ${b.type==='wind'?'under':'lean'}">${b.type==='wind'?'Wind':'Lean'}</span> ${esc(b.label)}</td>
         <td class="n">${odds(b.price)}</td><td class="push">${esc(b.detail)}</td>
         <td class="${cls(b.u)}">${b.u>0?'Won':b.u<0?'Lost':'Push'} ${per100(b.u)}</td></tr>`).join('')||'<tr><td colspan="6">No bets yet.</td></tr>'}</tbody>`;
@@ -541,14 +555,14 @@ function teamsPage(){
   const table=()=>{
     $('#power').innerHTML=`<thead><tr><th class="n">Rank</th><th>Team</th><th>Record</th><th class="n">Win chance</th><th>Change</th><th aria-hidden="true"></th></tr></thead>
       <tbody>${T.map((r,i)=>`<tr class="${r.team===sel?'sel':''}"><td class="n">${i+1}</td>
-        <td><button type="button" class="teamlink" data-team="${esc(r.team)}">${esc(r.name)}</button></td>
+        <td><button type="button" class="teamlink" data-team="${esc(r.team)}">${logo(r.team,'sm')}${esc(r.name)}</button></td>
         <td>${esc(r.record)}</td><td class="n"><b>${pct(vsAvg(r.rating))}</b></td>
         <td>${change(r)}</td>
         <td style="width:22%"><span class="rbar" style="width:${8+92*(vsAvg(r.rating)-min)/Math.max(0.01,max-min)}%"></span></td></tr>`).join('')}</tbody>`;
   };
   const detail=()=>{
     const t=T.find(x=>x.team===sel), rank=T.indexOf(t)+1;
-    $('#teamName').textContent=t.name;
+    $('#teamName').innerHTML=logo(t.team,'lg')+`<span>${esc(t.name)}</span>`;
     $('#teamSub').textContent=`Ranked ${rank} of 32 · ${t.record} this season · would beat an average team ${pct(vsAvg(t.rating))} of the time`;
     const pts=t.hist.map((h,i)=>({x:i,y:Math.round(vsAvg(h[1])*1000)/10}));
     const xTicks=[]; t.hist.forEach((h,i)=>{ if(i===0||h[3]!==t.hist[i-1][3]) xTicks.push({x:i,label:`${h[3]} season`}); });
@@ -561,7 +575,7 @@ function teamsPage(){
         const pm=g.mkt?(home?g.mkt.fair:1-g.mkt.fair):null;
         let r='<span class="push">'+esc(g.ko.split(' · ')[0])+'</span>';
         if(g.status==='final'){const us=home?g.hs:g.as, them=home?g.as:g.hs; r=`<span class="${us>them?'ok':us<them?'no':'push'}">${us>them?'Won':us<them?'Lost':'Tied'} ${us}–${them}</span>`;}
-        return `<tr><td><a href="index.html#week${g.wk}">${wkShort(g.wk)}</a></td><td>${home?'vs':'at'} ${esc(NAME[opp]||opp)}</td>
+        return `<tr><td><a href="index.html#week${g.wk}">${wkShort(g.wk)}</a></td><td>${home?'vs':'at'} ${withLogo(opp,NAME[opp]||opp)}</td>
           <td class="n">${pct(pe)} to win</td><td class="n">${pm==null?'<span class="push">No line yet</span>':pct(pm)+' to win'}</td><td>${r}</td></tr>`;}).join('')}</tbody>`;
   };
   document.addEventListener('click',e=>{const b=e.target.closest('[data-team]'); if(!b) return; sel=b.dataset.team;
