@@ -1,0 +1,495 @@
+{
+ "2026_05_CHI_GB": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.3139,
+    "edge": -6.2,
+    "price": {
+     "book": "Polymarket",
+     "cents": 42.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 2.3139,
+    "edge": -6.2,
+    "price": {
+     "book": "Polymarket",
+     "cents": 42.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 8.4,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Packers to win",
+    "why": [
+     "our model gives them 60% to win, the market 42%"
+    ]
+   }
+  },
+  "total|under|44.5": {
+   "first": {
+    "dec": 1.9804,
+    "edge": 6.0,
+    "price": {
+     "odds": -102
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.9804,
+    "edge": 6.0,
+    "price": {
+     "odds": -102
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 44.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 44.5",
+    "why": [
+     "13 mph wind forecast"
+    ]
+   }
+  }
+ },
+ "2026_05_CIN_MIA": {
+  "ml|home|": {
+   "first": {
+    "dec": 4.1255,
+    "edge": 1.8,
+    "price": {
+     "book": "Kalshi",
+     "cents": 23.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 4.1255,
+    "edge": 1.8,
+    "price": {
+     "book": "Kalshi",
+     "cents": 23.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 25.5,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Dolphins to win",
+    "why": [
+     "our model gives them 43% to win, the market 26%"
+    ]
+   }
+  },
+  "spread|home|7": {
+   "first": {
+    "dec": 1.9259,
+    "edge": -7.0,
+    "price": {
+     "odds": -108
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.9259,
+    "edge": -7.0,
+    "price": {
+     "odds": -108
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "spread",
+    "mk": "spread",
+    "model": 5.5,
+    "point": 7.0,
+    "rec": "spread",
+    "side": "home",
+    "src": [
+     "spread"
+    ],
+    "suggested": true,
+    "text": "Dolphins +7",
+    "why": [
+     "our model has them losing by 2.0; the line says losing by 7"
+    ]
+   }
+  },
+  "total|under|42.5": {
+   "first": {
+    "dec": 1.8696,
+    "edge": 5.3,
+    "price": {
+     "odds": -115
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.8696,
+    "edge": 5.3,
+    "price": {
+     "odds": -115
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 42.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 42.5",
+    "why": [
+     "12 mph wind forecast"
+    ]
+   }
+  }
+ },
+ "2026_05_CLE_NYJ": {
+  "ml|away|": {
+   "first": {
+    "dec": 2.1627,
+    "edge": -3.7,
+    "price": {
+     "book": "Polymarket",
+     "cents": 45.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 2.1627,
+    "edge": -3.7,
+    "price": {
+     "book": "Polymarket",
+     "cents": 45.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 8.0,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Browns to win",
+    "why": [
+     "our model gives them 61% to win, the market 46%"
+    ]
+   }
+  }
+ },
+ "2026_05_DET_ARI": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.8472,
+    "edge": -5.6,
+    "price": {
+     "book": "Polymarket",
+     "cents": 34.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 2.8472,
+    "edge": -5.6,
+    "price": {
+     "book": "Polymarket",
+     "cents": 34.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 5.5,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Cardinals to win",
+    "why": [
+     "our model gives them 44% to win, the market 34%"
+    ]
+   }
+  },
+  "total|under|54.5": {
+   "first": {
+    "dec": 1.9091,
+    "edge": 5.5,
+    "price": {
+     "odds": -110
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.9091,
+    "edge": 5.5,
+    "price": {
+     "odds": -110
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "roof",
+    "mk": "total",
+    "point": 54.5,
+    "side": "under",
+    "src": [
+     "roof"
+    ],
+    "suggested": false,
+    "text": "Under 54.5",
+    "why": [
+     "16 mph wind forecast, only if the roof is open"
+    ]
+   }
+  }
+ },
+ "2026_05_HOU_TEN": {
+  "total|under|39.5": {
+   "first": {
+    "dec": 1.9091,
+    "edge": 5.5,
+    "price": {
+     "odds": -110
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.9091,
+    "edge": 5.5,
+    "price": {
+     "odds": -110
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 39.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 39.5",
+    "why": [
+     "11 mph wind forecast"
+    ]
+   }
+  }
+ },
+ "2026_05_LV_NE": {
+  "total|under|45.5": {
+   "first": {
+    "dec": 1.8696,
+    "edge": 5.3,
+    "price": {
+     "odds": -115
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.8696,
+    "edge": 5.3,
+    "price": {
+     "odds": -115
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 45.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 45.5",
+    "why": [
+     "12 mph wind forecast"
+    ]
+   }
+  }
+ },
+ "2026_05_NYG_WAS": {
+  "total|under|43.5": {
+   "first": {
+    "dec": 1.9524,
+    "edge": 5.8,
+    "price": {
+     "odds": -105
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.9524,
+    "edge": 5.8,
+    "price": {
+     "odds": -105
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 43.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 43.5",
+    "why": [
+     "11 mph wind forecast"
+    ]
+   }
+  }
+ },
+ "2026_05_PHI_JAX": {
+  "total|under|42.5": {
+   "first": {
+    "dec": 1.9804,
+    "edge": 6.0,
+    "price": {
+     "odds": -102
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.9804,
+    "edge": 6.0,
+    "price": {
+     "odds": -102
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 42.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 42.5",
+    "why": [
+     "15 mph wind forecast"
+    ]
+   }
+  }
+ },
+ "2026_05_SF_SEA": {
+  "total|under|47.5": {
+   "first": {
+    "dec": 1.8696,
+    "edge": 5.3,
+    "price": {
+     "odds": -115
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 1.8696,
+    "edge": 5.3,
+    "price": {
+     "odds": -115
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 47.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 47.5",
+    "why": [
+     "11 mph wind forecast"
+    ]
+   }
+  }
+ },
+ "2026_05_TB_DAL": {
+  "ml|away|": {
+   "first": {
+    "dec": 5.254,
+    "edge": 7.9,
+    "price": {
+     "book": "Kalshi",
+     "cents": 18.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "last": {
+    "dec": 5.254,
+    "edge": 7.9,
+    "price": {
+     "book": "Kalshi",
+     "cents": 18.0
+    },
+    "ts": "2026-10-05T17:16"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 8.9,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Buccaneers to win",
+    "why": [
+     "our model gives them 19% to win, the market 21%"
+    ]
+   }
+  }
+ },
+ "_meta": {
+  "started": "2026-10-05T17:16"
+ }
+}
