@@ -60,7 +60,7 @@
       <div class="field"><label for="bCents">Price paid (¢)</label><input id="bCents" class="num" type="number" min="1" max="99" step="0.1" inputmode="decimal" required></div>
       <div class="field"><label for="bQty">Contracts</label><input id="bQty" class="num" type="number" min="1" step="1" value="10" inputmode="numeric" required></div>
       <div class="field"><label for="bReason">Why</label>
-        <select id="bReason"><option value="wind">Wind under</option><option value="gap">Price gap</option><option value="lean">Elo lean</option><option value="other">Other</option></select></div>
+        <select id="bReason"><option value="wind">Wind under</option><option value="gap">Price gap</option><option value="lean">Model lean</option><option value="other">Other</option></select></div>
       <div class="field wide"><label for="bNote">Note (optional)</label><input id="bNote" maxlength="140"></div>
       <div class="formfoot">
         <span class="why" id="bPreview"></span>
@@ -80,8 +80,8 @@
     <div class="eyebrow">All bets, newest first</div>
     <div class="tablebox"><table id="betTable"></table></div>
     <p class="lede">Fees are estimated from each exchange's taker formula (Polymarket sports 5%, Kalshi 7%
-      of price × (1 − price) per contract); check your own fills. "vs close" uses the nflverse closing line:
-      the expected return of your price if the closing price was fair, or the points you gained on the line.</p>
+      of price × (1 − price) per contract), so check your own fills. “Vs closing line” compares your bet with the final
+      line before kickoff: more points than the close, or a lower price, means you beat it.</p>
   </section>
 </div>
 
@@ -98,7 +98,7 @@
   </section>
 
   <section id="playsWrap" hidden>
-    <div class="eyebrow">To look at · wind unders and price gaps still to kick off</div>
+    <div class="eyebrow">Worth a look before kickoff</div>
     <div class="plays" id="plays"></div>
   </section>
 
@@ -107,9 +107,10 @@
       <button type="button" data-f="all" aria-pressed="true">All games</button>
       <button type="button" data-f="wind" aria-pressed="false">Wind signals</button>
       <button type="button" data-f="gap" aria-pressed="false">Price gaps</button>
-      <button type="button" data-f="lean" aria-pressed="false">Elo leans</button>
+      <button type="button" data-f="lean" aria-pressed="false">Model leans</button>
       <button type="button" data-f="final" aria-pressed="false">Final</button>
     </div>
+    <p class="oddshelp">How to read odds: <b>−150</b> means you bet $150 to win $100, and <b>+130</b> means you bet $100 to win $130. Prices in cents (¢) are Kalshi and Polymarket contracts that pay $1 if they win.</p>
     <div class="games" id="games"></div>
   </section>
 </div>

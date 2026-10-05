@@ -37,8 +37,8 @@
   </section>
 
   <section class="kpis" style="margin-top:16px">
-    <div class="kpi"><div class="v bad">−6.4%</div><div class="l">Elo, betting every edge at closing prices, 2016–2025 (2,367 bets)</div></div>
-    <div class="kpi"><div class="v">9 of 10</div><div class="l">Seasons the closing line was more accurate than Elo</div></div>
+    <div class="kpi"><div class="v bad">−6.4%</div><div class="l">Our model (Elo), betting every edge at closing prices, 2016–2025 (2,367 bets)</div></div>
+    <div class="kpi"><div class="v">9 of 10</div><div class="l">Seasons the betting market was more accurate than our model</div></div>
     <div class="kpi"><div class="v good">+14.2%</div><div class="l">Wind unders using forecasts, 2022–2025 (168 bets)</div></div>
     <div class="kpi"><div class="v">45</div><div class="l">Signals tested against the market; one survived</div></div>
   </section>
@@ -49,7 +49,7 @@
       the extra is the book's margin. Removing it gives the fair price:</p>
     <span class="formula">p<sub>fair</sub> = q<sub>home</sub> / (q<sub>home</sub> + q<sub>away</sub>)</span>
     <p>Expected value always uses the price you'd actually get:
-      EV = p<sub>model</sub> · d − 1. Break-even at −110 is 52.4%.</p>
+      Expected return (EV) = p<sub>model</sub> · d − 1, where d is the decimal odds. Break-even at −110 is 52.4%.</p>
 
     <h2>2. The Elo model</h2>
     <p>Every team has a rating, updated after each game since 1999 with a margin-of-victory multiplier. Each season
@@ -57,12 +57,12 @@
       rest 6 Elo per day (capped at ±35), and a 75-Elo penalty when a team starts someone other than its usual QB.</p>
     <span class="formula">P<sub>home</sub> = 1 / (1 + 10<sup>−Δ/400</sup>),  Δ = R<sub>home</sub> + HFA + adj − R<sub>away</sub></span>
     <p>The "Elo lean" blends the model with the market, 22% Elo and 78% market, and flags a side when that blend is
-      +EV at the posted price.</p>
+      worth betting (a positive expected return) at the posted price.</p>
 
     <h2>3. How Elo did against the closing line (2016–2025)</h2>
   </section>
   <div class="tablebox" style="margin-top:4px"><table>
-    <thead><tr><th>Model</th><th class="n">Log loss</th><th class="n">Accuracy</th><th class="n">ROI, every +EV side</th><th class="n">ROI, EV &gt; 3%</th></tr></thead>
+    <thead><tr><th>Model</th><th class="n">Accuracy score<br>(lower is better)</th><th class="n">Winners picked</th><th class="n">Return, every edge</th><th class="n">Return, edges over 3%</th></tr></thead>
     <tbody>
       <tr><td>Elo, core only</td><td class="n">0.6353</td><td class="n">63.6%</td><td class="n no">−6.3%</td><td class="n no">−8.3%</td></tr>
       <tr><td>+ rest + backup-QB flag</td><td class="n">0.6305</td><td class="n">64.3%</td><td class="n no">−6.4%</td><td class="n no">−7.3%</td></tr>
@@ -96,7 +96,7 @@
       after, is <b>10 mph or more</b>. Retractable roofs don't count.</p>
   </section>
   <div class="tablebox" style="margin-top:4px"><table>
-    <thead><tr><th>Test</th><th>Wind source</th><th class="n">Bets</th><th class="n">ROI</th></tr></thead>
+    <thead><tr><th>Test</th><th>Wind source</th><th class="n">Bets</th><th class="n">Return</th></tr></thead>
     <tbody>
       <tr><td>2006–2015 (screening years)</td><td>Recorded at the game</td><td class="n">694</td><td class="n ok">+3.6%</td></tr>
       <tr><td>2016–2025 (out of sample)</td><td>Recorded at the game</td><td class="n">608</td><td class="n ok">+11.8%</td></tr>
@@ -106,7 +106,7 @@
     </tbody></table></div>
   <section class="prose" style="margin-top:8px">
     <div class="callout">
-      <p style="margin:0"><b>Promising, not proven.</b> About 40 bets a season, borderline significance (t = 1.96),
+      <p style="margin:0"><b>Promising, not proven.</b> About 40 bets a season, borderline statistical significance,
         a losing 2024, and 45 ideas tested to find it. Recorded wind isn't known before kickoff, which is why the
         forecast test matters. Stakes stay flat at 1% of bankroll, and the 10 mph threshold won't be tuned on these
         results. The <a href="season.html">Season</a> page tracks it live.</p>
@@ -118,7 +118,7 @@
     <ul>
       <li><b>Closing lines are sharper than openers,</b> slightly at Pinnacle and clearly at the softer books
         (bet365, betr).</li>
-      <li><b>Lines moved toward Elo leans</b> 58% of the time against bet365's openers (671 moved lines) and 73%
+      <li><b>Lines moved toward the model’s leans</b> 58% of the time against bet365's openers (671 moved lines) and 73%
         against betr's (88). The same leans that lost 6.5% at bet365's close were about break-even at its open.</li>
       <li><b>Windy-game totals drop more during the week</b> (about −1.0 point vs −0.4 for calm games at bet365),
         and unders paid more at the open than at the close in every period. This uses recorded wind, which

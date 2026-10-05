@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Beatn’ the Books · Season</title>
-<meta name="description" content="Season-to-date record of the wind-under signal and the Elo leans, scored at the posted price.">
+<meta name="description" content="Season-to-date record of the wind-under signal and the model leans, scored at the posted price.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,11 +42,11 @@
   </section>
 
   <section>
-    <div class="eyebrow">Running total · units won or lost, 1 unit per bet</div>
+    <div class="eyebrow">Running profit if you bet $100 on each</div>
     <div class="panel">
       <div class="legend" aria-hidden="true">
         <span><i style="background:var(--series-1)"></i>Wind unders (the tested signal)</span>
-        <span><i style="background:var(--series-2)"></i>Elo leans (lost 7.1% in the backtest)</span>
+        <span><i style="background:var(--series-2)"></i>Model leans (lost about 7% in past seasons)</span>
       </div>
       <div class="chart" id="cumChart"></div>
     </div>
@@ -62,11 +62,11 @@
     <div class="filters" id="filters" role="group" aria-label="Filter bets" style="margin:0 0 12px">
       <button type="button" data-f="all" aria-pressed="true">All bets</button>
       <button type="button" data-f="wind" aria-pressed="false">Wind unders</button>
-      <button type="button" data-f="lean" aria-pressed="false">Elo leans</button>
+      <button type="button" data-f="lean" aria-pressed="false">Model leans</button>
     </div>
     <div class="tablebox"><table id="betLog"></table></div>
-    <p class="lede">Prices are the posted lines in nflverse, which are close to the closing number. Your book's price
-      will differ. Wind is the last forecast before kickoff (archived forecasts for games before this site went live).</p>
+    <p class="lede">Results use the final betting line before kickoff. Your own price will differ a little. Wind is the last
+      forecast before kickoff (older games use archived forecasts).</p>
   </section>
 
   <footer>Analysis only, not betting advice. Data: nflverse (scores, lines, starters) and Open-Meteo (wind forecasts).<br><span data-foot></span></footer>
