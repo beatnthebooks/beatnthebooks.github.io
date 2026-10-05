@@ -1,4 +1,4 @@
-/* Edge Board site. Layout: sticky bar (brand, page nav, updated stamp, week rail on the
+/* Beatn’ the Books site. Layout: sticky bar (brand, page nav, updated stamp, week rail on the
    week page) -> page heading -> tiles -> content cards/tables. Identity: a cool "market
    terminal": condensed display, Plex body, mono figures, teal accent. Charts use the
    validated categorical slots (blue, orange) so they never borrow status colors. */
@@ -219,5 +219,6 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);text-align:center;line-
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .betform{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:520px){ .bar .stamp{display:none} }   /* also in the footer; keeps the sticky bar short */
 @media (max-width:420px){ .ledger{grid-template-columns:repeat(2,minmax(0,1fr))} .pagehead h1{font-size:24px} }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}

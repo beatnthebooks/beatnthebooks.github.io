@@ -1,4 +1,4 @@
-/* Edge Board site. Every page loads data.js (window.EDGE, written by weekly.py) and this file.
+/* Beatn’ the Books site. Every page loads data.js (window.EDGE, written by weekly.py) and this file.
    The page to render comes from <main data-page="...">. */
 (function(){
 'use strict';

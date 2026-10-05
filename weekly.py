@@ -1,7 +1,7 @@
 """
 weekly.py
 =========
-Build the Edge Board website (site/): every NFL game of the current season,
+Build the Beatn' the Books website (site/): every NFL game of the current season,
 week by week, combining everything the project knows:
 
   * Elo win probability and Elo line (rift_real.run, walk-forward: every
@@ -381,7 +381,6 @@ def write_site(data: dict) -> Path:
     index = (SITE / "index.html").read_text(encoding="utf-8")
     ARTIFACT_INDEX.parent.mkdir(exist_ok=True)
     head = _between(index, "<!--head-->", "<!--/head-->").strip()
-    head = head.replace("<title>Edge Board</title>", "<title>Edge Board Weekly</title>")  # claude.ai name
     ARTIFACT_INDEX.write_text(head + "\n" + _between(index, "<!--body-->", "<!--/body-->").strip() + "\n",
                               encoding="utf-8")
     return SITE / "data.js"

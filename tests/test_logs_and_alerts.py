@@ -61,7 +61,7 @@ class AlertsOnce(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             state, sent = Path(tmp) / "alerts_sent.json", []
             self.run_alerts(data({"g1": True}), state, sent)
-            self.assertEqual(sent, ["Edge Board alerts are on"])              # first run: summary only
+            self.assertEqual(sent, ["Beatn' the Books alerts are on"])              # first run: summary only
             self.run_alerts(data({"g1": True}), state, sent)
             self.assertEqual(len(sent), 1)                                    # nothing new, nothing sent
             self.run_alerts(data({"g1": True, "g2": True}), state, sent)

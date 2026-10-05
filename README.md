@@ -1,4 +1,4 @@
-# Edge Board
+# Beatn' the Books
 
 NFL betting analytics: an Elo model compared with the betting market, a tested
 wind-under signal for totals, season tracking and team ratings. Analysis only;

@@ -112,7 +112,7 @@ def run(data: dict) -> int:
     n = 0
     if first:
         winds = sum(1 for k in live if k.endswith(":wind"))
-        send("Edge Board alerts are on",
+        send("Beatn' the Books alerts are on",
              f"Right now: {winds} wind under signal(s) and {len(live) - winds} price gap(s). "
              "From here you'll get one alert per new signal.", "white_check_mark")
         n += 1
@@ -141,5 +141,5 @@ if __name__ == "__main__":
     if "--test" in sys.argv:
         if not topic():
             sys.exit("No channel yet. Run `py weekly.py` once, or create ntfy_topic.txt.")
-        send("Edge Board test", "If you can read this, phone alerts work.", "white_check_mark")
+        send("Beatn' the Books test", "If you can read this, phone alerts work.", "white_check_mark")
         print("Test notification sent.")
