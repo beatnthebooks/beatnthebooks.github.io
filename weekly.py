@@ -32,8 +32,11 @@ Standard library only.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
+import os
+import re
 import sys
 import urllib.request
 from collections import defaultdict
@@ -372,12 +375,29 @@ def _between(text: str, start: str, end: str) -> str:
     return text[i + len(start):j]
 
 
+def bust_cache(stamp: str) -> None:
+    """Tag asset links in site/*.html with a version (?v=...) so browsers fetch the new
+    files after an update instead of reusing a saved copy (GitHub Pages lets them keep
+    files for 10 minutes). Code files get a content hash; data.js gets the build stamp."""
+    ver = {"assets/app.js": hashlib.sha1((SITE / "assets" / "app.js").read_bytes()).hexdigest()[:8],
+           "assets/style.css": hashlib.sha1((SITE / "assets" / "style.css").read_bytes()).hexdigest()[:8],
+           "data.js": re.sub(r"\D", "", stamp)}
+    pat = re.compile(r'(assets/app\.js|assets/style\.css|data\.js)(\?v=[^"]*)?"')
+    for page in SITE.glob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        new = pat.sub(lambda m: f'{m.group(1)}?v={ver[m.group(1)]}"', text)
+        if new != text:
+            page.write_text(new, encoding="utf-8")
+
+
 def write_site(data: dict) -> Path:
     """site/ is the website: static pages + assets, plus data.js written here.
     build/artifact-index.html is site/index.html without its document wrapper,
     because claude.ai adds its own when the page is published as an Artifact."""
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     (SITE / "data.js").write_text(f"window.EDGE={blob};\n", encoding="utf-8")
+    if os.environ.get("GITHUB_ACTIONS") == "true":     # public site only; claude.ai pushes new versions itself
+        bust_cache(data["updated"])
     index = (SITE / "index.html").read_text(encoding="utf-8")
     ARTIFACT_INDEX.parent.mkdir(exist_ok=True)
     head = _between(index, "<!--head-->", "<!--/head-->").strip()

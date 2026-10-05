@@ -245,7 +245,7 @@ function weekPage(){
       <span class="what">${esc(g.awayName)} at ${esc(g.homeName)}</span>
       <span class="why">${g.wind.toFixed(0)} mph wind forecast · ${esc(g.ko)} · re-check the forecast before kickoff</span>
       <a href="#g-${esc(g.id)}">See game</a></div>`).join('')
-      +gaps.flatMap(g=>g.gaps.map(x=>`<div class="play"><span class="tag lean">Price gap</span>
+      +gaps.flatMap(g=>g.gaps.map(x=>`<div class="play"><span class="tag gap">Price gap</span>
       <span class="what">${gapTxt(g,x)}</span><span class="ok">${x.ev.toFixed(1)}% better than fair</span>
       <span class="why">${esc(g.awayName)} at ${esc(g.homeName)} · not yet proven · check the live price first</span>
       <a href="#g-${esc(g.id)}">See game</a></div>`)).join('');
@@ -266,6 +266,8 @@ function weekPage(){
   // because the home page is where the claude.ai viewer grants the database.
   function route(){
     const bets=location.hash==='#bets';
+    const wm=location.hash.match(/^#week(\d+)$/);
+    if(wm&&weeks.includes(Number(wm[1]))) week=Number(wm[1]);
     $('#betsView').hidden=!bets; $('#weekView').hidden=bets; $('#rail').hidden=bets;
     $('#navWeek').toggleAttribute('aria-current',!bets); $('#navBets').toggleAttribute('aria-current',bets);
     if(bets){ $('#navBets').setAttribute('aria-current','page'); betsView(); }
