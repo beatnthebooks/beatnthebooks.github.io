@@ -615,11 +615,12 @@ def _between(text: str, start: str, end: str) -> str:
 def bust_cache(stamp: str) -> None:
     """Tag asset links in site/*.html with a version (?v=...) so browsers fetch the new
     files after an update instead of reusing a saved copy (GitHub Pages lets them keep
-    files for 10 minutes). Code files get a content hash; data.js gets the build stamp."""
-    ver = {"assets/app.js": hashlib.sha1((SITE / "assets" / "app.js").read_bytes()).hexdigest()[:8],
-           "assets/style.css": hashlib.sha1((SITE / "assets" / "style.css").read_bytes()).hexdigest()[:8],
-           "data.js": re.sub(r"\D", "", stamp)}
-    pat = re.compile(r'(assets/app\.js|assets/style\.css|data\.js)(\?v=[^"]*)?"')
+    files for 10 minutes). Code files and the tab icon get a content hash; data.js gets the build stamp.
+    (Browsers keep tab icons especially long: Edge kept showing the site's first, green favicon.svg.)"""
+    h = lambda *p: hashlib.sha1(SITE.joinpath(*p).read_bytes()).hexdigest()[:8]
+    ver = {"assets/app.js": h("assets", "app.js"), "assets/style.css": h("assets", "style.css"),
+           "tab-icon.svg": h("tab-icon.svg"), "data.js": re.sub(r"\D", "", stamp)}
+    pat = re.compile(r'(assets/app\.js|assets/style\.css|tab-icon\.svg|data\.js)(\?v=[^"]*)?"')
     for page in SITE.glob("*.html"):
         text = page.read_text(encoding="utf-8")
         new = pat.sub(lambda m: f'{m.group(1)}?v={ver[m.group(1)]}"', text)
