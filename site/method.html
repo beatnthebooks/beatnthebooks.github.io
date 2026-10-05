@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edge Board · Method</title>
+<meta name="description" content="How Edge Board works: the Elo model, the de-vig math, and the out-of-sample research behind the wind-under signal.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <div class="brandrow">
+      <a class="brand" href="index.html" aria-label="Edge Board home"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--accent)"/><path d="M7 22 13 15l5 4 7-10" stroke="var(--on-accent)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Edge Board</span></a>
+      <nav class="nav" aria-label="Pages">
+        <a href="index.html">This week</a>
+        <a href="index.html#bets">My bets</a>
+        <a href="season.html">Season</a>
+        <a href="teams.html">Teams</a>
+        <a href="method.html" aria-current="page">Method</a>
+      </nav>
+      <span class="spring"></span>
+      <span class="stamp" data-stamp></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" data-page="method">
+  <section>
+    <div class="pagehead"><div><div class="eyebrow">How it works</div><h1>Method and research</h1></div></div>
+    <p class="lede">Edge Board compares a rating model with the betting market, then tests every idea on seasons it
+      never saw. The short version: the NFL closing line is very hard to beat. One signal, wind, has held up so far.</p>
+  </section>
+
+  <section class="kpis" style="margin-top:16px">
+    <div class="kpi"><div class="v bad">−6.4%</div><div class="l">Elo, betting every edge at closing prices, 2016–2025 (2,367 bets)</div></div>
+    <div class="kpi"><div class="v">9 of 10</div><div class="l">Seasons the closing line was more accurate than Elo</div></div>
+    <div class="kpi"><div class="v good">+14.2%</div><div class="l">Wind unders using forecasts, 2022–2025 (168 bets)</div></div>
+    <div class="kpi"><div class="v">45</div><div class="l">Signals tested against the market; one survived</div></div>
+  </section>
+
+  <section class="prose">
+    <h2>1. The market price</h2>
+    <p>A moneyline becomes a probability with q = 1 / d, where d is decimal odds. Both sides add up to more than 100%;
+      the extra is the book's margin. Removing it gives the fair price:</p>
+    <span class="formula">p<sub>fair</sub> = q<sub>home</sub> / (q<sub>home</sub> + q<sub>away</sub>)</span>
+    <p>Expected value always uses the price you'd actually get:
+      EV = p<sub>model</sub> · d − 1. Break-even at −110 is 52.4%.</p>
+
+    <h2>2. The Elo model</h2>
+    <p>Every team has a rating, updated after each game since 1999 with a margin-of-victory multiplier. Each season
+      pulls ratings halfway back to 1500. Settings were tuned on 2006–2015 only: K = 20, home field 55 Elo,
+      rest 6 Elo per day (capped at ±35), and a 75-Elo penalty when a team starts someone other than its usual QB.</p>
+    <span class="formula">P<sub>home</sub> = 1 / (1 + 10<sup>−Δ/400</sup>),  Δ = R<sub>home</sub> + HFA + adj − R<sub>away</sub></span>
+    <p>The "Elo lean" blends the model with the market, 22% Elo and 78% market, and flags a side when that blend is
+      +EV at the posted price.</p>
+
+    <h2>3. How Elo did against the closing line (2016–2025)</h2>
+  </section>
+  <div class="tablebox" style="margin-top:4px"><table>
+    <thead><tr><th>Model</th><th class="n">Log loss</th><th class="n">Accuracy</th><th class="n">ROI, every +EV side</th><th class="n">ROI, EV &gt; 3%</th></tr></thead>
+    <tbody>
+      <tr><td>Elo, core only</td><td class="n">0.6353</td><td class="n">63.6%</td><td class="n no">−6.3%</td><td class="n no">−8.3%</td></tr>
+      <tr><td>+ rest + backup-QB flag</td><td class="n">0.6305</td><td class="n">64.3%</td><td class="n no">−6.4%</td><td class="n no">−7.3%</td></tr>
+      <tr><td>Blend, 22% Elo (the "lean")</td><td class="n">0.6107</td><td class="n">66.4%</td><td class="n no">−7.1%</td><td class="n no">−11.0%</td></tr>
+      <tr><td>Closing market</td><td class="n">0.6091</td><td class="n">66.5%</td><td class="n push">benchmark</td><td class="n"></td></tr>
+    </tbody></table></div>
+  <section class="prose" style="margin-top:8px">
+    <p>Blindly betting every favorite lost 3.0%, every underdog 5.2%. Elo's picks did worse than no model. When it
+      disagrees with the line, the market usually knows something it doesn't: injuries, QB quality, news.</p>
+
+    <h2>4. Searching for an edge against the market</h2>
+    <p>Instead of building a better standalone model, each idea was tested on top of the market's own price. If a
+      signal adds nothing the market hasn't priced, its coefficient is zero.</p>
+    <span class="formula">logit P(outcome) = b<sub>0</sub> + b<sub>1</sub> · logit(p<sub>market</sub>) + b<sub>2</sub> · signal</span>
+    <ul>
+      <li><b>The rule was fixed in advance.</b> A signal had to pass on 2001–2015 (|z| ≥ 2, same sign in both halves).
+        Only then was 2016–2025 scored, once.</li>
+      <li><b>37 signals</b> across moneylines, spreads and totals: rest, travel and time zones, divisional and home
+        underdogs, last week's result, season against the spread, QB changes, referees, temperature, wind, and more.</li>
+      <li><b>8 injury signals</b> were added later (2013–2025): snap share of players listed Out, Doubtful or
+        Questionable, and starting QBs out. The market clearly moves on injury reports, but none passed the
+        screen: by the close, injuries are fully priced.</li>
+      <li><b>Moneyline and spread: nothing.</b> Elo disagreement and the QB flag passed the screen, then lost to the
+        closing line out of sample.</li>
+      <li><b>Totals: wind.</b> The totals model was the only one to beat the closing line out of sample, and wind did
+        the work.</li>
+    </ul>
+
+    <h2>5. The wind signal</h2>
+    <p>Bet the <b>under</b> when an outdoor game's forecast wind, averaged over the kickoff hour and the three hours
+      after, is <b>10 mph or more</b>. Retractable roofs don't count.</p>
+  </section>
+  <div class="tablebox" style="margin-top:4px"><table>
+    <thead><tr><th>Test</th><th>Wind source</th><th class="n">Bets</th><th class="n">ROI</th></tr></thead>
+    <tbody>
+      <tr><td>2006–2015 (screening years)</td><td>Recorded at the game</td><td class="n">694</td><td class="n ok">+3.6%</td></tr>
+      <tr><td>2016–2025 (out of sample)</td><td>Recorded at the game</td><td class="n">608</td><td class="n ok">+11.8%</td></tr>
+      <tr><td>2022–2025</td><td>Forecast shortly before kickoff</td><td class="n">168</td><td class="n ok">+14.2%</td></tr>
+      <tr><td>Late 2024–2025</td><td>Forecast the day before</td><td class="n">105</td><td class="n ok">+7.2%</td></tr>
+      <tr><td>2022 · 2023 · 2024 · 2025</td><td>Forecast, by season</td><td class="n">52 · 33 · 41 · 42</td><td class="n">+26.8 · +39.2 · <span class="no">−25.7</span> · +17.8%</td></tr>
+    </tbody></table></div>
+  <section class="prose" style="margin-top:8px">
+    <div class="callout">
+      <p style="margin:0"><b>Promising, not proven.</b> About 40 bets a season, borderline significance (t = 1.96),
+        a losing 2024, and 45 ideas tested to find it. Recorded wind isn't known before kickoff, which is why the
+        forecast test matters. Stakes stay flat at 1% of bankroll, and the 10 mph threshold won't be tuned on these
+        results. The <a href="season.html">Season</a> page tracks it live.</p>
+    </div>
+
+    <h2>6. Betting earlier in the week</h2>
+    <p>A second historical dataset (opening and closing prices, 2014–2025) shows the market learns during
+      the week, and the two signals here point the same way it moves:</p>
+    <ul>
+      <li><b>Closing lines are sharper than openers,</b> slightly at Pinnacle and clearly at the softer books
+        (bet365, betr).</li>
+      <li><b>Lines moved toward Elo leans</b> 58% of the time against bet365's openers (671 moved lines) and 73%
+        against betr's (88). The same leans that lost 6.5% at bet365's close were about break-even at its open.</li>
+      <li><b>Windy-game totals drop more during the week</b> (about −1.0 point vs −0.4 for calm games at bet365),
+        and unders paid more at the open than at the close in every period. This uses recorded wind, which
+        nobody has days ahead, so it overstates what a bettor could get.</li>
+      <li>The site now records the first and last Kalshi/Polymarket price for every game, to measure this on
+        the markets you can actually use.</li>
+    </ul>
+
+    <h2>7. Data and updates</h2>
+    <ul>
+      <li>Games, scores, lines and projected starters: nflverse <span class="num">games.csv</span>. Lines usually appear a day or two before kickoff.</li>
+      <li>Wind: Open-Meteo forecasts for each stadium, refreshed on every update and frozen at kickoff.</li>
+      <li>Best prices (when set up): The Odds API, every major US sportsbook. For upcoming games the market
+        number is the median no-vig price across books, and leans are priced at the best book. Finished games
+        are always scored at the nflverse closing line, the same way the backtests were.</li>
+      <li>The site rebuilds from fresh data several times a day. Every number on it is computed by the same Python
+        code that ran the backtests.</li>
+    </ul>
+  </section>
+
+  <footer>Analysis only, not betting advice. Data: nflverse (scores, lines, starters) and Open-Meteo (wind forecasts).<br><span data-foot></span></footer>
+</main>
+<script src="data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+﻿7548 games. Margin std-dev around the spread (fit on DEV): 11.7
+
+=== ML  DEV 2006-2015  (2535 games) ===
+  market calibration: intercept -0.050 (z -1.1)   slope on logit(p) 0.991 (z vs 1: -0.2)
+  feature              coef      z  halves agree  selected
+  elo_gap           +0.2660  +2.21  yes           <== SELECTED
+  qb_change         +0.1964  +2.09  yes           <== SELECTED
+  tz_travel         +0.0861  +1.94  yes           
+  neutral           -0.7107  -1.60  yes           
+  ml_vs_spread      -0.7653  -1.55  yes           
+  big_dog           -0.2369  -1.27  yes           
+  home_dog          +0.1922  +1.25  yes           
+  rest_diff         +0.0200  +1.19  no            
+  off_bye           +0.1308  +1.06  no            
+  west_early        +0.1469  +0.92  no            
+  last_ats          -0.0023  -0.86  no            
+  early_elo         +0.1824  +0.76  no            
+  pts_gap           +0.0143  +0.62  no            
+  div_dog           +0.0503  +0.60  yes           
+  playoff           -0.1057  -0.50  no            
+  last_margin       -0.0011  -0.47  no            
+  cold_vs_warm      +0.1301  +0.45  no            
+  season_ats        +0.0031  +0.27  yes           
+  primetime_home    +0.0143  +0.13  no            
+
+=== SPREAD  DEV 2001-2015  (3884 games) ===
+  market calibration: intercept -0.045 (z -1.4)   slope on logit(p) -0.139 (z vs 1: -2.2)
+  feature              coef      z  halves agree  selected
+  elo_gap           +0.1923  +2.44  yes           <== SELECTED
+  tz_travel         +0.0631  +1.93  yes           
+  west_early        +0.1934  +1.69  no            
+  qb_change         +0.1067  +1.67  yes           
+  pts_gap           +0.0136  +1.63  yes           
+  big_dog           +0.1503  +1.59  yes           
+  ml_vs_spread      +0.6642  +1.54  yes           
+  last_margin       -0.0025  -1.48  yes           
+  last_ats          -0.0027  -1.40  yes           
+  season_ats        -0.0090  -1.29  yes           
+  div_dog           +0.0558  +1.04  yes           
+  home_dog          +0.0558  +0.81  yes           
+  off_bye           +0.0759  +0.81  yes           
+  rest_diff         +0.0099  +0.78  yes           
+  primetime_home    +0.0535  +0.59  no            
+  cold_vs_warm      +0.1133  +0.54  yes           
+  early_elo         +0.0631  +0.43  no            
+  neutral           -0.1265  -0.37  no            
+  playoff           -0.0564  -0.35  no            
+
+=== TOTAL  DEV 2001-2015  (3921 games) ===
+  market calibration: intercept -0.001 (z -0.0)   slope on logit(p) -0.659 (z vs 1: -1.8)
+  feature              coef      z  halves agree  selected
+  wind              -0.0163  -2.99  yes           <== SELECTED
+  team_ou           -0.0379  -2.65  yes           <== SELECTED
+  wind_15           -0.2756  -2.62  yes           <== SELECTED
+  div               -0.1495  -2.26  no            
+  line_level        -0.0118  -1.72  yes           
+  dome              +0.1271  +1.67  yes           
+  cold              +0.2302  +1.66  yes           
+  late_season       -0.0731  -1.05  no            
+  last_ou           -0.0034  -0.88  no            
+  any_backup_qb     +0.0386  +0.54  no            
+  ref_ou            +0.0113  +0.40  yes           
+  abs_spread        +0.0028  +0.30  yes           
+  short_week        -0.0440  -0.24  yes           
+  primetime         +0.0209  +0.23  no            
+  playoff           +0.0206  +0.13  no            
+  pts_model         -0.0000  -0.00  no            
+
+Selected on DEV: {'ml': ['elo_gap', 'qb_change'], 'spread': ['elo_gap'], 'total': ['wind', 'wind_15', 'team_ou']}
+
+==============================================================================
+OUT-OF-SAMPLE TEST 2016-2025 (expanding-window refit, real closing prices)
+==============================================================================
+
+ML: market calibration only 
+  log loss  model 0.60914  vs market 0.60913  (market better, 2760 games)
+  EV > 0%:   591 bets  ROI  -4.42%  (t = -0.79)  winning seasons 2/5
+  EV > 2%:    33 bets  ROI -28.37%  (t = -1.02)  winning seasons 1/2
+  EV > 4%:     1 bets  ROI -100.00%  (t = +0.00)  winning seasons 0/1
+
+ML: + selected features ['elo_gap', 'qb_change']
+  log loss  model 0.60959  vs market 0.60913  (market better, 2760 games)
+  EV > 0%:  1235 bets  ROI  -4.44%  (t = -1.23)  winning seasons 4/10
+  EV > 2%:   703 bets  ROI  +2.91%  (t = +0.55)  winning seasons 7/10
+  EV > 4%:   421 bets  ROI  +5.29%  (t = +0.74)  winning seasons 8/10
+
+SPREAD: market calibration only 
+  log loss  model 0.69312  vs market 0.69272  (market better, 2696 games)
+  EV > 0%:  1154 bets  ROI  +0.57%  (t = +0.19)  winning seasons 5/10
+  EV > 2%:   543 bets  ROI  +0.62%  (t = +0.14)  winning seasons 5/8
+  EV > 4%:   214 bets  ROI  -4.00%  (t = -0.56)  winning seasons 4/7
+
+SPREAD: + selected features ['elo_gap']
+  log loss  model 0.69359  vs market 0.69272  (market better, 2696 games)
+  EV > 0%:  1280 bets  ROI  -0.43%  (t = -0.16)  winning seasons 5/10
+  EV > 2%:   708 bets  ROI  -2.35%  (t = -0.62)  winning seasons 2/10
+  EV > 4%:   360 bets  ROI  -0.94%  (t = -0.18)  winning seasons 5/10
+
+TOTAL: market calibration only 
+  log loss  model 0.69337  vs market 0.69300  (market better, 2738 games)
+  EV > 0%:   763 bets  ROI  +1.06%  (t = +0.29)  winning seasons 7/10
+  EV > 2%:   262 bets  ROI  -7.32%  (t = -1.16)  winning seasons 2/7
+  EV > 4%:    84 bets  ROI  +3.30%  (t = +0.29)  winning seasons 3/6
+
+TOTAL: + selected features ['wind', 'wind_15', 'team_ou']
+  log loss  model 0.69238  vs market 0.69300  (model better, 2738 games)
+  EV > 0%:  1671 bets  ROI  +3.05%  (t = +1.27)  winning seasons 8/10
+  EV > 2%:  1160 bets  ROI  +2.59%  (t = +0.90)  winning seasons 7/10
+  EV > 4%:   765 bets  ROI  +6.26%  (t = +1.76)  winning seasons 8/10
+
+Blind baselines, 2016-2025 at closing prices:
+  every home   spread   2696 bets  ROI  -4.56%
+  every away   spread   2696 bets  ROI  -1.60%
+  every over   total    2738 bets  ROI  -5.27%
+  every under  total    2738 bets  ROI  -1.09%

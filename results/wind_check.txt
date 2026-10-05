@@ -1,0 +1,26 @@
+﻿Downloading forecasts through 2026-10-04 (cached after the first run) ...
+
+819 outdoor/open games since 2022-09-01; 669 have both a forecast and recorded wind
+  correlation, forecast vs recorded wind: 0.69
+  mean wind: forecast 7.2 mph, recorded 8.2 mph
+
+UNDER at the closing price, by season group
+ 2022-2025
+  every outdoor game (baseline)                  777 bets  ROI   -0.5%  t = -0.15
+  forecast wind >= 10 mph                        168 bets  ROI  +14.2%  t = +1.96
+  recorded wind >= 10 mph (same games as both)   210 bets  ROI  +10.9%  t = +1.68
+  forecast wind >= 10 mph (same games as both)   142 bets  ROI  +11.8%  t = +1.50
+  day-before forecast >= 10 mph (late 2024 on)   105 bets  ROI   +7.2%  t = +0.78
+ 2026 so far
+  every outdoor game (baseline)                   42 bets  ROI   -0.1%  t = -0.00
+  forecast wind >= 10 mph                          9 bets  ROI  -14.9%  t = -0.44
+  recorded wind >= 10 mph (same games as both)    11 bets  ROI   +4.0%  t = +0.13
+  forecast wind >= 10 mph (same games as both)     8 bets  ROI   -4.3%  t = -0.12
+  day-before forecast >= 10 mph (late 2024 on)    10 bets  ROI   -3.9%  t = -0.12
+
+By season, forecast wind >= 10 mph
+  2022                                            52 bets  ROI  +26.8%  t = +2.08
+  2023                                            33 bets  ROI  +39.2%  t = +2.71
+  2024                                            41 bets  ROI  -25.7%  t = -1.75
+  2025                                            42 bets  ROI  +17.8%  t = +1.23
+  2026                                             9 bets  ROI  -14.9%  t = -0.44

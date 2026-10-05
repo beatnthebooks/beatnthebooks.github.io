@@ -1,0 +1,76 @@
+Loaded 7548 games (7334 played), 1999-2026.
+
+Tuning on 2006-2015 only ...
+  core: K=20  home field=fixed 55  regression=0.50  MOV=True
+  rest: 6 Elo/day    backup-QB penalty: 75 Elo
+
+OUT-OF-SAMPLE TEST, 2016-2025  (closing moneylines, real vig)
+======================================================================================
+                             LogLoss   Brier     Acc       ROI EV>0      ROI EV>3%
+  Elo, core only              0.6353  0.2216   63.6%    -6.3% (2396)    -8.3% (2065)
+  + rest                      0.6349  0.2215   63.8%    -6.8% (2383)    -8.1% (2057)
+  + backup-QB flag            0.6309  0.2197   64.0%    -5.7% (2381)    -6.0% (2036)
+  + rest + QB  (final)        0.6305  0.2196   64.3%    -6.4% (2367)    -7.3% (2040)
+  blend (w=0.22 on model)     0.6107  0.2106   66.4%    -7.1% (1394)   -11.0% ( 708)
+  closing market              0.6091  0.2099   66.5%        (the benchmark)
+  coin flip                   0.6931  0.2500
+  games scored: 2760
+
+BY SEASON (final model vs closing market, log loss; lower wins)
+  2016: model 0.6187  market 0.6222  -> model
+  2017: model 0.6237  market 0.5932  -> market
+  2018: model 0.6261  market 0.6143  -> market
+  2019: model 0.6407  market 0.6166  -> market
+  2020: model 0.6187  market 0.5906  -> market
+  2021: model 0.6521  market 0.6240  -> market
+  2022: model 0.6326  market 0.6060  -> market
+  2023: model 0.6503  market 0.6270  -> market
+  2024: model 0.6101  market 0.5892  -> market
+  2025: model 0.6303  market 0.6078  -> market
+
+2026 SO FAR (58 games): model logloss 0.6560  market 0.6622  ROI EV>0 +8.2% (51 bets)
+
+CURRENT RATINGS (after every completed game)
+   1. Seahawks     1643.8
+   2. 49ers        1602.8
+   3. Vikings      1599.0
+   4. Jaguars      1596.2
+   5. Bills        1594.7
+   6. Bears        1570.4
+   7. Patriots     1567.1
+   8. Broncos      1566.2
+   9. Rams         1562.7
+  10. Chiefs       1551.8
+  11. Ravens       1538.5
+  12. Lions        1521.1
+  13. Bengals      1510.6
+  14. Steelers     1501.2
+  15. Eagles       1494.7
+  16. Giants       1490.8
+  17. Raiders      1485.0
+  18. Texans       1484.9
+  19. Falcons      1484.4
+  20. Browns       1483.3
+  21. Cowboys      1480.5
+  22. Colts        1479.1
+  23. Packers      1462.0
+  24. Saints       1460.0
+  25. Panthers     1448.8
+  26. Commanders   1435.7
+  27. Chargers     1435.2
+  28. Buccaneers   1414.7
+  29. Dolphins     1404.1
+  30. Cardinals    1403.6
+  31. Jets         1394.2
+  32. Titans       1332.9
+  home-field now: 55.0 Elo
+
+NOT YET PLAYED (model vs closing line)
+  2026-10-04 16:05  MIA @ MIN  model  80.8%  market  80.8%  blend  80.8%  (home)  
+  2026-10-04 16:25   KC @ LV   model  48.3%  market  33.6%  blend  36.9%  (home)  
+  2026-10-04 16:25  LAC @ SEA  model  82.0%  market  74.4%  blend  76.1%  (home)  
+  2026-10-04 16:25  DEN @ SF   model  62.9%  market  60.0%  blend  60.6%  (home)  
+  2026-10-04 20:20  DET @ CAR  model  47.5%  market  36.3%  blend  38.8%  (home)  
+  2026-10-05 20:15  ATL @ NO   model  62.3%  market  54.3%  blend  56.0%  (home)  ATL QB Michael Penix Jr. not usual starter
+
+Wrote current_ratings.json to results/

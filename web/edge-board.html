@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edge Board</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+  /* Layout: sticky app bar; KPI tile row; controls; add-game; game cards; reality aside.
+     Identity: a cool "market terminal" — condensed display, plex sans body, mono figures. */
+  :root{
+    --bg:#eef2f5; --surface:#ffffff; --surface-2:#f3f6f9; --raise:#e7edf1;
+    --fg:#16222b; --muted:#5d6e79; --line:#d7dee4; --line-2:#e6ecf0;
+    --accent:#0f8d85; --accent-strong:#0a6f68;
+    --good:#1f9d57; --good-bg:#e4f4ea;
+    --warn:#b5781a; --warn-bg:#f6ecd9;
+    --bad:#cf3b3b; --bad-bg:#f8e3e3;
+    --low:#64757f; --low-bg:#e9eef1;
+    --font-display:"Archivo",system-ui,sans-serif;
+    --font-body:"IBM Plex Sans",system-ui,sans-serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --bg:#0d141a; --surface:#141e26; --surface-2:#1a2730; --raise:#223139;
+    --fg:#e7eef3; --muted:#93a4af; --line:#26343f; --line-2:#1f2c35;
+    --accent:#2fb3aa; --accent-strong:#54c7bf;
+    --good:#35c074; --good-bg:#12271b;
+    --warn:#e0a033; --warn-bg:#2a2110;
+    --bad:#ef6a6a; --bad-bg:#2c1414;
+    --low:#8698a3; --low-bg:#1c2831;
+    color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#0d141a; --surface:#141e26; --surface-2:#1a2730; --raise:#223139;
+    --fg:#e7eef3; --muted:#93a4af; --line:#26343f; --line-2:#1f2c35;
+    --accent:#2fb3aa; --accent-strong:#54c7bf;
+    --good:#35c074; --good-bg:#12271b;
+    --warn:#e0a033; --warn-bg:#2a2110;
+    --bad:#ef6a6a; --bad-bg:#2c1414;
+    --low:#8698a3; --low-bg:#1c2831;
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--font-body);
+    font-size:15px;line-height:1.5;margin:0}
+  .wrap{max-width:960px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+  h1,h2,h3{font-family:var(--font-display);margin:0;letter-spacing:-.01em}
+  .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+  button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+  a{color:var(--accent-strong)}
+
+  /* App bar */
+  .appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+    background:var(--surface);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;padding:12px 16px;flex-wrap:wrap}
+  .appbar .brand{display:flex;flex-direction:column}
+  .appbar h1{font-size:20px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.04em;line-height:1}
+  .appbar .tag{font-size:11.5px;color:var(--muted);letter-spacing:.02em;margin-top:3px}
+  .appbar .spring{flex:1 1 40px}
+  .iconbtn{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
+    padding:8px 11px;cursor:pointer;font-size:13px;display:inline-flex;gap:6px;align-items:center}
+  .iconbtn:hover{border-color:var(--accent)}
+
+  section{margin-top:22px}
+  .eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--muted);font-weight:600;margin-bottom:10px}
+
+  /* KPI tiles */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+  .kpi .v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;
+    font-size:24px;font-weight:600;line-height:1.1}
+  .kpi .l{font-size:11.5px;color:var(--muted);margin-top:5px;letter-spacing:.02em}
+  .kpi .v.good{color:var(--good)} .kpi .v.accent{color:var(--accent-strong)}
+
+  /* panels */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .controls{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .field label{font-size:11.5px;color:var(--muted);letter-spacing:.02em;font-weight:600}
+  .field input,.field select{background:var(--surface-2);border:1px solid var(--line);
+    border-radius:9px;padding:8px 10px;min-width:0}
+  .field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+  .field.sm input{width:92px}
+
+  details.add{margin-top:14px}
+  details.add>summary{cursor:pointer;font-size:13px;color:var(--accent-strong);
+    font-weight:600;list-style:none;display:inline-flex;align-items:center;gap:6px}
+  details.add>summary::-webkit-details-marker{display:none}
+  .addgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px;align-items:end}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 14px;
+    font-weight:600;cursor:pointer;white-space:nowrap}
+  .btn:hover{background:var(--accent-strong)}
+  .btn.ghost{background:transparent;color:var(--bad);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--bad)}
+  .btn.sec{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
+  .btn.sec:hover{border-color:var(--accent)}
+
+  /* model controls + power ratings */
+  .switch{display:inline-flex;align-items:center;gap:7px;font-size:13px;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:7px 10px}
+  .switch input{accent-color:var(--accent)}
+  input[type=range]{accent-color:var(--accent);width:160px;max-width:100%}
+  .src{font-size:9px;font-weight:700;padding:1px 5px;border-radius:5px;
+    letter-spacing:.04em;text-transform:uppercase}
+  .src.model{background:var(--good-bg);color:var(--good)}
+  .src.manual{background:var(--warn-bg);color:var(--warn)}
+  .src.fair{background:var(--low-bg);color:var(--low)}
+  .revert{background:none;border:none;color:var(--accent-strong);cursor:pointer;
+    font-size:11px;padding:2px 0 0;text-align:left}
+  .revert:hover{text-decoration:underline}
+  .ratingsgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));
+    gap:10px;margin-top:14px}
+  .ratingsgrid .field input{width:100%}
+  .rowbtns{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .foot .mline{font-family:var(--font-mono);color:var(--muted)}
+  .foot .gnote{flex-basis:100%;color:var(--warn);font-size:11.5px}
+
+  /* track record */
+  .track{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .track .kpi{background:var(--surface-2)}
+  .track .kpi .v.bad{color:var(--bad)}
+  .seasons{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .seasons span{font-family:var(--font-mono);font-size:11px;padding:3px 7px;border-radius:6px}
+  .seasons .m{background:var(--low-bg);color:var(--low)}
+  .seasons .w{background:var(--good-bg);color:var(--good)}
+  .tnote{font-size:13px;color:var(--muted);margin:12px 0 0;max-width:72ch}
+
+  /* game cards */
+  .board{display:flex;flex-direction:column;gap:12px}
+  .game{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .game.best{border-color:var(--accent)}
+  .ghead{display:flex;align-items:center;gap:10px;padding:12px 14px;
+    background:var(--surface-2);border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+  .ghead .match{font-family:var(--font-display);font-weight:700;font-size:16px}
+  .ghead .spring{flex:1 1 20px}
+  .chip{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;
+    letter-spacing:.02em;white-space:nowrap}
+  .chip.when{background:var(--raise);color:var(--muted)}
+  .chip.vig{background:var(--raise);color:var(--muted);font-family:var(--font-mono)}
+  .rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;line-height:1}
+  .rm:hover{color:var(--bad)}
+
+  .side{display:grid;grid-template-columns:1.3fr .9fr .9fr 1.1fr;gap:10px 12px;
+    padding:12px 14px;align-items:center}
+  .side+.side{border-top:1px solid var(--line-2)}
+  .side.win{background:linear-gradient(0deg,var(--good-bg),transparent)}
+  .side .team{font-weight:600;display:flex;align-items:center;gap:7px;min-width:0}
+  .side .team .win-dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex:none}
+  .cell{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .cell .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .cell .val{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:14px}
+  .cell input{width:100%;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:7px;padding:5px 7px;font-family:var(--font-mono);
+    font-variant-numeric:tabular-nums;font-size:13px}
+  .cell input:focus{outline:2px solid var(--accent);border-color:transparent}
+  .edge{font-family:var(--font-mono);font-weight:600}
+  .tier{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.03em;align-self:flex-start}
+  .tier.HIGH{background:var(--good-bg);color:var(--good)}
+  .tier.MEDIUM{background:var(--warn-bg);color:var(--warn)}
+  .tier.LOW{background:var(--low-bg);color:var(--low)}
+  .ev.pos{color:var(--good)} .ev.neg{color:var(--bad)}
+  .meter{height:5px;border-radius:3px;background:var(--line-2);overflow:hidden;margin-top:3px}
+  .meter>span{display:block;height:100%}
+  .foot{display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;
+    padding:10px 14px;border-top:1px solid var(--line-2);font-size:12px;color:var(--muted)}
+  .foot .stake{font-family:var(--font-mono)}
+  .foot .stake b{color:var(--fg)}
+
+  /* reality */
+  .reality{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:12px;padding:16px 18px}
+  .reality h3{font-size:15px;margin-bottom:8px}
+  .reality ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:7px}
+  .reality li{font-size:13.5px;color:var(--fg)}
+  .reality b{font-family:var(--font-mono)}
+
+  /* wind watch */
+  .wrow{display:grid;grid-template-columns:1.7fr .8fr .8fr .8fr 1.5fr;gap:10px 12px;
+    align-items:center;padding:11px 0;border-top:1px solid var(--line-2)}
+  .wrow.head{border-top:none;padding-top:0}
+  .wrow.head .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .wrow .match{font-weight:600}
+  .wrow .sub{font-size:11.5px;color:var(--muted)}
+  .wrow input{width:100%;max-width:90px;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:7px;padding:5px 7px;font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:13px}
+  .wrow input:focus{outline:2px solid var(--accent);border-color:transparent}
+  .wind{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:600}
+  .wind.hi{color:var(--good)}
+  .sig{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.03em;
+    align-self:flex-start;white-space:nowrap}
+  .sig.under{background:var(--good-bg);color:var(--good)}
+  .sig.roof{background:var(--warn-bg);color:var(--warn)}
+  .sig.none,.sig.unknown{background:var(--low-bg);color:var(--low)}
+  .wrow .stake{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+  .wrow .stake b{color:var(--fg)}
+
+  footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-height:1.6}
+
+  @media (max-width:720px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .track{grid-template-columns:repeat(2,1fr)}
+    .addgrid{grid-template-columns:repeat(2,1fr)}
+    .side{grid-template-columns:1fr 1fr;gap:12px}
+    .side .team{grid-column:1 / -1}
+    .wrow{grid-template-columns:1fr 1fr}
+    .wrow .wmatch{grid-column:1 / -1}
+    .wrow.head{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="appbar">
+  <div class="brand">
+    <h1>Edge&nbsp;Board</h1>
+    <span class="tag">Private edge tool · real Elo model · wind watch · de-vig · EV · Kelly</span>
+  </div>
+  <span class="spring"></span>
+  <button class="iconbtn" id="themeBtn" type="button">◐ Theme</button>
+</header>
+
+<div class="wrap">
+
+  <section class="kpis" id="kpis" aria-label="Summary"></section>
+
+  <section>
+    <div class="eyebrow">Settings</div>
+    <div class="panel controls">
+      <div class="field">
+        <label for="method">De-vig method</label>
+        <select id="method">
+          <option value="multiplicative">Multiplicative (standard)</option>
+          <option value="power">Power (shades favorites)</option>
+        </select>
+      </div>
+      <div class="field sm">
+        <label for="bankroll">Bankroll ($)</label>
+        <input id="bankroll" class="mono" type="number" min="0" step="10" value="1000">
+      </div>
+      <div class="field">
+        <label for="kfrac">Kelly fraction</label>
+        <select id="kfrac">
+          <option value="0.25">Quarter (safe)</option>
+          <option value="0.5" selected>Half</option>
+          <option value="1">Full (aggressive)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="useModel">Model fills win%</label>
+        <label class="switch"><input type="checkbox" id="useModel"> auto from ratings</label>
+      </div>
+      <div class="field">
+        <label for="mweight">Model influence <span id="mwlab" class="mono"></span></label>
+        <input type="range" id="mweight" min="0" max="100" step="5">
+      </div>
+      <details class="add">
+        <summary>+ Add a game</summary>
+        <div class="addgrid">
+          <div class="field"><label>Away team</label><input id="a_away" placeholder="Away"></div>
+          <div class="field"><label>Away ML</label><input id="a_awayodds" class="mono" placeholder="-150"></div>
+          <div class="field"><label>Home team</label><input id="a_home" placeholder="Home"></div>
+          <div class="field"><label>Home ML</label><input id="a_homeodds" class="mono" placeholder="+130"></div>
+          <div class="field"><label>Kickoff</label><input id="a_when" placeholder="3:25 CT"></div>
+          <div class="field"><label>Your home win %</label><input id="a_model" class="mono" placeholder="fair"></div>
+        </div>
+        <div style="margin-top:12px"><button class="btn" id="addBtn" type="button">Add to board</button></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Power ratings · model inputs</div>
+    <div class="panel">
+      <p style="margin:0;font-size:13px;color:var(--muted);max-width:72ch">
+        These are real Elo ratings built from every NFL game since 1999, with margin of
+        victory, rest days and backup-QB adjustments. The model turns them into a win%,
+        then blends that with the market by your influence slider. Nudge a team up or
+        down to add your own read.</p>
+      <div class="ratingsgrid" id="ratings"></div>
+      <div class="rowbtns">
+        <button class="btn sec" id="anchorBtn" type="button">⚓ Anchor to market</button>
+        <button class="btn sec" id="resetRatingsBtn" type="button">Reset to real ratings</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Today's board · sorted by value</div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Totals · wind watch · the one lead that held up</div>
+    <div class="panel">
+      <p class="tnote" style="margin-top:0">Closing totals under-adjust for wind. The rule: bet the
+        <b>under</b> in an outdoor game when the forecast wind over the first four hours from kickoff is
+        <b>10 mph or more</b>. Forecasts come from Open-Meteo when <span class="mono">update_board.py</span>
+        runs. The backtest used forecasts from shortly before kickoff, so re-run it on game day.
+        Enter your book's total and under price.</p>
+      <div id="wind" style="margin-top:12px"></div>
+      <div class="track" style="margin-top:16px">
+        <div class="kpi"><div class="v" style="color:var(--good)">+14.2%</div><div class="l">ROI 2022–25 using archived forecast wind (168 bets, t = 1.96)</div></div>
+        <div class="kpi"><div class="v" style="color:var(--good)">+11.8%</div><div class="l">ROI 2016–25 using recorded wind (608 bets); 8 of 10 seasons up</div></div>
+        <div class="kpi"><div class="v bad">−25.7%</div><div class="l">Worst season (2024, 41 bets). Losing years will happen.</div></div>
+        <div class="kpi"><div class="v">≈40</div><div class="l">Signals per season, spread from September to January</div></div>
+      </div>
+      <p class="tnote">Found by <span class="mono">edge_lab.py</span>: 37 candidate signals screened on 2001–2015,
+        only wind survived both the screen and the 2016–2025 test. The sample is small, and the edge is
+        promising but not proven. Stake is a flat 1% of bankroll; the edge is too uncertain to size with Kelly.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Model track record · real games, out-of-sample</div>
+    <div class="panel">
+      <div class="track">
+        <div class="kpi"><div class="v bad">−6.4%</div><div class="l">ROI 2016–25, betting every model edge at the closing price (2,367 bets)</div></div>
+        <div class="kpi"><div class="v">9 of 10</div><div class="l">Seasons the closing line was more accurate than the model</div></div>
+        <div class="kpi"><div class="v">0.631</div><div class="l">Model log loss vs 0.609 for the market (lower is better)</div></div>
+        <div class="kpi"><div class="v">−3.0%</div><div class="l">For comparison: blindly betting every favorite</div></div>
+      </div>
+      <div class="seasons" aria-label="More accurate side, by season">
+        <span class="w">2016 · model</span><span class="m">2017 · market</span><span class="m">2018 · market</span>
+        <span class="m">2019 · market</span><span class="m">2020 · market</span><span class="m">2021 · market</span>
+        <span class="m">2022 · market</span><span class="m">2023 · market</span><span class="m">2024 · market</span>
+        <span class="m">2025 · market</span>
+      </div>
+      <p class="tnote">Tuned on 2006–2015, then scored once on 2016–2025 without peeking.
+        The backup-QB flag made the model more accurate; rest days barely mattered.
+        It's up 8.2% on 51 bets in 2026, which is too few games to mean anything.
+        A green row is a reason to check the news, not a bet.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="reality">
+      <h3>Reality check</h3>
+      <ul>
+        <li>Break-even at −110 is <b>52.4%</b>. A 50.7% record loses money.</li>
+        <li>The de-vig math is identical for everyone — it is <b>never</b> your edge. Edge only exists when your win% beats the fair price.</li>
+        <li>On real games this model lost money at closing prices. A gap between it and the line usually means the market knows something the model doesn't, like an injury or a new starter.</li>
+        <li>Real edge lives in three places: the <b>best price</b> across books (shop the dogs), <b>news</b> before the line moves, and genuinely better <b>inputs</b> than the market.</li>
+        <li>Treat a green row as "look here," not "lock." Verify every play by hand.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Personal analytics tool — the math is exact, the reads are yours. Not betting advice.<br>
+    Lines are a snapshot you enter; shop for the best number before you bet.
+  </footer>
+</div>
+
+<script>
+/* ---------- odds / edge math (ported from the verified Python module) ---------- */
+function amToDec(a){a=Number(a); if(!isFinite(a)||a===0) return NaN; return a>0 ? 1+a/100 : 1+100/Math.abs(a);}
+function impAm(a){const d=amToDec(a); return isFinite(d)?1/d:NaN;}
+function removeVig(raw, method){
+  const tot=raw.reduce((s,x)=>s+x,0);
+  if(method==='power'){
+    let lo=0,hi=10,k=1;
+    for(let i=0;i<200;i++){k=(lo+hi)/2; (raw.reduce((s,x)=>s+Math.pow(x,k),0)>1)?lo=k:hi=k;}
+    return raw.map(x=>Math.pow(x,(lo+hi)/2));
+  }
+  return raw.map(x=>x/tot); // multiplicative
+}
+function classify(pp){const a=Math.abs(pp); return a>=10?'HIGH':a>=5?'MEDIUM':'LOW';}
+function side(model, fair, dec){
+  const edge=(model-fair)*100, ev=(model*dec-1)*100, b=dec-1;
+  let k=b>0?(model*b-(1-model))/b:0; k=Math.max(0,k);
+  return {model,fair,dec,edge,ev,kelly:k,tier:classify(edge)};
+}
+
+/* ---------- the model (Elo power ratings + market blend) ---------- */
+function rating(t){ return (state.ratings && isFinite(state.ratings[t])) ? state.ratings[t] : 1500; }
+/* g.adj = extra Elo for the home side from rest days and backup-QB flags
+   (computed by rift_real.py from the game data) */
+function eloDiff(g,S){ return rating(g.home)+S.homeAdv+(Number(g.adj)||0)-rating(g.away); }
+function eloProbHome(g,S){ return 1/(1+Math.pow(10,-eloDiff(g,S)/400)); }
+function eloSpreadHome(g,S){ return -eloDiff(g,S)/25; }   // negative = home favored, in points
+function blend(m,k,w){ w=Math.max(0,Math.min(1,w)); return w*m+(1-w)*k; }
+function clampP(p){ return Math.min(0.999,Math.max(0.001,p)); }
+
+/* effective home win% + where it came from: model / manual / fair */
+function effModelHome(g, fairH, S){
+  if(S.useModel && !g.manual){
+    return {p:clampP(blend(eloProbHome(g,S), fairH, S.modelWeight)), src:'model'};
+  }
+  const v=Number(g.modelHome);
+  if(!isFinite(v)) return {p:fairH, src:'fair'};
+  return {p:clampP(v/100), src:'manual'};
+}
+
+function compute(g, S){
+  const rawA=impAm(g.awayOdds), rawH=impAm(g.homeOdds);
+  const [fairA,fairH]=removeVig([rawA,rawH], S.method);
+  const vig=(rawA+rawH-1)*100;
+  const em=effModelHome(g, fairH, S);
+  const mH=em.p, mA=1-mH;
+  const decA=amToDec(g.bestAway??g.awayOdds), decH=amToDec(g.bestHome??g.homeOdds);
+  const away=side(mA,fairA,decA), home=side(mH,fairH,decH);
+  return {vig, away, home, best: home.ev>=away.ev?'home':'away',
+          src:em.src, spread:eloSpreadHome(g,S)};
+}
+
+/* ---------- state ---------- */
+const LS='edgeboard.v3';
+/* Real Elo ratings (every NFL game 1999 to Oct 4 2026) and today's closing lines */
+const SEED={"ratings":{"Falcons":1484.4,"Vikings":1599.0,"Bears":1570.4,"Chiefs":1551.8,"Browns":1483.3,"Steelers":1501.2,"Packers":1462.0,"Raiders":1485.0,"Colts":1479.1,"Bills":1594.7,"Jaguars":1596.2,"49ers":1602.8,"Saints":1460.0,"Panthers":1448.8,"Jets":1394.2,"Patriots":1567.1,"Eagles":1494.7,"Cardinals":1403.6,"Seahawks":1643.8,"Lions":1521.1,"Rams":1562.7,"Ravens":1538.5,"Buccaneers":1414.7,"Giants":1490.8,"Titans":1332.9,"Bengals":1510.6,"Commanders":1435.7,"Cowboys":1480.5,"Broncos":1566.2,"Dolphins":1404.1,"Chargers":1435.2,"Texans":1484.9},"homeAdv":55,"blend":0.22,"games":[{"id":1,"away":"Dolphins","home":"Vikings","awayOdds":400,"homeOdds":-535,"when":"3:05 CT \u00b7 started","adj":0.0,"note":"","modelHome":null,"manual":false},{"id":2,"away":"Chiefs","home":"Raiders","awayOdds":-225,"homeOdds":185,"when":"3:25 CT \u00b7 started","adj":0.0,"note":"","modelHome":null,"manual":false},{"id":3,"away":"Chargers","home":"Seahawks","awayOdds":275,"homeOdds":-345,"when":"3:25 CT \u00b7 started","adj":0.0,"note":"","modelHome":null,"manual":false},{"id":4,"away":"Broncos","home":"49ers","awayOdds":140,"homeOdds":-166,"when":"3:25 CT \u00b7 started","adj":0.0,"note":"","modelHome":null,"manual":false},{"id":5,"away":"Lions","home":"Panthers","awayOdds":-198,"homeOdds":164,"when":"7:20 CT","adj":0.0,"note":"","modelHome":null,"manual":false},{"id":6,"away":"Falcons","home":"Saints","awayOdds":110,"homeOdds":-130,"when":"Mon 7:15 CT","adj":57.0,"note":"Falcons QB Michael Penix Jr. not usual starter; rest edge -18","modelHome":null,"manual":false}],"totals":[{"id":1,"away":"Chargers","home":"Seahawks","when":"3:25 CT \u00b7 started","roof":"outdoors","wind":2.2,"signal":"none","total":42.5,"underOdds":-102},{"id":2,"away":"Broncos","home":"49ers","when":"3:25 CT \u00b7 started","roof":"outdoors","wind":7.7,"signal":"none","total":48.5,"underOdds":-115},{"id":3,"away":"Lions","home":"Panthers","when":"7:20 CT","roof":"outdoors","wind":2.2,"signal":"none","total":51.5,"underOdds":-108},{"id":4,"away":"Buccaneers","home":"Cowboys","when":"Thu 7:15 CT","roof":"retractable","wind":4.5,"signal":"none","total":null,"underOdds":null},{"id":5,"away":"Eagles","home":"Jaguars","when":"Sun 8:30 CT","roof":"outdoors","wind":8.5,"signal":"none","total":null,"underOdds":null},{"id":6,"away":"Bears","home":"Packers","when":"Sun 12:00 CT","roof":"outdoors","wind":10.6,"signal":"under","total":null,"underOdds":null},{"id":7,"away":"Bengals","home":"Dolphins","when":"Sun 12:00 CT","roof":"outdoors","wind":14.1,"signal":"under","total":null,"underOdds":null},{"id":8,"away":"Raiders","home":"Patriots","when":"Sun 12:00 CT","roof":"outdoors","wind":12.8,"signal":"under","total":null,"underOdds":null},{"id":9,"away":"Browns","home":"Jets","when":"Sun 12:00 CT","roof":"outdoors","wind":12.0,"signal":"under","total":null,"underOdds":null},{"id":10,"away":"Colts","home":"Steelers","when":"Sun 12:00 CT","roof":"outdoors","wind":8.2,"signal":"none","total":null,"underOdds":null},{"id":11,"away":"Texans","home":"Titans","when":"Sun 12:00 CT","roof":"outdoors","wind":6.2,"signal":"none","total":null,"underOdds":null},{"id":12,"away":"Giants","home":"Commanders","when":"Sun 12:00 CT","roof":"outdoors","wind":10.4,"signal":"under","total":null,"underOdds":null},{"id":13,"away":"Lions","home":"Cardinals","when":"Sun 3:25 CT","roof":"retractable","wind":8.7,"signal":"none","total":null,"underOdds":null},{"id":14,"away":"49ers","home":"Seahawks","when":"Sun 3:25 CT","roof":"outdoors","wind":8.2,"signal":"none","total":null,"underOdds":null},{"id":15,"away":"Ravens","home":"Falcons","when":"Sun 7:20 CT","roof":"retractable","wind":6.5,"signal":"none","total":null,"underOdds":null}],"stamp":"2026-10-04T17:01"};
+const BASE_RATINGS=Object.assign({}, SEED.ratings);
+const ABBR={ARI:'Cardinals',ATL:'Falcons',BAL:'Ravens',BUF:'Bills',CAR:'Panthers',CHI:'Bears',
+  CIN:'Bengals',CLE:'Browns',DAL:'Cowboys',DEN:'Broncos',DET:'Lions',GB:'Packers',HOU:'Texans',
+  IND:'Colts',JAX:'Jaguars',KC:'Chiefs',LA:'Rams',LAR:'Rams',LAC:'Chargers',LV:'Raiders',MIA:'Dolphins',
+  MIN:'Vikings',NE:'Patriots',NO:'Saints',NYG:'Giants',NYJ:'Jets',PHI:'Eagles',PIT:'Steelers',
+  SEA:'Seahawks',SF:'49ers',TB:'Buccaneers',TEN:'Titans',WAS:'Commanders'};
+function teamName(s){
+  const t=s.trim(); const up=t.toUpperCase();
+  if(ABBR[up]) return ABBR[up];
+  const hit=Object.keys(BASE_RATINGS).find(n=>n.toLowerCase()===t.toLowerCase()
+    || t.toLowerCase().endsWith(' '+n.toLowerCase()));
+  return hit||t;
+}
+const demo={
+  method:'multiplicative', bankroll:1000, kfrac:0.5,
+  useModel:true, modelWeight:0.20, homeAdv:SEED.homeAdv,
+  ratings:Object.assign({}, SEED.ratings), games:SEED.games, totals:SEED.totals||[]
+};
+let state=load();
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(LS));
+    if(s&&s.games){
+      if(s.seedStamp!==SEED.stamp){   // fresh data from update_board.py: new games + ratings, keep your settings
+        s.games=JSON.parse(JSON.stringify(SEED.games)); s.ratings=Object.assign({},SEED.ratings);
+        s.totals=JSON.parse(JSON.stringify(SEED.totals||[]));
+        s.homeAdv=SEED.homeAdv; s.seedStamp=SEED.stamp; }
+      if(!s.totals) s.totals=JSON.parse(JSON.stringify(SEED.totals||[]));
+      s.ratings=s.ratings||Object.assign({},BASE_RATINGS); if(s.useModel===undefined)s.useModel=true;
+      if(s.modelWeight===undefined)s.modelWeight=0.20; if(s.homeAdv===undefined)s.homeAdv=SEED.homeAdv; return s; }
+  }catch(e){}
+  const d=JSON.parse(JSON.stringify(demo)); d.seedStamp=SEED.stamp; return d;
+}
+function save(){ try{localStorage.setItem(LS, JSON.stringify(state));}catch(e){} }
+
+/* ---------- render ---------- */
+const $=s=>document.querySelector(s);
+const fmtPct=x=>x.toFixed(1)+'%';
+const fmtAm=o=>{o=Number(o); return (o>0?'+':'')+o;};
+const st=()=>({method:state.method, bankroll:Number(state.bankroll)||0, kfrac:Number(state.kfrac),
+  useModel:!!state.useModel, modelWeight:Number(state.modelWeight)||0, homeAdv:Number(state.homeAdv)||55});
+
+function tierColor(t){return t==='HIGH'?'var(--good)':t==='MEDIUM'?'var(--warn)':'var(--low)';}
+const SRCLABEL={model:'model', manual:'manual', fair:'market'};
+
+function sideRow(g, s, isHome, isWin, src){
+  const teamName=isHome?g.home:g.away;
+  const boardOdds=isHome?g.homeOdds:g.awayOdds;
+  const bestKey=isHome?'bestHome':'bestAway';
+  const bestVal=g[bestKey]??boardOdds;
+  const mw=Math.min(1,Math.abs(s.edge)/15)*100;
+  const mcol=s.edge>=0?tierColor(s.tier):'var(--bad)';
+  const winLabel = isHome
+    ? `Win% <span class="src ${src}">${SRCLABEL[src]}</span>`
+    : `Win% (=1−home)`;
+  const winControl = isHome
+    ? `<input class="mono" data-id="${g.id}" data-field="modelHome" value="${(s.model*100).toFixed(1)}" inputmode="decimal">
+       ${g.manual?`<button class="revert" data-revert="${g.id}" type="button">↺ use model</button>`:''}`
+    : `<span class="val">${fmtPct(s.model*100)}</span>`;
+  return `<div class="side ${isWin?'win':''}">
+    <div class="team">${isWin?'<span class="win-dot"></span>':''}${teamName}
+      <span class="chip vig" style="background:transparent;padding:0;color:var(--muted)">${fmtAm(boardOdds)}</span></div>
+    <div class="cell"><span class="k">Best price</span>
+      <input class="mono" data-id="${g.id}" data-field="${bestKey}" value="${fmtAm(bestVal)}" inputmode="numeric"></div>
+    <div class="cell"><span class="k">${winLabel}</span>
+      ${winControl}
+      <span class="val" style="color:var(--muted);font-size:11px">fair ${fmtPct(s.fair*100)}</span></div>
+    <div class="cell"><span class="k">Edge / EV</span>
+      <span><span class="edge" style="color:${mcol}">${s.edge>=0?'+':''}${s.edge.toFixed(1)}pp</span>
+        <span class="tier ${s.tier}">${s.tier}</span></span>
+      <span class="val ev ${s.ev>=0?'pos':'neg'}">EV ${s.ev>=0?'+':''}${s.ev.toFixed(1)}%</span>
+      <span class="meter"><span style="width:${mw}%;background:${mcol}"></span></span></div>
+  </div>`;
+}
+
+function spreadTxt(g, spread){
+  // spread is for the home team; negative = home favored
+  const t = spread<=0 ? g.home : g.away;
+  const n = Math.abs(spread).toFixed(1);
+  return `model line: ${t} -${n}`;
+}
+
+function gameCard(g){
+  const S=st();
+  const c=compute(g, S);
+  const winHome=c.best==='home';
+  const bestSide=winHome?c.home:c.away;
+  const stake=S.bankroll*bestSide.kelly*S.kfrac;
+  const stakeTxt=bestSide.ev>0
+    ? `Suggested stake <b>$${stake.toFixed(0)}</b> · ${(bestSide.kelly*S.kfrac*100).toFixed(1)}% of roll`
+    : `No +EV side — <b>pass</b>`;
+  return `<div class="game ${bestSide.ev>0?'best':''}">
+    <div class="ghead">
+      <span class="match">${g.away} @ ${g.home}</span>
+      <span class="spring"></span>
+      <span class="chip when">${g.when||''}</span>
+      <span class="chip vig">vig ${c.vig.toFixed(1)}%</span>
+      <button class="rm" data-rm="${g.id}" title="Remove" type="button">✕</button>
+    </div>
+    ${sideRow(g, c.away, false, !winHome, c.src)}
+    ${sideRow(g, c.home, true, winHome, c.src)}
+    <div class="foot">
+      <span class="stake">${stakeTxt}</span>
+      <span class="mline">${spreadTxt(g, c.spread)}</span>
+      <span>Best bet: <b style="color:var(--fg)">${winHome?g.home:g.away}</b></span>
+      ${g.note?`<span class="gnote">Model adjustment: ${g.note}</span>`:''}
+    </div>
+  </div>`;
+}
+
+function renderKpis(){
+  const S=st();
+  const rows=state.games.map(g=>{const c=compute(g,S); const best=c.best==='home'?c.home:c.away; return {c,best};});
+  const n=rows.length;
+  const plus=rows.filter(r=>r.best.ev>0).length;
+  const bestEdge=rows.reduce((m,r)=>Math.max(m,r.best.edge),-99);
+  const avgVig=n?rows.reduce((s,r)=>s+r.c.vig,0)/n:0;
+  $('#kpis').innerHTML=`
+    <div class="kpi"><div class="v">${n}</div><div class="l">Games on board</div></div>
+    <div class="kpi"><div class="v ${plus?'good':''}">${plus}</div><div class="l">+EV plays</div></div>
+    <div class="kpi"><div class="v accent">${n?(bestEdge>=0?'+':'')+bestEdge.toFixed(1):'—'}</div><div class="l">Best edge (pp)</div></div>
+    <div class="kpi"><div class="v">${n?avgVig.toFixed(1):'—'}</div><div class="l">Avg vig %</div></div>`;
+}
+
+function renderRatings(){
+  const teams=[...new Set(state.games.flatMap(g=>[g.away,g.home]))].sort();
+  $('#ratings').innerHTML = teams.map(t=>`
+    <div class="field"><label>${t}</label>
+      <input class="mono rating" data-team="${t}" value="${Math.round(rating(t))}" inputmode="numeric"></div>`).join('')
+    || '<span class="tag" style="color:var(--muted)">Add games to rate teams.</span>';
+}
+
+function render(){
+  renderKpis();
+  const S=st();
+  const sorted=[...state.games].sort((a,b)=>{
+    const ea=compute(a,S), eb=compute(b,S);
+    const va=(ea.best==='home'?ea.home:ea.away).ev, vb=(eb.best==='home'?eb.home:eb.away).ev;
+    return vb-va;
+  });
+  $('#board').innerHTML=sorted.map(gameCard).join('')||'<div class="panel">No games. Add one above.</div>';
+  renderWind();
+}
+
+/* ---------- wind watch (totals) ---------- */
+const SIGLABEL={under:'UNDER signal', roof:'Windy · roof may close', none:'No signal', unknown:'No forecast'};
+function windRow(t){
+  const S=st();
+  const dec=amToDec(t.underOdds);
+  const be=isFinite(dec)?`break-even ${(100/dec).toFixed(1)}%`:'enter under price';
+  const stake=t.signal==='under'
+    ? `Flat stake <b>$${(S.bankroll*0.01).toFixed(0)}</b> · 1% of roll`
+    : t.signal==='roof' ? 'Bet only if the roof is open' : 'Pass';
+  return `<div class="wrow">
+    <div class="wmatch"><div class="match">${t.away} @ ${t.home}</div>
+      <div class="sub">${t.when||''} · ${t.roof}</div></div>
+    <div><span class="wind ${t.wind!=null&&t.wind>=10?'hi':''}">${t.wind==null?'—':t.wind.toFixed(1)+' mph'}</span></div>
+    <div><input data-tid="${t.id}" data-tfield="total" value="${t.total??''}" placeholder="total" inputmode="decimal"></div>
+    <div><input data-tid="${t.id}" data-tfield="underOdds" value="${t.underOdds==null?'':fmtAm(t.underOdds)}" placeholder="-110" inputmode="numeric">
+      <div class="sub">${be}</div></div>
+    <div style="display:flex;flex-direction:column;gap:4px"><span class="sig ${t.signal}">${SIGLABEL[t.signal]||t.signal}</span>
+      <span class="stake">${stake}</span></div>
+  </div>`;
+}
+function renderWind(){
+  const rows=[...(state.totals||[])].sort((a,b)=>(b.wind??-1)-(a.wind??-1));
+  $('#wind').innerHTML = rows.length
+    ? `<div class="wrow head"><span class="k">Game</span><span class="k">Wind</span><span class="k">Total</span>
+        <span class="k">Under price</span><span class="k">Signal</span></div>` + rows.map(windRow).join('')
+    : '<span class="tnote">No outdoor games in the next 8 days. Run update_board.py to refresh.</span>';
+}
+
+/* ---------- model actions ---------- */
+function anchorRatings(){
+  const S=st();
+  state.games.forEach(g=>{
+    const [,fairH]=removeVig([impAm(g.awayOdds),impAm(g.homeOdds)], S.method);
+    const p=clampP(fairH);
+    const targetDiff=400*Math.log10(p/(1-p));   // = rH + HFA + adj - rA
+    state.ratings[g.away]=1500;
+    state.ratings[g.home]=1500+targetDiff-S.homeAdv-(Number(g.adj)||0);
+  });
+  save(); render(); renderRatings();
+}
+function resetRatings(){ state.ratings=Object.assign({},BASE_RATINGS); save(); render(); renderRatings(); }
+
+/* ---------- events ---------- */
+document.addEventListener('input', e=>{
+  const t=e.target;
+  if(t.classList && t.classList.contains('rating')){
+    const team=t.dataset.team; const v=Number(t.value);
+    state.ratings[team]= isFinite(v)? v : 1500; save();
+    renderKpis(); scheduleSoftRender(); return;
+  }
+  if(t.dataset && t.dataset.tid){
+    const w=(state.totals||[]).find(x=>x.id==t.dataset.tid); if(!w) return;
+    const v=t.value.trim();
+    w[t.dataset.tfield]= v===''? null : Number(v.replace('+',''));
+    if(t.dataset.tfield==='underOdds'){   // update break-even in place (no re-render, keeps focus)
+      const dec=amToDec(w.underOdds), sub=t.parentElement.querySelector('.sub');
+      if(sub) sub.textContent=isFinite(dec)?`break-even ${(100/dec).toFixed(1)}%`:'enter under price';
+    }
+    save(); return;
+  }
+  if(t.dataset && t.dataset.field){
+    const g=state.games.find(x=>x.id==t.dataset.id); if(!g) return;
+    const f=t.dataset.field; let v=t.value.trim();
+    if(f==='modelHome'){ g.modelHome=v===''?null:Number(v); g.manual=true; }
+    else { g[f]=v===''?null:Number(v.replace('+','')); }
+    save(); renderKpis(); scheduleSoftRender();
+  }
+});
+let softT=null;
+function scheduleSoftRender(){ clearTimeout(softT); softT=setTimeout(render, 450); }
+
+$('#method').addEventListener('change',e=>{state.method=e.target.value;save();render();});
+$('#bankroll').addEventListener('input',e=>{state.bankroll=e.target.value;save();render();});
+$('#kfrac').addEventListener('change',e=>{state.kfrac=e.target.value;save();render();});
+$('#useModel').addEventListener('change',e=>{state.useModel=e.target.checked;save();render();});
+$('#mweight').addEventListener('input',e=>{
+  state.modelWeight=Number(e.target.value)/100; $('#mwlab').textContent=e.target.value+'%';
+  save(); renderKpis(); scheduleSoftRender();
+});
+
+document.addEventListener('click', e=>{
+  const rm=e.target.closest('[data-rm]');
+  if(rm){ state.games=state.games.filter(g=>g.id!=rm.dataset.rm); save(); render(); renderRatings(); return; }
+  const rev=e.target.closest('[data-revert]');
+  if(rev){ const g=state.games.find(x=>x.id==rev.dataset.revert); if(g){ g.manual=false; g.modelHome=null; save(); render(); } return; }
+  if(e.target.id==='anchorBtn'){ anchorRatings(); return; }
+  if(e.target.id==='resetRatingsBtn'){ resetRatings(); return; }
+});
+
+$('#addBtn').addEventListener('click',()=>{
+  const away=teamName($('#a_away').value), home=teamName($('#a_home').value);
+  const ao=$('#a_awayodds').value.trim(), ho=$('#a_homeodds').value.trim();
+  if(!away||!home||!ao||!ho){ return; }
+  const m=$('#a_model').value.trim();
+  state.games.push({id:Date.now(), away, home, awayOdds:Number(ao.replace('+','')),
+    homeOdds:Number(ho.replace('+','')), when:$('#a_when').value.trim(),
+    modelHome:m===''?null:Number(m), manual:m!==''});
+  ['a_away','a_awayodds','a_home','a_homeodds','a_when','a_model'].forEach(id=>$('#'+id).value='');
+  save(); render(); renderRatings();
+});
+
+/* theme */
+const themeBtn=$('#themeBtn');
+function applyTheme(t){ if(t) document.documentElement.setAttribute('data-theme',t); else document.documentElement.removeAttribute('data-theme'); }
+try{applyTheme(localStorage.getItem('edgeboard.theme'));}catch(e){}
+themeBtn.addEventListener('click',()=>{
+  const cur=document.documentElement.getAttribute('data-theme');
+  const dark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const next=cur? (cur==='dark'?'light':'dark') : (dark?'light':'dark');
+  applyTheme(next); try{localStorage.setItem('edgeboard.theme',next);}catch(e){}
+});
+
+/* sync settings controls to state */
+$('#method').value=state.method; $('#bankroll').value=state.bankroll; $('#kfrac').value=state.kfrac;
+$('#useModel').checked=!!state.useModel;
+$('#mweight').value=Math.round((Number(state.modelWeight)||0)*100);
+$('#mwlab').textContent=Math.round((Number(state.modelWeight)||0)*100)+'%';
+renderRatings();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+{
+ "2026_01_ATL_PIT": {
+  "asof": null,
+  "src": "archive",
+  "wind": 4.9
+ },
+ "2026_01_CHI_CAR": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.1
+ },
+ "2026_01_CLE_JAX": {
+  "asof": null,
+  "src": "archive",
+  "wind": 5.5
+ },
+ "2026_01_DAL_NYG": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.1
+ },
+ "2026_01_DEN_KC": {
+  "asof": null,
+  "src": "archive",
+  "wind": 11.8
+ },
+ "2026_01_NE_SEA": {
+  "asof": null,
+  "src": "archive",
+  "wind": 3.9
+ },
+ "2026_01_NYJ_TEN": {
+  "asof": null,
+  "src": "archive",
+  "wind": 3.3
+ },
+ "2026_01_TB_CIN": {
+  "asof": null,
+  "src": "archive",
+  "wind": 8.0
+ },
+ "2026_01_WAS_PHI": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.5
+ },
+ "2026_02_CLE_TB": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.5
+ },
+ "2026_02_DET_BUF": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.2
+ },
+ "2026_02_GB_NYJ": {
+  "asof": null,
+  "src": "archive",
+  "wind": 5.8
+ },
+ "2026_02_IND_KC": {
+  "asof": null,
+  "src": "archive",
+  "wind": 5.5
+ },
+ "2026_02_JAX_DEN": {
+  "asof": null,
+  "src": "archive",
+  "wind": 6.3
+ },
+ "2026_02_MIA_SF": {
+  "asof": null,
+  "src": "archive",
+  "wind": 8.4
+ },
+ "2026_02_MIN_CHI": {
+  "asof": null,
+  "src": "archive",
+  "wind": 8.6
+ },
+ "2026_02_NO_BAL": {
+  "asof": null,
+  "src": "archive",
+  "wind": 4.6
+ },
+ "2026_02_PHI_TEN": {
+  "asof": null,
+  "src": "archive",
+  "wind": 4.5
+ },
+ "2026_02_PIT_NE": {
+  "asof": null,
+  "src": "archive",
+  "wind": 6.0
+ },
+ "2026_03_ARI_SF": {
+  "asof": null,
+  "src": "archive",
+  "wind": 12.7
+ },
+ "2026_03_ATL_GB": {
+  "asof": null,
+  "src": "archive",
+  "wind": 1.7
+ },
+ "2026_03_BAL_DAL": {
+  "asof": null,
+  "src": "archive",
+  "wind": 4.5
+ },
+ "2026_03_CAR_CLE": {
+  "asof": null,
+  "src": "archive",
+  "wind": 10.8
+ },
+ "2026_03_CIN_PIT": {
+  "asof": null,
+  "src": "archive",
+  "wind": 11.4
+ },
+ "2026_03_HOU_IND": {
+  "asof": null,
+  "src": "archive",
+  "wind": 6.1
+ },
+ "2026_03_KC_MIA": {
+  "asof": null,
+  "src": "archive",
+  "wind": 3.6
+ },
+ "2026_03_LAC_BUF": {
+  "asof": null,
+  "src": "archive",
+  "wind": 11.5
+ },
+ "2026_03_LA_DEN": {
+  "asof": null,
+  "src": "archive",
+  "wind": 5.4
+ },
+ "2026_03_MIN_TB": {
+  "asof": null,
+  "src": "archive",
+  "wind": 5.3
+ },
+ "2026_03_NE_JAX": {
+  "asof": null,
+  "src": "archive",
+  "wind": 5.5
+ },
+ "2026_03_PHI_CHI": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.2
+ },
+ "2026_03_SEA_WAS": {
+  "asof": null,
+  "src": "archive",
+  "wind": 11.9
+ },
+ "2026_03_TEN_NYG": {
+  "asof": null,
+  "src": "archive",
+  "wind": 12.3
+ },
+ "2026_04_ARI_NYG": {
+  "asof": null,
+  "src": "archive",
+  "wind": 6.7
+ },
+ "2026_04_DEN_SF": {
+  "asof": null,
+  "src": "archive",
+  "wind": 7.7
+ },
+ "2026_04_DET_CAR": {
+  "asof": "2026-10-04T18:27",
+  "src": "live",
+  "wind": 1.5
+ },
+ "2026_04_GB_TB": {
+  "asof": null,
+  "src": "archive",
+  "wind": 1.2
+ },
+ "2026_04_IND_WAS": {
+  "asof": null,
+  "src": "archive",
+  "wind": 5.4
+ },
+ "2026_04_JAX_CIN": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.6
+ },
+ "2026_04_LAC_SEA": {
+  "asof": null,
+  "src": "archive",
+  "wind": 2.2
+ },
+ "2026_04_LA_PHI": {
+  "asof": null,
+  "src": "archive",
+  "wind": 8.9
+ },
+ "2026_04_NE_BUF": {
+  "asof": null,
+  "src": "archive",
+  "wind": 11.6
+ },
+ "2026_04_NYJ_CHI": {
+  "asof": null,
+  "src": "archive",
+  "wind": 7.8
+ },
+ "2026_04_PIT_CLE": {
+  "asof": null,
+  "src": "archive",
+  "wind": 10.9
+ },
+ "2026_04_TEN_BAL": {
+  "asof": null,
+  "src": "archive",
+  "wind": 4.3
+ },
+ "2026_05_BAL_ATL": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 8.1
+ },
+ "2026_05_CHI_GB": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 16.4
+ },
+ "2026_05_CIN_MIA": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 14.4
+ },
+ "2026_05_CLE_NYJ": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 10.1
+ },
+ "2026_05_DET_ARI": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 6.6
+ },
+ "2026_05_HOU_TEN": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 8.3
+ },
+ "2026_05_IND_PIT": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 7.8
+ },
+ "2026_05_LV_NE": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 7.3
+ },
+ "2026_05_NYG_WAS": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 8.9
+ },
+ "2026_05_PHI_JAX": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 12.2
+ },
+ "2026_05_SF_SEA": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 7.4
+ },
+ "2026_05_TB_DAL": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 6.2
+ },
+ "2026_06_BAL_CLE": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 12.2
+ },
+ "2026_06_CAR_PHI": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 5.3
+ },
+ "2026_06_CHI_ATL": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 12.8
+ },
+ "2026_06_DAL_GB": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 6.1
+ },
+ "2026_06_HOU_JAX": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 6.4
+ },
+ "2026_06_LAC_KC": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 7.2
+ },
+ "2026_06_NO_NYG": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 11.0
+ },
+ "2026_06_NYJ_NE": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 8.2
+ },
+ "2026_06_PIT_TB": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 9.2
+ },
+ "2026_06_SEA_DEN": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 2.7
+ },
+ "2026_06_TEN_IND": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 10.2
+ },
+ "2026_06_WAS_SF": {
+  "asof": "2026-10-04T19:30",
+  "src": "live",
+  "wind": 6.8
+ }
+}
