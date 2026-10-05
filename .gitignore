@@ -1,0 +1,12 @@
+__pycache__/
+build/
+data/*.tmp
+data/wind_forecast_cache.json
+# aussportsbetting.com terms: personal use only, never republish the data
+data/nfl_odds_history.xlsx
+.claude/
+# private ntfy channel name: anyone who knows it can read the alerts
+ntfy_topic.txt
+
+# nflverse injury reports + snap counts (re-downloadable)
+data/nflverse/
