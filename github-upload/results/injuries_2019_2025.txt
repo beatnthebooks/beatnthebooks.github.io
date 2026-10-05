@@ -1,0 +1,54 @@
+﻿Team-weeks with an injury report: 7045 · games covered 2013+: 3608
+Average snap share listed Out/Doubtful per team-game: 1.15 (1.00 = one full-time player) · QB out in 463 team-games
+
+=== ML · DEV 2013-2018 (1601 games) ===
+  signal         coef      z  halves agree  avg |value|
+  inj_def      +0.069  +1.08  yes           0.63   
+  inj_q        +0.021  +0.72  no            1.39   
+  inj_off      -0.033  -0.54  yes           0.64   
+  inj_all      +0.015  +0.36  yes           0.98   
+  inj_qb       +0.058  +0.35  no            0.12   
+
+=== SPREAD · DEV 2013-2018 (1557 games) ===
+  signal         coef      z  halves agree  avg |value|
+  inj_qb       +0.137  +0.92  no            0.12   
+  inj_q        +0.008  +0.30  no            1.39   
+  inj_def      +0.008  +0.13  no            0.63   
+  inj_off      -0.003  -0.05  no            0.64   
+  inj_all      +0.002  +0.05  no            0.97   
+
+=== TOTAL · DEV 2013-2018 (1586 games) ===
+  signal         coef      z  halves agree  avg |value|
+  tot_def      +0.023  +0.40  no            1.07   
+  tot_off      -0.020  -0.39  yes           1.11   
+  tot_net      -0.001  -0.02  no            0.94   
+
+Selected on DEV: {'ml': ['(none)'], 'spread': ['(none)'], 'total': ['(none)']}
+
+==============================================================================
+OUT-OF-SAMPLE TEST 2019-2025 (expanding-window refit, real closing prices)
+==============================================================================
+
+ML: market calibration only 
+  log loss  model 0.60874  vs market 0.60881  (model better, 1960 games)
+  EV > 0%:   190 bets  ROI  +5.31%  (t = +0.89)  winning seasons 3/3
+  EV > 2%:     1 bets  ROI +80.65%  (t = +0.00)  winning seasons 1/1
+  EV > 4%: no bets
+
+ML: no injury signal passed the screen
+
+SPREAD: market calibration only 
+  log loss  model 0.69380  vs market 0.69219  (market better, 1917 games)
+  EV > 0%:   774 bets  ROI  -4.25%  (t = -1.18)  winning seasons 2/7
+  EV > 2%:   405 bets  ROI  -3.27%  (t = -0.65)  winning seasons 2/5
+  EV > 4%:   212 bets  ROI  -5.20%  (t = -0.74)  winning seasons 2/4
+
+SPREAD: no injury signal passed the screen
+
+TOTAL: market calibration only 
+  log loss  model 0.69326  vs market 0.69294  (market better, 1941 games)
+  EV > 0%:   466 bets  ROI  -0.75%  (t = -0.16)  winning seasons 4/7
+  EV > 2%:   118 bets  ROI -10.85%  (t = -1.17)  winning seasons 1/4
+  EV > 4%:    22 bets  ROI  -6.41%  (t = -0.29)  winning seasons 2/3
+
+TOTAL: no injury signal passed the screen

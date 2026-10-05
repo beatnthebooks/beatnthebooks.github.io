@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beatn’ the Books · Teams</title>
+<meta name="description" content="Elo power ratings for all 32 NFL teams, with each team's rating trend and schedule.">
+<meta name="theme-color" content="#09080d">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <div class="brandrow">
+      <a class="brand" href="index.html" aria-label="Beatn’ the Books home"><img src="favicon.svg" alt="" width="42" height="42"><span class="word">Beatn’ the <em>Books</em></span></a>
+      <nav class="nav" aria-label="Pages">
+        <a href="index.html">This week</a>
+        <a href="index.html#bets">My bets</a>
+        <a href="season.html">Season</a>
+        <a href="teams.html" aria-current="page">Teams</a>
+        <a href="method.html">Method</a>
+      </nav>
+      <span class="spring"></span>
+      <span class="stamp" data-stamp></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" data-page="teams">
+  <section>
+    <div class="pagehead">
+      <div>
+        <div class="eyebrow">Power ratings</div>
+        <h1>Teams</h1>
+      </div>
+      <div class="sub" id="powerSub"></div>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="tablebox" style="align-self:start"><table id="power"></table></div>
+    <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+      <div class="panel">
+        <h2 id="teamName" style="font-size:22px"></h2>
+        <div class="why" id="teamSub" style="font-size:15px;margin:6px 0 12px"></div>
+        <div class="why" style="margin-bottom:6px">Chance to beat an average team before each game, over the last two seasons</div>
+        <div class="chart" id="teamChart"></div>
+      </div>
+      <div class="tablebox"><table id="teamGames"></table></div>
+    </div>
+  </section>
+
+  <footer><div class="fbrand"><img src="favicon.svg" alt="" width="30" height="30"><span>Beatn’ the <em>Books</em></span></div><br>Analysis only, not betting advice. Data: nflverse (scores, lines, starters) and Open-Meteo (wind forecasts).<br><span data-foot></span></footer>
+</main>
+<script src="data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

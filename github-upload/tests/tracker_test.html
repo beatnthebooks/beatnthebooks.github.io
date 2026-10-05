@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bet tracker tests</title>
+<style>
+  body{font:14px/1.5 system-ui,sans-serif;margin:0;padding:16px;background:#fff;color:#16222b}
+  @media (prefers-color-scheme:dark){body{background:#0d141a;color:#e7eef3}}
+  h1{font-size:18px} .pass{color:#1f9d57} .fail{color:#cf3b3b;font-weight:600}
+  td,th{padding:4px 10px;text-align:left;border-bottom:1px solid #8884} table{border-collapse:collapse}
+</style>
+</head>
+<body>
+<h1 id="sum">Running…</h1>
+<p>Checks the "My bets" settlement, fees and closing-line math in <code>site/assets/app.js</code>
+  against hand-calculated answers. Open this file in a browser; it needs nothing else.</p>
+<table id="out"><tr><th>Check</th><th>Expected</th><th>Got</th><th></th></tr></table>
+<script>
+/* Fixture: one final game (home won 24-20; closed home -3, total 44.5, home 60% to win), one upcoming. */
+window.EDGE = {
+  updatedLabel: "test", hfa: 55, blendW: 0.22, windMph: 10, currentWeek: 5, gapEv: 2,
+  fees: {kalshi: 0.07, polymarket: 0.05},
+  teams: [{team: "GB", name: "Packers"}, {team: "CHI", name: "Bears"}],
+  games: [
+    {id: "final", wk: 4, status: "final", date: "2026-10-04", away: "CHI", home: "GB",
+     awayName: "Bears", homeName: "Packers", as: 20, hs: 24,
+     closeFair: {home: 0.60, spreadLine: 3, spreadHome: 0.5, total: 44.5, over: 0.5}},
+    {id: "later", wk: 5, status: "upcoming", date: "2026-10-11", away: "CHI", home: "GB",
+     awayName: "Bears", homeName: "Packers", as: null, hs: null,
+     closeFair: {home: 0.55, spreadLine: 1.5, total: 44}}
+  ]
+};
+</script>
+<script src="../site/assets/app.js"></script>
+<script>
+const T = window.EDGE_TEST, rows = [];
+let fails = 0;
+function check(name, want, got, tol) {
+  const ok = typeof want === "number" ? got != null && Math.abs(got - want) <= (tol ?? 1e-6) : want === got;
+  if (!ok) fails++;
+  rows.push(`<tr><td>${name}</td><td>${want}</td><td>${got}</td><td class="${ok ? "pass" : "fail"}">${ok ? "pass" : "FAIL"}</td></tr>`);
+}
+const bet = (o) => Object.assign({gid: "final", venue: "kalshi", n: 10, point: null}, o);
+
+// 1. Moneyline, Packers at 55c x10 on Polymarket: wins
+let m = T.betMath(bet({mk: "ml", side: "home", cents: 55, venue: "polymarket"}));
+check("ML fee = 0.05 x .55 x .45 x 10", 0.12375, m.fee);
+check("ML result", "won", m.result);
+check("ML profit = 10 x .45 - fee", 4.37625, m.pl);
+check("ML value vs close = .60 / (.55 + fee/contract) - 1", (0.60 / (0.55 + 0.012375) - 1) * 100, m.clvEv, 1e-9);
+check("ML beat the close", true, m.beat);
+
+// 2. Bears +3 at 50c (Kalshi): Packers won by 4, so Bears +3 loses; same line as the close
+m = T.betMath(bet({mk: "spread", side: "away", point: 3, cents: 50}));
+check("Spread result", "lost", m.result);
+check("Spread loss = -10 x .50 - fee", -5.175, m.pl);
+check("Spread fee (Kalshi 0.07 x .5 x .5 x 10)", 0.175, m.fee);
+check("Spread same line: value vs close", (0.5 / (0.5 + 0.0175) - 1) * 100, m.clvEv, 1e-9);
+check("Spread beat the close", false, m.beat);
+
+// 3. Packers -2.5 at 48c: wins by 4; got half a point better than the closing -3
+m = T.betMath(bet({mk: "spread", side: "home", point: -2.5, cents: 48}));
+check("Spread -2.5 result", "won", m.result);
+check("Points vs close (-2.5 vs -3)", 0.5, m.clvPts);
+check("Spread -2.5 beat the close", true, m.beat);
+
+// 4. Under 44 with 44 points scored: push, lose only the fee; half a point worse than 44.5
+m = T.betMath(bet({mk: "total", side: "under", point: 44, cents: 50}));
+check("Total push", "push", m.result);
+check("Push costs only the fee", -0.175, m.pl);
+check("Points vs close (under 44 vs 44.5)", -0.5, m.clvPts);
+
+// 5. Over 44 at 50c: 44 scored, push too; got half a point better than over 44.5
+m = T.betMath(bet({mk: "total", side: "over", point: 44, cents: 50}));
+check("Over 44 points vs close", 0.5, m.clvPts);
+
+// 6. Game not kicked off: no result, no closing-line verdict yet
+m = T.betMath(bet({gid: "later", mk: "ml", side: "away", cents: 45}));
+check("Upcoming: no result", undefined, m.result);
+check("Upcoming: no close yet", undefined, m.beat);
+
+// 7. Bet text
+check("Text: spread", "Bears +3", T.betText({mk: "spread", side: "away", point: 3}, window.EDGE.games[0]));
+check("Text: total", "Under 44", T.betText({mk: "total", side: "under", point: 44}, null));
+
+document.getElementById("out").insertAdjacentHTML("beforeend", rows.join(""));
+const sum = document.getElementById("sum");
+sum.textContent = fails ? `${fails} of ${rows.length} checks FAILED` : `All ${rows.length} checks passed`;
+sum.className = fails ? "fail" : "pass";
+document.title = fails ? "FAIL · Bet tracker tests" : "PASS · Bet tracker tests";
+</script>
+</body>
+</html>

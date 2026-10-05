@@ -1,0 +1,38 @@
+﻿Loaded 62,029 player-games of passing/rushing stats.
+Tuning QB ratings on 2006-2015 only ...
+  chosen: value=box mult=2.0 alpha=0.2 new-QB prior=1.0 sd below avg · backup flag=75
+  training log loss: current model 0.6200 -> QB model 0.6189
+  + team EPA efficiency: mult=3.0 alpha=0.08 -> training log loss 0.6185
+  + injuries (all non-QB positions, by snap share): offense 0.0 Elo, defense 25.0 Elo per full-time starter out, questionable 2.0 -> training log loss 0.6178
+
+OUT-OF-SAMPLE TEST 2016-2025 (closing moneylines)
+                                     LogLoss     Acc       ROI EV>0      ROI EV>3%
+  original Elo                        0.6305   64.3%    -6.4% (2367)    -7.3% (2040)
+  QB + team EPA                       0.6290   64.3%    -5.5% (2332)    -5.1% (1965)
+  QB + team EPA + injuries            0.6291   64.1%    -6.3% (2323)    -6.3% (1959)
+  original blend (w=0.22)             0.6107   66.4%    -7.1% (1394)   -11.0% ( 708)
+  QB + EPA blend (w=0.28)             0.6110   66.5%    -5.4% (1486)    -7.0% ( 784)
+  + injuries blend (w=0.3)            0.6111   66.5%    -5.2% (1553)    -7.2% ( 860)
+  closing market                      0.6091   66.5%
+
+BY SEASON (log loss; lower wins)
+  2016: original 0.6187  QB+EPA 0.6153  +injuries 0.6169  market 0.6222
+  2017: original 0.6237  QB+EPA 0.6147  +injuries 0.6070  market 0.5932
+  2018: original 0.6261  QB+EPA 0.6358  +injuries 0.6368  market 0.6143
+  2019: original 0.6407  QB+EPA 0.6435  +injuries 0.6488  market 0.6166
+  2020: original 0.6187  QB+EPA 0.6215  +injuries 0.6228  market 0.5906
+  2021: original 0.6521  QB+EPA 0.6437  +injuries 0.6439  market 0.6240
+  2022: original 0.6326  QB+EPA 0.6339  +injuries 0.6327  market 0.6060
+  2023: original 0.6503  QB+EPA 0.6450  +injuries 0.6459  market 0.6270
+  2024: original 0.6101  QB+EPA 0.6053  +injuries 0.6036  market 0.5892
+  2025: original 0.6303  QB+EPA 0.6302  +injuries 0.6315  market 0.6078
+
+AGAINST OPENING LINES (2014+; no injury info, which isn't known when lines open)
+  original       Pinnacle 2014-17       line moved toward the lean  53.9% of  529 · bet at the open:  +0.7% on 546
+  original       bet365 2018-24         line moved toward the lean  57.7% of  671 · bet at the open:  +0.8% on 725
+  original       betr 2025-             line moved toward the lean  72.7% of   88 · bet at the open:  +8.3% on 92
+  QB + EPA       Pinnacle 2014-17       line moved toward the lean  55.2% of  589 · bet at the open:  +5.1% on 609
+  QB + EPA       bet365 2018-24         line moved toward the lean  62.8% of  772 · bet at the open:  +2.5% on 843
+  QB + EPA       betr 2025-             line moved toward the lean  74.8% of  111 · bet at the open: +10.7% on 116
+
+Wrote results\qb_model_settings.json
