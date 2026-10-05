@@ -48,6 +48,24 @@ class LeanShift(unittest.TestCase):
         self.assertEqual(more["n"], 40)
 
 
+class SpreadMath(unittest.TestCase):
+    def test_cover_is_even_when_model_agrees_with_the_line(self):
+        p = 1 / (1 + 10 ** (-3 * 25 / 400))                 # Elo win prob worth exactly 3 points
+        self.assertAlmostEqual(W.spread_cover(p, 3.0, 11.7, 0.28), 0.5, places=6)
+
+    def test_model_likes_home_more_than_the_line(self):
+        self.assertGreater(W.spread_cover(0.8, 3.0, 11.7, 0.28), 0.5)
+        self.assertLess(W.spread_cover(0.4, 3.0, 11.7, 0.28), 0.5)
+
+    def test_record_uses_unseen_seasons_and_strong_picks_only(self):
+        g = dict(game(2018, 24, 10), spread=3.0, hso=-110.0, aso=-110.0)
+        strong = [{"g": g, "p": 0.95}] * 5                    # big edges on both ML and spread
+        early = [{"g": dict(g, season=2010), "p": 0.95}] * 50  # tuning seasons: ignored
+        weak = [{"g": g, "p": 0.53}] * 50                     # model ~ market (52%): no strong pick
+        rec = W.model_record(strong + early + weak, 0.28, 11.7, 2026)
+        self.assertEqual(rec["ml"]["n"], 5)
+
+
 class WindPickPrice(unittest.TestCase):
     g = {"tot": 44.5, "oo": -110.0, "uo": -110.0}
 

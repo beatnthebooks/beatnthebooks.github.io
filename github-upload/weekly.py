@@ -42,9 +42,10 @@ import urllib.request
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
+from statistics import NormalDist
 
 import alerts
-from edge_lab import _inverse, _solve, devig, load, logit, sigmoid
+from edge_lab import DEV, _inverse, _solve, devig, fit_sigma, load, logit, sigmoid
 from odds import EXCHANGE_FEE, add_live_exchanges, get_odds, log_snapshots, match_games
 from qb_model import Model as QBModel, ensure_stats
 from rift_real import TEAM_NAME, am_to_dec, run
@@ -227,6 +228,74 @@ def real_edge(p_fair: float, shift: float, dec: float) -> float:
     return round((sigmoid(logit(p_fair) + shift) * dec - 1) * 100, 1)
 
 
+# Model picks on the moneyline and the spread are SUGGESTED when the model's own edge is at least this big
+# (Mason, Oct 5: "suggest bets when the edge is pretty good on the ML or the spread"). They're shown with their
+# real record (model_record) and ranked by real_edge like everything else. 5% chosen as "pretty good" up front;
+# 8%+ looked better in 2016-25 (ML +2.9%, spread +0.4%) but choosing the cutoff that looks best is fooling ourselves.
+MODEL_MIN_EDGE = 5.0
+ND = NormalDist()
+
+
+def model_margin(p: float) -> float:
+    """Elo win probability -> expected home margin in points (25 Elo per point)."""
+    return 400 * math.log10(p / (1 - p)) / 25
+
+
+def spread_cover(p: float, line: float, sigma: float, blend_w: float) -> float:
+    """Model-blend chance the HOME team covers. line = expected home margin (nflverse spread_line, + = home
+    favored); the blend mixes our margin with the market's like the moneyline blend; sigma = margin spread."""
+    bm = blend_w * model_margin(p) + (1 - blend_w) * line
+    return ND.cdf((bm - line) / sigma)
+
+
+def _model_bets(recs, blend_w, sigma, start, season):
+    """Walk-forward model picks at closing prices: yields (kind, model_ev, market_p_of_side, dec, won/None)."""
+    for r in recs:
+        g = r["g"]
+        if not (start <= g["season"] < season) or g["hs"] is None:
+            continue
+        if g["hml"] and g["aml"] and g["hs"] != g["as"]:
+            f = devig(g["hml"], g["aml"])
+            bl = blend_w * r["p"] + (1 - blend_w) * f
+            dh, da = am_to_dec(g["hml"]), am_to_dec(g["aml"])
+            evh, eva = bl * dh - 1, (1 - bl) * da - 1
+            home = evh >= eva
+            yield "ml", max(evh, eva), (f if home else 1 - f), (dh if home else da), (g["hs"] > g["as"]) == home
+        if g["spread"] is not None and g["hso"] and g["aso"]:
+            pc = spread_cover(r["p"], g["spread"], sigma, blend_w)
+            pm = devig(g["hso"], g["aso"])
+            dh, da = am_to_dec(g["hso"]), am_to_dec(g["aso"])
+            evh, eva = pc * dh - 1, (1 - pc) * da - 1
+            home = evh >= eva
+            margin = g["hs"] - g["as"]
+            won = None if margin == g["spread"] else (margin > g["spread"]) == home
+            yield "spread", max(evh, eva), (pm if home else 1 - pm), (dh if home else da), won
+
+
+def fit_spread_shift(recs, blend_w, sigma, season, start=LEAN_FIT_FROM) -> dict:
+    """Like fit_lean_shift, for the model's spread picks (from its first unseen season)."""
+    off, y = [], []
+    for kind, ev, pm, _, won in _model_bets(recs, blend_w, sigma, start, season):
+        if kind == "spread" and ev > 0 and won is not None:
+            off.append(logit(pm))
+            y.append(1.0 if won else 0.0)
+    beta, se = _fit_offset_logit([[1.0]] * len(y), off, y)
+    return {"shift": round(beta[0], 5), "se": round(se[0], 5), "n": len(y), "won": int(sum(y)),
+            "seasons": f"{start}-{season - 1}"}
+
+
+def model_record(recs, blend_w, sigma, season, start=LEAN_FIT_FROM) -> dict:
+    """What suggested model picks (model edge >= MODEL_MIN_EDGE) returned at closing prices, per $1."""
+    out = {}
+    for kind in ("ml", "spread"):
+        rets = [0.0 if won is None else (dec - 1 if won else -1.0)
+                for k, ev, _, dec, won in _model_bets(recs, blend_w, sigma, start, season)
+                if k == kind and ev * 100 >= MODEL_MIN_EDGE]
+        out[kind] = {"n": len(rets), "roi": round(sum(rets) / len(rets) * 100, 1) if rets else None,
+                     "seasons": f"{start}-{season - 1}"}
+    return out
+
+
 def wind_pick(g, s: dict | None, wind_shift: float) -> dict | None:
     """The under to bet on a wind signal: line, the price you'd pay (your best Kalshi/Polymarket offer when it
     matches the sportsbooks' line, else sportsbook odds; finished games: the closing price, as in the
@@ -298,6 +367,8 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shift
     mine = (s or {}).get("ml", {})
     fair = (s or {}).get("fair", {}).get("home")
     src = "books" if fair is not None else "nflverse"
+    if fair is not None and 0 < s["books"] < GAP_MIN_BOOKS and g["hml"] and g["aml"]:
+        fair, src = None, "nflverse"      # too few books for a fair price (early-week lines): use the consensus line
     if fair is None and g["hml"] and g["aml"]:
         fair = devig(g["hml"], g["aml"])
     if "home" in mine and "away" in mine:
@@ -355,6 +426,35 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shift
         row["total"] = {"line": g["tot"], "oo": g["oo"], "uo": g["uo"]}
     elif "totalPoint" in f:
         row["total"] = {"line": f["totalPoint"], "oo": None, "uo": None}
+
+    # ---- model spread pick: our margin vs the line, priced where you'd bet (finished games: closing price) ----
+    L = (row.get("spread") or {}).get("line")
+    if shifts and L is not None:
+        offers = (s or {}).get("spread", {})
+        if s and s["books"] >= GAP_MIN_BOOKS and f.get("spreadPoint") == -L and "spreadHome" in f:
+            pm = f["spreadHome"]                       # sportsbooks' fair chance the home side covers
+        elif g["hso"] and g["aso"]:
+            pm = devig(g["hso"], g["aso"])
+        else:
+            pm = 0.5
+        opts = {}
+        for side, pt, am in (("home", -L, g["hso"]), ("away", L, g["aso"])):
+            o = offers.get(side)
+            if o and o.get("point") == pt:
+                opts[side] = (o["dec"], {"cents": o["cents"], "book": o["book"]})
+            elif am:
+                opts[side] = (am_to_dec(am), {"odds": int(am)})
+        if len(opts) == 2:
+            pc = spread_cover(p, L, shifts["sigma"], blend_w)
+            evs = {"home": pc * opts["home"][0] - 1, "away": (1 - pc) * opts["away"][0] - 1}
+            side = max(evs, key=evs.get)
+            dec, price = opts[side]
+            sl = {"side": side, "point": -L if side == "home" else L, "ev": round(evs[side] * 100, 1),
+                  "edge": real_edge(pm if side == "home" else 1 - pm, shifts["spread"]["shift"], dec), **price}
+            if final:
+                margin = g["hs"] - g["as"]
+                sl["units"] = round(settle(None if margin == L else (margin > L) == (side == "home"), dec), 3)
+            row["spreadLean"] = sl
 
     # ---- wind watch ----
     w = wind_log.get(g["gid"])
@@ -481,7 +581,10 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
     if shop:
         log_snapshots(shop, games)
 
-    shifts = {"wind": fit_wind_shift(games, season), "lean": fit_lean_shift(recs, blend_w, season)}
+    sigma = fit_sigma(games, DEV["spread"])
+    shifts = {"wind": fit_wind_shift(games, season), "lean": fit_lean_shift(recs, blend_w, season),
+              "spread": fit_spread_shift(recs, blend_w, sigma, season), "sigma": sigma}
+    record = model_record(recs, blend_w, sigma, season)
     rows = [game_row(r, blend_w, wind_log, shop, now, shifts) for r in recs if r["g"]["season"] == season]
     unplayed = [x for x in rows if x["status"] != "final"]
     current = unplayed[0]["wk"] if unplayed else rows[-1]["wk"]
@@ -496,6 +599,7 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
         "blendW": blend_w, "hfa": round(hfa, 1), "windMph": WIND_MPH, "model": model_name,
         "oddsFetched": odds["fetched"] if odds else None, "oddsGames": len(shop), "gapEv": GAP_EV,
         "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live), "pickShifts": shifts,
+        "modelMinEdge": MODEL_MIN_EDGE, "modelRecord": record,
         "fees": EXCHANGE_FEE,
         "games": rows, "summary": season_summary(rows), "teams": teams,
     }

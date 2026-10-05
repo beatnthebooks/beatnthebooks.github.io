@@ -170,6 +170,9 @@ section{margin-top:30px}
 .pprice{color:var(--fg-2);font-size:14.5px;font-weight:600}
 .pedge{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:17px;white-space:nowrap}
 .pedge small{font-family:var(--font-body);font-size:12.5px;font-weight:600;color:var(--muted);margin-left:3px}
+.pedge.model{color:var(--purple-soft)}
+.prec{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
+.prec b{font-weight:700}
 .pwhy{font-size:13.5px;color:var(--muted);margin-top:5px;display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center}
 .pwhy .tag{font-size:10.5px;padding:2px 8px}
 .pwhy .pill{font-size:12.5px;padding:2px 9px}

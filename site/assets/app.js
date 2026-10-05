@@ -135,14 +135,20 @@ function monthTicks(d0,d1){
    edge = expected profit per $1 at the price you'd pay. Wind unders and model leans use the market's fair
    chance shifted by what that kind of bet has really returned (weekly.py: real_edge); price gaps use the
    sportsbooks' fair price. One bet suggested by two signals is listed once with both reasons. */
-const EVID={wind:['under','Wind · tested'],roof:['roof','Wind · roof must be open'],gap:['gap','Price gap · unproven'],lean:['lean','Model pick · no proven edge']};
-const EDGE_FROM={wind:0,roof:0,gap:1,lean:2};          // whose edge number to show when two signals merge
+const EVID={wind:['under','Wind · tested'],roof:['roof','Wind · roof must be open'],gap:['gap','Price gap · unproven'],
+  lean:['lean','Model pick · no proven edge'],spread:['lean','Model pick · no proven edge']};
+const EDGE_FROM={wind:0,roof:0,gap:1,lean:2,spread:2};  // whose edge number to show when two signals merge
+/* Model picks (moneyline and spread) are suggested when the model's own edge is at least D.modelMinEdge (5%),
+   shown with that number and their real record, and ranked by their realistic edge like everything else. */
 function picks(g){
-  const out=[], team=s=>s==='home'?g.homeName:g.awayName, f=g.status==='final';
+  const out=[], team=s=>s==='home'?g.homeName:g.awayName, f=g.status==='final', MIN=D.modelMinEdge??5;
   const add=p=>{const e=out.find(x=>x.key===p.key);
     if(!e){out.push(p); return;}
     e.src.push(...p.src); e.why.push(...p.why); if(e.result==null) e.result=p.result;
+    if(p.model!=null&&e.model==null){e.model=p.model; e.rec=p.rec;}
+    e.suggested=e.suggested||p.suggested;
     if(EDGE_FROM[p.src[0]]<EDGE_FROM[e.edgeFrom]){e.edge=p.edge; e.price=p.price; e.edgeFrom=p.src[0];}};
+  const has=key=>out.some(x=>x.key===key);
   const wp=g.windPick;
   if(wp&&(g.signal==='under'||g.signal==='roof'))
     add({key:`total|under|${wp.point}`,text:`Under ${wp.point}`,edge:wp.edge,edgeFrom:g.signal==='roof'?'roof':'wind',src:[g.signal==='roof'?'roof':'wind'],
@@ -153,13 +159,27 @@ function picks(g){
     text:x.mk==='total'?`${x.side==='over'?'Over':'Under'} ${x.point}`:team(x.side)+(x.mk==='spread'?` ${x.point>0?'+':''}${x.point}`:' to win'),
     edge:x.ev,edgeFrom:'gap',src:['gap'],price:`${x.cents.toFixed(0)}¢ on ${esc(x.book)}`,
     why:[`${x.ev.toFixed(1)}% cheaper than the sportsbooks’ fair price`],result:null}));
+  const rec=k=>(D.modelRecord||{})[k];
   const m=g.mkt;
   if(m&&m.lean&&m.leanEdge!=null){
-    const pm=m.lean==='home'?g.pElo:1-g.pElo, fair=m.lean==='home'?m.fair:1-m.fair;
-    add({key:`ml|${m.lean}|`,text:`${team(m.lean)} to win`,edge:m.leanEdge,edgeFrom:'lean',src:['lean'],
-      price:m.leanCents!=null?`${m.leanCents.toFixed(0)}¢ on ${esc(m.leanBook)}`:`${odds(m.leanOdds)} at sportsbooks`,
-      why:[`our model ${pct(pm)} vs the market’s ${pct(fair)} (model’s own estimate ${signed(m.leanEv)}%)`],
-      result:'leanUnits' in m?m.leanUnits:null});
+    const key=`ml|${m.lean}|`, pm=m.lean==='home'?g.pElo:1-g.pElo, fair=m.lean==='home'?m.fair:1-m.fair;
+    if(m.leanEv>=MIN||has(key))
+      add({key,text:`${team(m.lean)} to win`,edge:m.leanEdge,edgeFrom:'lean',src:['lean'],model:m.leanEv,rec:rec('ml'),
+        suggested:m.leanEv>=MIN,
+        price:m.leanCents!=null?`${m.leanCents.toFixed(0)}¢ on ${esc(m.leanBook)}`:`${odds(m.leanOdds)} at sportsbooks`,
+        why:[`our model gives them ${pct(pm)} to win, the market ${pct(fair)}`],
+        result:'leanUnits' in m?m.leanUnits:null});
+  }
+  const sl=g.spreadLean;
+  if(sl){
+    const pt=`${sl.point>0?'+':''}${sl.point}`, key=`spread|${sl.side}|${sl.point}`;
+    const myMargin=g.eloLine*(sl.side==='home'?1:-1), lineMargin=-sl.point;
+    if(sl.ev>=MIN||has(key))
+      add({key,text:`${team(sl.side)} ${pt}`,edge:sl.edge,edgeFrom:'spread',src:['spread'],model:sl.ev,rec:rec('spread'),
+        suggested:sl.ev>=MIN,
+        price:sl.cents!=null?`${sl.cents.toFixed(0)}¢ on ${esc(sl.book)}`:`${odds(sl.odds)} at sportsbooks`,
+        why:[`our model has them ${myMargin>=0?'winning':'losing'} by ${Math.abs(myMargin).toFixed(1)}; the line says ${lineMargin>=0?'winning':'losing'} by ${Math.abs(lineMargin)}`],
+        result:'units' in sl?sl.units:null});
   }
   out.sort((a,b)=>b.edge-a.edge);
   return out;
@@ -224,15 +244,21 @@ function weekPage(){
     return `${esc(who)} at ${x.cents.toFixed(0)}¢ on ${esc(x.book)}`;
   }
   function picksBlock(g){
-    const P=picks(g), f=g.status==='final', good=P.filter(p=>p.edge>0), weak=P.filter(p=>p.edge<=0);
+    const P=picks(g), f=g.status==='final';
+    const good=P.filter(p=>p.edge>0||p.suggested), weak=P.filter(p=>!(p.edge>0||p.suggested));
     const head=`<div class="bh">${f?'Picks before kickoff':g.status==='live'?'Picks (locked at kickoff)':'Bets to take'}
-      <span class="why">best edge first · edge = expected profit per $1 at that price</span></div>`;
+      <span class="why">best first, by each kind of bet’s real record · edge = expected profit per $1 at that price</span></div>`;
     const res=u=>u==null?'':`<span class="pill ${cls(u)}">${u>0?'Won':u<0?'Lost':'Push'} ${per100(u)}</span>`;
+    const modelOnly=p=>p.edgeFrom==='lean'||p.edgeFrom==='spread';
+    const edgeTxt=p=>modelOnly(p)
+      ?`<span class="pedge model">${signed(p.model)}%<small> model edge</small></span>`
+      :`<span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span>`;
+    const recTxt=p=>p.rec&&p.rec.n?`<div class="prec">Model picks this strong have returned <b class="${cls(p.rec.roi)}">${signed(p.rec.roi)}%</b>
+      over ${p.rec.n.toLocaleString('en-US')} bets (${esc(p.rec.seasons.replace('-','–'))}). Small stake or skip.</div>`:'';
     const row=(p,i)=>`<div class="pick ${i===0?'top':''}"><span class="rank">${i+1}</span><div class="pmain">
-      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${p.price}</span>
-        <span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span></div>
+      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${p.price}</span>${edgeTxt(p)}</div>
       <div class="pwhy">${[...new Set(p.src)].map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}
-        <span>${esc(p.why.join(' · '))}</span>${f?res(p.result):''}</div></div></div>`;
+        <span>${esc(p.why.join(' · '))}</span>${f?res(p.result):''}</div>${modelOnly(p)?recTxt(p):''}</div></div>`;
     const conflict=new Set(good.map(p=>p.key.split('|')[0])).size<good.length?
       '<div class="why">Two picks bet against each other on the same market: take the higher one, or pass.</div>':'';
     const none=!good.length?`<div class="nobet"><b>No bet${f?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':'Nothing on this game showed a real edge at the available prices, so pass.'}</div>`:'';
