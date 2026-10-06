@@ -482,6 +482,38 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shift
     return row
 
 
+def season_models(games: list, season: int, site_recs: list, site_blend: float) -> list:
+    """This season's version of the Method page's model table: finished games at closing moneylines, scored the
+    same way as the 2016-2025 backtest (rift_real.collect / log_loss / accuracy / roi)."""
+    import rift_real as RR
+    saved = json.loads(PARAMS.read_text(encoding="utf-8"))
+    params, w_elo = saved["params"], saved.get("blend_w", 0.22)
+    elo_core = run(games, **dict(params, rest_pts=0.0, qb_pen=0.0))[0]
+    elo_full = run(games, **params)[0]
+    out = []
+
+    def add(label, recs, blend=None, kind="model"):
+        P, M, O, G = RR.collect(recs, {season}, blend)
+        if not P:
+            return
+        b0, _, r0 = RR.roi(P, G, O, 0.0)
+        b3, _, r3 = RR.roi(P, G, O, 0.03)
+        out.append({"label": label, "kind": kind, "n": len(P), "ll": round(RR.log_loss(P, O), 4),
+                    "acc": round(RR.accuracy(P, O), 4), "roi": round(r0 * 100, 1), "bets": b0,
+                    "roi3": round(r3 * 100, 1), "bets3": b3})
+
+    add("Elo, core only", elo_core)
+    add("+ rest + backup-QB flag", elo_full)
+    add(f"Blend, {round(w_elo * 100)}% Elo (the old lean)", elo_full, w_elo)
+    add("QB ratings + team efficiency (today’s model)", site_recs, kind="site")
+    add(f"Blend, {round(site_blend * 100)}% of today’s model (its picks)", site_recs, site_blend, kind="site")
+    P, M, O, _ = RR.collect(site_recs, {season})
+    if M:
+        out.append({"label": "Closing market", "kind": "market", "n": len(M),
+                    "ll": round(RR.log_loss(M, O), 4), "acc": round(RR.accuracy(M, O), 4)})
+    return out
+
+
 def season_summary(rows: list) -> dict:
     fin = [x for x in rows if x["status"] == "final"]
     with_mkt = [x for x in fin if "mkt" in x and "mktRight" in x["mkt"]]
@@ -571,13 +603,19 @@ def pick_model(season: int, refresh: bool):
         return (lambda gs: run(gs, **params)[:2]), saved["blend_w"], params.get("hfa", 55.0), "elo"
 
 
-def build(now: datetime, refresh_stats: bool = False) -> dict:
+def build(now: datetime, refresh_stats: bool = False, pregame: bool = False) -> dict:
+    """pregame: a game-day check; if a game kicks off within alerts.PREGAME_HOURS, pull fresh prices even if the
+    odds cache is recent (3 credits), so the last look before kickoff uses current Kalshi/Polymarket prices."""
     games = load(DATA)
     season = max(g["season"] for g in games)
     model_run, blend_w, hfa, model_name = pick_model(season, refresh_stats)
     recs, ratings = model_run(games)
     wind_log = update_wind_log(games, season, now)
-    odds = get_odds()                      # None unless ODDS_API_KEY is set or a cache exists
+    soon = pregame and any(g["season"] == season and g["hs"] is None
+                           and now < kickoff_ct(g) <= now + timedelta(hours=alerts.PREGAME_HOURS) for g in games)
+    if soon:
+        print("Game-day check: a game kicks off soon, pulling fresh prices.")
+    odds = get_odds(force=soon)            # None unless ODDS_API_KEY is set or a cache exists
     shop = match_games(odds, games, TEAM_NAME)
     # Kalshi/Polymarket moneylines straight from their free feeds (no key, so GitHub gets them too)
     import exchanges
@@ -620,7 +658,8 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
         "modelMinEdge": MODEL_MIN_EDGE, "modelRecord": record,
         "fees": EXCHANGE_FEE,
         "games": rows, "summary": dict(season_summary(rows), picks=P.scoreboard(rows),
-                                       pickLogStarted=pick_log.get("_meta", {}).get("started")),
+                                       pickLogStarted=pick_log.get("_meta", {}).get("started"),
+                                       models=season_models(games, season, recs, blend_w)),
         "teams": teams,
     }
 
@@ -682,10 +721,13 @@ def main() -> None:
                 print(f"Sent {n} injury alert(s).")
     except Exception as exc:
         print(f"Injury watch failed ({exc}); continuing with the rebuild.")
-    data = build(now, refresh_stats="--fetch" in sys.argv)
+    pregame = "--pregame" in sys.argv        # game-day check shortly before kickoff (scheduled task)
+    data = build(now, refresh_stats="--fetch" in sys.argv, pregame=pregame)
     out = write_site(data)
     try:
         sent = alerts.run(data)            # phone alerts via ntfy; does nothing without a channel
+        if pregame:
+            sent += alerts.pregame(data)   # one "Kickoff soon" summary per kickoff window
         if sent:
             print(f"Sent {sent} phone alert(s).")
     except Exception as exc:

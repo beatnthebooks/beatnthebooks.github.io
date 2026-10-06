@@ -350,6 +350,7 @@ tbody tr.sel td{background:var(--purple-bg)}
 .prose h2{font-size:22px;font-weight:600;line-height:1.3;margin:40px 0 12px}
 .prose p,.prose li{font-size:16px;color:var(--fg-2)}
 .prose ul{padding-left:20px;display:flex;flex-direction:column;gap:8px}
+.prose h3.subhead{font-size:17px;font-weight:600;margin:28px 0 6px;color:var(--purple-soft)}
 .prose li::marker{color:var(--purple)}
 .formula{background:var(--well);border:1px solid var(--line);border-radius:12px;padding:11px 15px;
   display:block;overflow-x:auto;font-size:15px;white-space:nowrap;color:var(--fg)}

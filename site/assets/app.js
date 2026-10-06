@@ -771,6 +771,22 @@ function teamsPage(){
 /* ======================= method page ======================= */
 function methodPage(){
   $$('[data-season]').forEach(el=>el.textContent=D.season);
+  /* Section 3, this season: the same model table for this year's finished games (weekly.season_models) */
+  const MR=(D.summary||{}).models;
+  if(MR&&MR.length&&$('#thisYear')){
+    const mkt=MR.find(r=>r.kind==='market'), n=MR[0].n;
+    const ret=(v,b)=>`<td class="n ${cls(v)}">${b?signed(v)+'%':'—'} <span class="push small">${b?plural(b,'bet'):''}</span></td>`;
+    $('#thisYearTitle').textContent=`This season so far (${D.season}, ${plural(n,'game')})`;
+    $('#thisYear').innerHTML=`<thead><tr><th>Model</th><th class="n">Accuracy score<br>(lower is better)</th><th class="n">Winners picked</th>
+      <th class="n">Return, every edge</th><th class="n">Return, edges over 3%</th></tr></thead><tbody>${MR.map(r=>r.kind==='market'
+        ?`<tr><td>${esc(r.label)}</td><td class="n">${r.ll.toFixed(4)}</td><td class="n">${(r.acc*100).toFixed(1)}%</td><td class="n push">benchmark</td><td class="n"></td></tr>`
+        :`<tr${r.kind==='site'?' class="sel"':''}><td>${esc(r.label)}</td><td class="n ${mkt&&r.ll<mkt.ll?'ok':''}">${r.ll.toFixed(4)}</td><td class="n">${(r.acc*100).toFixed(1)}%</td>`
+          +ret(r.roi,r.bets)+ret(r.roi3,r.bets3)+'</tr>').join('')}</tbody>`;
+    const beat=mkt?MR.filter(r=>r.kind!=='market'&&r.ll<mkt.ll).length:0;
+    $('#thisYearNote').textContent=(beat?`So far this season ${beat===MR.length-1?'every model has':plural(beat,'model')+' have'} been more accurate than the closing line (green), the reverse of 2016–2025, when the market won 9 of 10 seasons.`
+      :'So far this season the closing line has been more accurate than every model, as it was in 9 of 10 seasons from 2016 to 2025.')
+      +` ${n} games is a small sample: one season can swing a lot, so the ten-season table above is the better guide. Highlighted rows are the model the site uses now.`;
+  }
   /* Top tile: this season's model picks at the final line (Mason's request), with the long-run record under it */
   const L=(D.summary||{}).lean, tile=$('#modelYear');
   if(tile&&L&&L.n){
