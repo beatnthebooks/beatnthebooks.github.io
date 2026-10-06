@@ -86,6 +86,37 @@ def next_game(games, team, now):
     return None
 
 
+CARD_STATUSES = ("Out", "Doubtful", "Questionable")     # IR/PUP are long-term: old news, already priced
+
+
+def card_injuries(season: int, team_name: dict, feed: list | None = None, value=None) -> dict:
+    """{team: [key players listed Out/Doubtful/Questionable]} for the game cards, from ESPN's live feed.
+    Key = a QB who has been starting, or anyone playing >= KEY_SHARE of offense/defense snaps (same rule as
+    the phone alerts). Downloads this season's and last season's snap counts if they're missing (GitHub)."""
+    import injuries as I
+    nv = ROOT / "data" / "nflverse"
+    for yr in (season - 1, season):
+        if not (nv / f"snap_counts_{yr}.csv").exists():
+            refresh_current_files(yr)
+    value = value or I.snap_values()
+    feed = fetch_feed() if feed is None else feed
+    out = {}
+    for e in feed:
+        code = team_code(e["team_name"], team_name)
+        if not code or not e["name"] or e["status"] not in CARD_STATUSES:
+            continue
+        off, dfn = value(season, 99, code, e["name"])
+        is_qb = e["pos"] == "QB" and off >= 0.5
+        if not (is_qb or max(off, dfn) >= KEY_SHARE):
+            continue
+        out.setdefault(code, []).append({"name": e["name"], "pos": e["pos"], "status": e["status"],
+                                         "share": round(max(off, dfn), 2), "qb": is_qb, "note": e["comment"][:160]})
+    order = {s: i for i, s in enumerate(CARD_STATUSES)}
+    for lst in out.values():
+        lst.sort(key=lambda p: (not p["qb"], order[p["status"]], -p["share"]))
+    return out
+
+
 def find_key_changes(feed, prev, games, value, season, team_name, now):
     """Return (changes, new_state). A change = a key player newly Out/Doubtful."""
     state, changes = {}, []

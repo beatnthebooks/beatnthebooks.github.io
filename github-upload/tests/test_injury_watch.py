@@ -61,6 +61,17 @@ class KeyChanges(unittest.TestCase):
         self.assertEqual([c["name"] for c in ch], ["Star Corner"])
 
 
+class CardInjuries(unittest.TestCase):
+    def test_only_key_players_listed_and_ordered(self):
+        f = feed(Caleb="Out", Kyler="Questionable", Backup="Out", Star="Doubtful", Far="Injured Reserve")
+        with mock.patch.object(W, "refresh_current_files", lambda yr: None):
+            out = W.card_injuries(2026, NAMES, feed=f, value=value)
+        self.assertEqual([p["name"] for p in out["CHI"]], ["Caleb Williams", "Kyler Gordon"])   # QB first; backup skipped
+        self.assertTrue(out["CHI"][0]["qb"])
+        self.assertEqual(out["GB"][0]["status"], "Doubtful")
+        self.assertNotIn("KC", out)                                  # injured reserve isn't news
+
+
 class RunFlow(unittest.TestCase):
     def test_first_run_is_silent_then_alerts_once(self):
         sent = []

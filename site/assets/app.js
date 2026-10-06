@@ -142,6 +142,29 @@ const pickEdge=p=>modelOnly(p)&&p.model!=null
   ?`<span class="pedge model">${signed(p.model)}%<small> model edge</small></span>`
   :`<span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span>`;
 const logBtn=(g,p)=>`<button type="button" class="btn small logbet" data-gid="${esc(g.id)}" data-key="${esc(p.key)}">Log this bet</button>`;
+/* Live scores: the page reads ESPN's public scoreboard while games are on (every 30 s; every 5 min on a game
+   day otherwise). Nothing is saved; results still come from the site's own updates. If ESPN can't be reached
+   (or a host blocks it), cards just show what the last site update knew. */
+const LIVE=new Map(), ESPN_CODE={WSH:'WAS',LAR:'LA',JAC:'JAX'};
+const liveOf=g=>{const v=LIVE.get(g.id); return v&&v.state!=='pre'?v:null;};
+async function fetchLive(games,wk){
+  if(!games.length) return [];
+  // ESPN wants season + week (a range of dates returns nothing); playoffs are its season type 3, Super Bowl = week 5
+  const post=wk>=19, ew=post?({19:1,20:2,21:3,22:5}[wk]||wk-18):wk;
+  const d=await (await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=${post?3:2}&week=${ew}&dates=${D.season}`)).json();
+  const changed=[];
+  for(const e of d.events||[]){
+    const c=(e.competitions||[])[0]; if(!c) continue;
+    const t={}, byId={};
+    c.competitors.forEach(x=>{const code=ESPN_CODE[x.team.abbreviation]||x.team.abbreviation; t[x.homeAway]={code,score:Number(x.score)}; byId[x.team.id]=code;});
+    const g=games.find(g=>t.home&&t.away&&g.home===t.home.code&&g.away===t.away.code); if(!g) continue;
+    const s=c.status.type, sit=c.situation||{};
+    const v={state:s.state, detail:s.shortDetail||s.detail||'', hs:t.home.score, as:t.away.score,
+      poss:byId[sit.possession]||'', down:s.state==='in'?(sit.downDistanceText||''):'', red:!!sit.isRedZone};
+    if(JSON.stringify(LIVE.get(g.id))!==JSON.stringify(v)){ LIVE.set(g.id,v); changed.push(g); }
+  }
+  return changed;
+}
 const priceTxt=pr=>!pr?'':pr.cents!=null?`${Number(pr.cents).toFixed(0)}¢ on ${esc(pr.book)}`:`${odds(pr.odds)} at sportsbooks`;
 /* ======================= week page ======================= */
 function weekPage(){
@@ -202,8 +225,17 @@ function weekPage(){
       :(x.side==='home'?g.homeName:g.awayName)+(x.mk==='spread'?' '+(x.point>0?'+':'')+x.point:' to win');
     return `${esc(who)} at ${x.cents.toFixed(0)}¢ on ${esc(x.book)}`;
   }
+  function injuryBlock(g){
+    const I=g.injuries; if(!I||g.status==='final'||(liveOf(g)||{}).state==='post') return '';
+    const side=(code,name,list)=>`<div class="iteam"><div class="ihead">${logo(code,'xs')}<b>${esc(name)}</b></div>${list.length
+      ?list.map(p=>`<div class="iplayer"><span class="ist ${p.status.toLowerCase()}">${esc(p.status)}</span>
+          <span><b>${esc(p.name)}</b> <span class="push">${esc(p.pos)}${p.qb?' · starting QB':` · ${Math.round(p.share*100)}% of snaps`}</span></span></div>`).join('')
+      :'<div class="push small">No key players listed</div>'}</div>`;
+    return `<div class="block"><div class="bh">Key injuries <span class="why">starting QBs and players on the field 60%+ of snaps · ESPN</span></div>
+      <div class="injuries">${side(g.away,g.awayName,I.away||[])}${side(g.home,g.homeName,I.home||[])}</div></div>`;
+  }
   function picksBlock(g){
-    const P=g.picks||[], f=g.status==='final', started=g.status!=='upcoming';
+    const P=g.picks||[], f=g.status==='final', started=g.status!=='upcoming'||!!liveOf(g);
     const good=P.filter(p=>p.good), weak=P.filter(p=>!p.good);
     const head=`<div class="bh">${f?'Picks before kickoff':started?'Picks (locked at kickoff)':'Bets to take'}
       <span class="why">best first, by each kind of bet’s real record · edge = expected profit per $1 at that price</span></div>`;
@@ -239,18 +271,21 @@ function weekPage(){
       ${out.length?`<div class="pills">${out.join('')}</div><div class="why">Bet results are per $100 bet.</div>`:''}</div>`;
   }
   function card(g){
-    const f=g.status==='final', aw=f&&g.as>g.hs, hw=f&&g.hs>g.as;
-    const status=f?'<span class="chip final">Final</span>':g.status==='live'?'<span class="chip live">In progress</span>':'';
+    const L=!(g.status==='final')&&liveOf(g), f=g.status==='final'||(L&&L.state==='post');
+    const hs=L?L.hs:g.hs, as=L?L.as:g.as, aw=f&&as>hs, hw=f&&hs>as, showScore=f||!!L;
+    const status=f?'<span class="chip final">Final</span>'
+      :L?`<span class="chip live"><span class="livedot"></span>Live · ${esc(L.detail)}</span>`
+      :g.status==='live'?'<span class="chip live">In progress</span>':'';
     const intl=g.neutral||/Tottenham|Wembley|Allianz|Deutsche|Bernabeu|Azteca|Banorte|Maracan|Corinthians/.test(g.stadium||'');
     const mk=g.mkt, sp=g.spread, tt=g.total;
     const fav=sp?favorite(sp.line,g):null, modelFav=favorite(g.eloLine,g);
     const notes=(g.notes||[]).map(n=>`<div class="note">${esc(n)}</div>`).join('');
-    const team=(code,name,score,win)=>`<div class="trow ${f?(win?'win':'lose'):''}"><span class="tname">${logo(code)}<a href="${teamHref(code)}">${esc(name)}</a></span>${f?`<span class="score">${score}</span>`:''}</div>`;
+    const team=(code,name,score,win)=>`<div class="trow ${f?(win?'win':'lose'):''}"><span class="tname">${logo(code)}<a href="${teamHref(code)}">${esc(name)}</a>${L&&L.state==='in'&&L.poss===code?'<span class="poss" title="Has the ball">●</span>':''}</span>${showScore?`<span class="score">${score}</span>`:''}</div>`;
     return `<article class="game ${g.signal==='under'?'sig-card':''}" id="g-${esc(g.id)}">
       <header class="ghead">
         <div class="gmeta"><span>${esc(g.ko)}</span>${status}${intl?`<span class="chip venue">${esc(g.stadium)}</span>`:''}</div>
-        <div class="teams">${team(g.away,g.awayName,g.as,aw)}${team(g.home,g.homeName,g.hs,hw)}</div>
-        <div class="why">${esc(g.awayName)} at ${esc(g.homeName)}</div>
+        <div class="teams">${team(g.away,g.awayName,as,aw)}${team(g.home,g.homeName,hs,hw)}</div>
+        <div class="why">${esc(g.awayName)} at ${esc(g.homeName)}${L&&L.down?` · <span class="sit ${L.red?'red':''}">${esc(L.down)}${L.red?' · red zone':''}</span>`:''}</div>
       </header>
       <div class="gbody">
         ${picksBlock(g)}
@@ -265,6 +300,7 @@ function weekPage(){
             ?`<dd>${esc(g.awayName)} ${odds(mk.aml)}</dd><dd class="sub">${esc(g.homeName)} ${odds(mk.hml)}</dd>`
             :`<dd>${mk?esc(g.homeName)+' '+pct(mk.fair)+' to win':'Not posted yet'}</dd><dd class="sub">${mk?'fair chance from sportsbooks':'&nbsp;'}</dd>`}</div>
         </dl>
+        ${injuryBlock(g)}
         ${shopBlock(g)}
         <div class="block signals"><div class="bh">Signals</div>${windLine(g)}${leanLine(g)}</div>
         ${notes?`<div class="block">${notes}</div>`:''}
@@ -274,7 +310,7 @@ function weekPage(){
   }
   /* Best bets: every pick worth taking this week, across all games, best edge first (same order as the cards) */
   function bestBets(gs){
-    const open=games=>games.filter(g=>g.status==='upcoming')
+    const open=games=>games.filter(g=>g.status==='upcoming'&&!liveOf(g))
       .flatMap(g=>(g.picks||[]).filter(p=>p.good).map(p=>({g,p}))).sort((a,b)=>b.p.edge-a.p.edge);
     let list=open(gs), ahead=false;
     if(!list.length&&week===D.currentWeek){                  // e.g. only Monday night left: show next week's
@@ -351,6 +387,27 @@ function weekPage(){
   }
   window.addEventListener('hashchange',route);
   route();
+  // live scores: poll ESPN on game days for the week on screen; fast while a game is on
+  let liveTimer=null, liveFirst=true;
+  async function liveTick(){
+    clearTimeout(liveTimer);
+    const gs=D.games.filter(g=>g.wk===week), today=new Date().toISOString().slice(0,10);
+    const due=gs.some(g=>g.status!=='final'&&g.date<=today&&!(LIVE.get(g.id)&&LIVE.get(g.id).state==='post'));
+    let fast=false;
+    if(due&&(!document.hidden||liveFirst)&&location.hash!=='#bets'){     // hidden tabs: one check, then wait
+      liveFirst=false;
+      try{
+        const changed=await fetchLive(gs,week);
+        changed.forEach(g=>{const el=document.getElementById('g-'+g.id); if(el) el.outerHTML=card(g);});
+        if(changed.length) bestBets(gs);
+        fast=gs.some(g=>(LIVE.get(g.id)||{}).state==='in');
+      }catch(_){}
+    }
+    liveTimer=setTimeout(liveTick,fast?30000:300000);
+  }
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) liveTick(); });
+  window.addEventListener('hashchange',()=>setTimeout(liveTick,50));
+  liveTick();
 }
 
 /* ======================= bet tracker ======================= */

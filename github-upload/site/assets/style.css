@@ -136,6 +136,26 @@ section{margin-top:30px}
 .btn.logbet{background:transparent;color:var(--purple-soft);border:1px solid var(--edge);box-shadow:none;padding:5px 13px}
 .btn.logbet:hover{background:var(--purple-bg);color:#fff;filter:none}
 
+/* ---------- key injuries ---------- */
+.injuries{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.iteam{background:var(--well);border:1px solid var(--line-2);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.ihead{display:flex;align-items:center;gap:8px;font-size:14px}
+.ihead b{font-family:var(--font-display);font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:13px}
+.iplayer{display:flex;gap:8px;align-items:baseline;font-size:14px;line-height:1.4;min-width:0}
+.iplayer b{font-weight:700}
+.ist{flex:none;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px}
+.ist.out{background:var(--bad-bg);color:var(--bad)}
+.ist.doubtful{background:#2d1d12;color:#fb923c}
+.ist.questionable{background:var(--warn-bg);color:var(--warn)}
+
+/* ---------- live scores ---------- */
+.chip.live{display:inline-flex;align-items:center;gap:6px}
+.livedot{width:7px;height:7px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 0 rgba(248,113,113,.6);animation:livepulse 1.6s infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(248,113,113,.6)}70%{box-shadow:0 0 0 7px rgba(248,113,113,0)}100%{box-shadow:0 0 0 0 rgba(248,113,113,0)}}
+.poss{color:var(--warn);font-size:12px;margin-left:2px}
+.sit{color:var(--fg-2);font-weight:600}
+.sit.red{color:var(--bad)}
+
 /* ---------- team logo badges ---------- */
 .tl{--tc:#4c3a8f;--s:36px;position:relative;flex:none;display:inline-grid;place-items:center;width:var(--s);height:var(--s);border-radius:50%;
   vertical-align:middle;background:var(--surface-2);
@@ -327,6 +347,7 @@ footer .fbrand em{font-style:normal;color:var(--purple-soft)}
   .pagehead h1{font-size:44px}
 }
 @media (max-width:700px){
+  .injuries{grid-template-columns:minmax(0,1fr)}
   .best{grid-template-columns:auto minmax(0,1fr);padding:12px}
   .best .bedge,.best .bact{grid-column:2}
 }
@@ -361,4 +382,4 @@ footer .fbrand em{font-style:normal;color:var(--purple-soft)}
   .prose h2{font-size:19px}
   #teamName{font-size:24px!important}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.livedot{animation:none}}

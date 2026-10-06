@@ -594,6 +594,16 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
     # every suggestion is logged the first time it's shown, then graded at that price (picks.py)
     pick_log = P.update_log(rows, now.isoformat(timespec="minutes"))
     P.apply_log(rows, {g["gid"]: g for g in games}, pick_log)
+    # key injuries on each card (ESPN feed; same "key player" rule as the phone alerts)
+    try:
+        import injury_watch
+        inj = injury_watch.card_injuries(season, TEAM_NAME)
+        for x in rows:
+            if x["status"] != "final":
+                x["injuries"] = {side: inj.get(x[side], [])[:6] for side in ("away", "home")}
+    except Exception as exc:
+        inj = None
+        print(f"  injury feed unavailable ({exc})")
     unplayed = [x for x in rows if x["status"] != "final"]
     current = unplayed[0]["wk"] if unplayed else rows[-1]["wk"]
     teams, last_wk = team_table(games, model_run, season, ratings)
@@ -606,7 +616,7 @@ def build(now: datetime, refresh_stats: bool = False) -> dict:
         "season": season, "currentWeek": current, "deltaWeek": last_wk,
         "blendW": blend_w, "hfa": round(hfa, 1), "windMph": WIND_MPH, "model": model_name,
         "oddsFetched": odds["fetched"] if odds else None, "oddsGames": len(shop), "gapEv": GAP_EV,
-        "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live), "pickShifts": shifts,
+        "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live), "pickShifts": shifts, "injuriesOk": inj is not None,
         "modelMinEdge": MODEL_MIN_EDGE, "modelRecord": record,
         "fees": EXCHANGE_FEE,
         "games": rows, "summary": dict(season_summary(rows), picks=P.scoreboard(rows),
