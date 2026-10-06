@@ -619,7 +619,8 @@ def build(now: datetime, refresh_stats: bool = False, pregame: bool = False) -> 
     shop = match_games(odds, games, TEAM_NAME)
     # Kalshi/Polymarket moneylines straight from their free feeds (no key, so GitHub gets them too)
     import exchanges
-    live = exchanges.current(games, TEAM_NAME)
+    links = {}                             # each game's market pages, for the site's "Kalshi ↗ / Polymarket ↗" buttons
+    live = exchanges.current(games, TEAM_NAME, links)
     add_live_exchanges(shop, live, games)
     if shop:
         log_snapshots(shop, games)
@@ -629,6 +630,9 @@ def build(now: datetime, refresh_stats: bool = False, pregame: bool = False) -> 
               "spread": fit_spread_shift(recs, blend_w, sigma, season), "sigma": sigma}
     record = model_record(recs, blend_w, sigma, season)
     rows = [game_row(r, blend_w, wind_log, shop, now, shifts) for r in recs if r["g"]["season"] == season]
+    for x in rows:
+        if x["status"] == "upcoming" and x["id"] in links:
+            x["links"] = links[x["id"]]
     # every suggestion is logged the first time it's shown, then graded at that price (picks.py)
     pick_log = P.update_log(rows, now.isoformat(timespec="minutes"))
     P.apply_log(rows, {g["gid"]: g for g in games}, pick_log)

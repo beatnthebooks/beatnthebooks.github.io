@@ -164,6 +164,16 @@ const pickEdge=p=>modelOnly(p)&&p.model!=null
   ?`<span class="pedge model">${signed(p.model)}%<small> model edge</small></span>`
   :`<span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span>`;
 const logBtn=(g,p)=>`<button type="button" class="btn small logbet" data-gid="${esc(g.id)}" data-key="${esc(p.key)}">Log this bet</button>`;
+/* "Kalshi ↗ / Polymarket ↗": the market's own page (g.links, read from each exchange's open listings at every site
+   update: Kalshi has a page per bet type, Polymarket one page per game). The exchange whose price is shown goes first. */
+const betLinks=(g,p)=>{
+  const L=g.links; if(!L) return '';
+  const kx=L.kalshi&&L.kalshi[p.key.split('|')[0]], a=[];
+  if(kx) a.push(['kalshi','Kalshi',kx]);
+  if(L.polymarket) a.push(['poly','Polymarket',L.polymarket]);
+  if(p.price&&/poly/i.test(p.price.book||'')) a.reverse();
+  return a.map(([c,n,u])=>`<a class="xlink ${c}" href="${esc(u)}" target="_blank" rel="noopener noreferrer" title="Open this market on ${n}">${n} <span aria-hidden="true">↗</span></a>`).join('');
+};
 /* Live scores: the page reads ESPN's public scoreboard while games are on (every 30 s; every 5 min on a game
    day otherwise). Nothing is saved; results still come from the site's own updates. If ESPN can't be reached
    (or a host blocks it), cards just show what the last site update knew. */
@@ -313,7 +323,7 @@ function weekPage(){
     const row=(p,i)=>`<div class="pick ${i===0?'top':''}"><span class="rank">${i+1}</span><div class="pmain">
       <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${priceTxt(p.price)}</span>${unitChip(p)}${pickEdge(p)}</div>
       <div class="pwhy">${(p.src||[]).map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}
-        <span>${esc((p.why||[]).join(' · '))}</span>${p.grade?res(p.grade.units)+clv(p.grade):''}</div>${modelOnly(p)?recTxt(p):''}${started?'':`<div class="pact">${logBtn(g,p)}</div>`}</div></div>`;
+        <span>${esc((p.why||[]).join(' · '))}</span>${p.grade?res(p.grade.units)+clv(p.grade):''}</div>${modelOnly(p)?recTxt(p):''}${started?'':`<div class="pact">${logBtn(g,p)}${betLinks(g,p)}</div>`}</div></div>`;
     const conflict=new Set(good.map(p=>p.key.split('|')[0])).size<good.length?
       '<div class="why">Two picks bet against each other on the same market: take the higher one, or pass.</div>':'';
     const none=!good.length?`<div class="nobet"><b>No bet${started?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':started?'Nothing on this game showed a real edge before kickoff.':'Nothing on this game shows a real edge at the available prices, so pass.'}</div>`:'';
@@ -401,7 +411,7 @@ function weekPage(){
         <div class="bwhy"><span>${esc(g.awayName)} at ${esc(g.homeName)} · ${esc(g.ko)}</span>
           ${(p.src||[]).map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}</div></div>
       <div class="bedge">${pickEdge(p)}</div>
-      <div class="bact">${logBtn(g,p)}<a href="#g-${esc(g.id)}">See game</a></div></div>`).join('')
+      <div class="bact">${betLinks(g,p)}${logBtn(g,p)}<a href="#g-${esc(g.id)}">See game</a></div></div>`).join('')
       +(list.length>SHOW?`<button type="button" class="btn ghost small showall" data-showall>Show all ${list.length}</button>`:'');
   }
   function render(){

@@ -99,6 +99,38 @@ class LivePrices(unittest.TestCase):
         self.assertEqual(s2["ml"]["away"]["book"], "Polymarket")
 
 
+class MarketLinks(unittest.TestCase):
+    """The site's "Kalshi ↗ / Polymarket ↗" buttons: only for events the exchanges list as open."""
+
+    def test_links_only_for_listed_open_events(self):
+        from unittest import mock
+        game = g("2099-10-11")                                   # CHI at GB, far in the future
+        names = {"CHI": "Bears", "GB": "Packers", "KC": "Chiefs", "LV": "Raiders"}
+        kx = {"KXNFLGAME": [{"event_ticker": "KXNFLGAME-99OCT11CHIGB", "markets": [
+                  {"ticker": "KXNFLGAME-99OCT11CHIGB-CHI", "yes_bid_dollars": "0.40", "yes_ask_dollars": "0.42"},
+                  {"ticker": "KXNFLGAME-99OCT11CHIGB-GB", "yes_bid_dollars": "0.58", "yes_ask_dollars": "0.60"}]}],
+              "KXNFLSPREAD": [{"event_ticker": "KXNFLSPREAD-99OCT11CHIGB"}],
+              "KXNFLTOTAL": [{"event_ticker": "KXNFLTOTAL-99OCT11KCLV"}]}       # another game's total only
+        poly = [{"slug": "nfl-chi-gb-2099-10-11", "markets": [
+            {"sportsMarketType": "moneyline", "outcomes": '["Bears", "Packers"]', "clobTokenIds": '["1", "2"]',
+             "gameStartTime": "2099-10-11T17:00:00Z", "bestBid": "0.40", "bestAsk": "0.42"}]}]
+
+        def fake_get(url, tries=3):
+            if "gamma" in url:
+                return poly
+            series = url.split("series_ticker=")[1].split("&")[0]
+            return {"events": kx[series]}
+
+        links = {}
+        with mock.patch.object(X, "get", fake_get):
+            prices = X.current([game], names, links)
+        self.assertIn("kalshi", prices[game["gid"]])               # prices unchanged by the links
+        self.assertEqual(links[game["gid"]], {
+            "kalshi": {"ml": "https://kalshi.com/markets/kxnflgame/nfl-game/kxnflgame-99oct11chigb",
+                       "spread": "https://kalshi.com/markets/kxnflspread/pro-football-spread/kxnflspread-99oct11chigb"},
+            "polymarket": "https://polymarket.com/event/nfl-chi-gb-2099-10-11"})   # no total: Kalshi hasn't listed it
+
+
 class LineMove(unittest.TestCase):
     def test_last_ats_uses_only_earlier_games(self):
         games = [g("2026-09-13", hs=30.0, spread=3.0, **{"as": 0.0}), g("2026-09-20"), g("2026-09-27")]

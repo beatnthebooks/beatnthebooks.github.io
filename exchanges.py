@@ -99,11 +99,12 @@ def rates():
 # Listing markets
 # ----------------------------------------------------------------------
 
-def kalshi_events(status: str) -> list:
+def kalshi_events(status: str, series: str = "KXNFLGAME") -> list:
     out, cur = [], ""
     while True:
-        d = get(f"{KX}/events?series_ticker=KXNFLGAME&status={status}&limit=200"
-                + ("&with_nested_markets=true" if status == "open" else "") + (f"&cursor={cur}" if cur else ""))
+        d = get(f"{KX}/events?series_ticker={series}&status={status}&limit=200"
+                + ("&with_nested_markets=true" if status == "open" and series == "KXNFLGAME" else "")
+                + (f"&cursor={cur}" if cur else ""))
         out += d.get("events", [])
         cur = d.get("cursor")
         if not cur or not d.get("events"):
@@ -115,6 +116,23 @@ def kalshi_game(ev_ticker: str) -> tuple:
     part = ev_ticker.split("-")[1]
     d = date(2000 + int(part[:2]), MONTHS[part[2:5]], int(part[5:7]))
     return d, part[7:]
+
+
+# Kalshi's web pages: kalshi.com/markets/<series>/<series page>/<event>, checked Oct 6 2026 (a wrong or closed
+# event sends you to the series' first game, so links are only made for events that are listed open)
+KX_WEB = {"KXNFLGAME": "nfl-game", "KXNFLSPREAD": "pro-football-spread", "KXNFLTOTAL": "pro-football-total-points"}
+KX_KIND = {"KXNFLGAME": "ml", "KXNFLSPREAD": "spread", "KXNFLTOTAL": "total"}
+
+
+def kalshi_url(event_ticker: str) -> str:
+    """'KXNFLTOTAL-26OCT11CINMIA' -> https://kalshi.com/markets/kxnfltotal/pro-football-total-points/kxnfltotal-26oct11cinmia"""
+    series = event_ticker.split("-")[0]
+    return f"https://kalshi.com/markets/{series.lower()}/{KX_WEB[series]}/{event_ticker.lower()}"
+
+
+def poly_url(slug: str) -> str:
+    """One Polymarket page per game holds its moneyline, spreads and totals."""
+    return f"https://polymarket.com/event/{slug}"
 
 
 def kx_team(code: str, names: dict) -> str | None:
@@ -289,9 +307,11 @@ def quote(rec: dict, venue: str, ts: int, fees: dict):
 # Live prices (used by the site)
 # ----------------------------------------------------------------------
 
-def current(games, names) -> dict:
+def current(games, names, links: dict | None = None) -> dict:
     """{gid: {"kalshi": {"home": ask, "away": ask}, "polymarket": {...}}} for games not yet played.
-    Prices are what you'd pay per $1 contract, before fees."""
+    Prices are what you'd pay per $1 contract, before fees.
+    links (optional, filled in place): {gid: {"kalshi": {"ml"|"spread"|"total": url}, "polymarket": url}} for every
+    open market, thin or not, so the site can send Mason straight to the bet."""
     now = time.time()
     by_pair = defaultdict(list)
     for g in games:
@@ -299,6 +319,7 @@ def current(games, names) -> dict:
             by_pair[frozenset((g["home"], g["away"]))].append(g)
     nick = nicknames(names)
     out = defaultdict(dict)
+    kx_gid = {}                                                # '26OCT11CINMIA' -> gid
     try:
         for ev in kalshi_events("open"):
             d, _ = kalshi_game(ev["event_ticker"])
@@ -310,6 +331,7 @@ def current(games, names) -> dict:
             g = match_game(by_pair, teams[0], teams[1], noon, hours=40)
             if g is None:
                 continue
+            kx_gid[ev["event_ticker"].split("-", 1)[1]] = g["gid"]
             ba = {("home" if t == g["home"] else "away"): (_num(m.get("yes_bid_dollars")), _num(m.get("yes_ask_dollars")))
                   for m, t in zip(mk, teams)}
             if len(ba) != 2 or any(b is None or a is None or not 0 < a < 1 or a - b > MAX_SPREAD
@@ -319,6 +341,18 @@ def current(games, names) -> dict:
             out[g["gid"]]["kalshi"] = {"home": round(min(ha, 1 - ab), 4), "away": round(min(aa, 1 - hb), 4)}
     except Exception as exc:
         print(f"  Kalshi prices unavailable ({exc})")
+    if links is not None and kx_gid:                           # the same game's spread and total events
+        for series in ("KXNFLGAME", "KXNFLSPREAD", "KXNFLTOTAL"):
+            try:
+                evs = ([{"event_ticker": f"KXNFLGAME-{s}"} for s in kx_gid] if series == "KXNFLGAME"
+                       else kalshi_events("open", series))
+            except Exception as exc:
+                print(f"  Kalshi {KX_KIND[series]} links unavailable ({exc})")
+                continue
+            for ev in evs:
+                gid = kx_gid.get(ev["event_ticker"].split("-", 1)[1])
+                if gid:
+                    links.setdefault(gid, {}).setdefault("kalshi", {})[KX_KIND[series]] = kalshi_url(ev["event_ticker"])
     try:
         for ev in poly_events(POLY_SERIES[-1], closed=False):
             ml = poly_moneyline(ev, nick)
@@ -326,6 +360,8 @@ def current(games, names) -> dict:
                 continue
             teams, _, start, m = ml
             g = match_game(by_pair, teams[0], teams[1], start)
+            if g is not None and links is not None and ev.get("slug"):
+                links.setdefault(g["gid"], {})["polymarket"] = poly_url(ev["slug"])
             bid, ask = _num(m.get("bestBid")), _num(m.get("bestAsk"))
             if g is None or not bid or not ask or not (0 < bid < ask < 1) or ask - bid > MAX_SPREAD:
                 continue
