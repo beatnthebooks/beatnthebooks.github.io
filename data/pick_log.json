@@ -12,12 +12,12 @@
    },
    "last": {
     "dec": 2.3139,
-    "edge": -6.2,
+    "edge": -3.7,
     "price": {
      "book": "Polymarket",
      "cents": 42.0
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -78,12 +78,12 @@
     "ts": "2026-10-05T19:22"
    },
    "last": {
-    "dec": 1.8475,
-    "edge": 5.2,
+    "dec": 1.8929,
+    "edge": 5.4,
     "price": {
-     "odds": -118
+     "odds": -112
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "wind",
@@ -113,13 +113,13 @@
     "ts": "2026-10-05T17:16"
    },
    "last": {
-    "dec": 3.8554,
-    "edge": -4.8,
+    "dec": 3.9562,
+    "edge": -2.4,
     "price": {
-     "book": "Polymarket",
-     "cents": 25.0
+     "book": "Kalshi",
+     "cents": 24.0
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -153,7 +153,7 @@
     "price": {
      "odds": -108
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -182,12 +182,12 @@
     "ts": "2026-10-05T17:16"
    },
    "last": {
-    "dec": 1.8696,
-    "edge": 5.3,
+    "dec": 1.9091,
+    "edge": 5.5,
     "price": {
-     "odds": -115
+     "odds": -110
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "wind",
@@ -223,7 +223,7 @@
      "book": "Polymarket",
      "cents": 45.0
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -288,13 +288,13 @@
     "ts": "2026-10-05T17:16"
    },
    "last": {
-    "dec": 3.0222,
-    "edge": -1.6,
+    "dec": 3.0772,
+    "edge": 2.1,
     "price": {
-     "book": "Polymarket",
-     "cents": 32.0
+     "book": "Kalshi",
+     "cents": 31.0
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -347,6 +347,43 @@
   }
  },
  "2026_05_HOU_TEN": {
+  "ml|home|": {
+   "first": {
+    "dec": 3.7089,
+    "edge": -1.8,
+    "price": {
+     "book": "Polymarket",
+     "cents": 26.0
+    },
+    "ts": "2026-10-06T10:05"
+   },
+   "last": {
+    "dec": 3.7089,
+    "edge": -1.8,
+    "price": {
+     "book": "Polymarket",
+     "cents": 26.0
+    },
+    "ts": "2026-10-06T10:05"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 9.4,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Titans to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 35% to win, the market 27%"
+    ]
+   }
+  },
   "total|under|39.5": {
    "first": {
     "dec": 1.9091,
@@ -396,7 +433,7 @@
     "price": {
      "odds": -115
     },
-    "ts": "2026-10-06T07:03"
+    "ts": "2026-10-06T10:05"
    },
    "pick": {
     "edgeFrom": "wind",
