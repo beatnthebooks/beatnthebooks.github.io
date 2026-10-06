@@ -121,6 +121,22 @@ class Ranking(unittest.TestCase):
         self.assertTrue(all(p["good"] and p["suggested"] for p in P))
 
 
+class UnitSizing(unittest.TestCase):
+    def test_units_follow_the_evidence(self):
+        u = lambda **p: PK.units_for(dict({"good": True, "src": [p.get("edgeFrom")]}, **p))
+        self.assertEqual(u(edgeFrom="wind", edge=4.0), 1.0)
+        self.assertEqual(u(edgeFrom="wind", edge=6.5), 1.5)                  # great price
+        self.assertEqual(u(edgeFrom="roof", edge=7.0), 0.5)                  # roof must be open
+        self.assertEqual(u(edgeFrom="gap", edge=5.0), 0.5)
+        self.assertEqual(u(edgeFrom="gap", edge=5.0, src=["gap", "lean"]), 0.75)   # the model agrees
+        self.assertEqual(u(edgeFrom="lean", edge=-3.0), 0.25)
+        self.assertEqual(PK.units_for({"good": False, "edgeFrom": "wind", "edge": 9.0}), 0.0)
+
+    def test_picks_carry_units(self):
+        P = PK.game_picks(card(signal="under", windPick=dict(WIND, edge=6.2)), 5.0)
+        self.assertEqual(P[0]["units"], 1.5)
+
+
 class Grading(unittest.TestCase):
     g = {"hs": 24, "as": 20, "hml": -150.0, "aml": 130.0, "spread": 3.0, "hso": -110.0, "aso": -110.0,
          "tot": 44.5, "oo": -110.0, "uo": -110.0}

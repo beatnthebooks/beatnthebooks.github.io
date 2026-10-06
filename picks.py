@@ -25,6 +25,22 @@ from edge_lab import devig
 ROOT = Path(__file__).resolve().parent
 LOG = ROOT / "data" / "pick_log.json"
 EDGE_FROM = {"wind": 0, "roof": 0, "gap": 1, "lean": 2, "spread": 2}   # whose edge number shows when signals merge
+UNIT_PCT = 2.0     # 1 unit = 2% of Mason's Kalshi bankroll (his rule, Oct 5 2026)
+
+
+def units_for(p: dict) -> float:
+    """Stake in units, scaled by how much evidence backs the kind of bet (and, for wind, how good the price is).
+    Wind unders are the one tested signal; price gaps are unproven; model picks have lost money historically."""
+    if not p.get("good"):
+        return 0.0
+    main, src = p["edgeFrom"], set(p.get("src", []))
+    if main == "wind":
+        return 1.5 if p["edge"] >= 6.0 else 1.0
+    if main == "roof":                       # same signal, but only matters if the roof is open
+        return 0.5
+    if main == "gap":
+        return 0.75 if src & {"lean", "spread"} else 0.5
+    return 0.25                              # model pick on its own
 KINDS = ("wind", "gap", "lean", "spread")                              # scoreboard rows (roof counts as wind)
 
 
@@ -111,6 +127,7 @@ def game_picks(row: dict, min_model_edge: float) -> list:
     for p in out:
         p["good"] = p["edge"] > 0 or p["suggested"]
         p["src"] = list(dict.fromkeys(p["src"]))
+        p["units"] = units_for(p)
     out.sort(key=lambda p: -p["edge"])
     return out
 
@@ -179,7 +196,7 @@ def update_log(rows: list, now_iso: str, log: dict | None = None) -> dict:
             e = log.setdefault(r["id"], {}).get(p["key"])
             if e is None:
                 keep = {k: p[k] for k in ("mk", "side", "point", "text", "src", "edgeFrom", "why", "model", "rec",
-                                          "suggested") if k in p}
+                                          "suggested", "units") if k in p}
                 log[r["id"]][p["key"]] = {"pick": keep, "first": snap, "last": snap}
                 changed = True
             elif e["last"] != snap:
@@ -206,6 +223,7 @@ def apply_log(rows: list, games_by_gid: dict, log: dict) -> None:
             for key, e in entries.items():
                 p = dict(e["pick"], key=key, dec=e["first"]["dec"], price=e["first"]["price"],
                          edge=e["first"]["edge"], good=True, logged=e["first"]["ts"])
+                p.setdefault("units", units_for(p))       # picks logged before unit sizing existed
                 ps.append(p)
             ps.sort(key=lambda p: -p["edge"])
             r["picks"] = ps
@@ -227,8 +245,8 @@ def apply_log(rows: list, games_by_gid: dict, log: dict) -> None:
 
 def scoreboard(rows: list) -> dict:
     """Season record of graded suggestions, by the kind of bet whose edge ranked it (wind > gap > model)."""
-    out = {k: {"n": 0, "won": 0, "lost": 0, "push": 0, "units": 0.0, "live": 0, "beat": 0, "judged": 0,
-               "clvSum": 0.0, "clvN": 0} for k in KINDS + ("all",)}
+    out = {k: {"n": 0, "won": 0, "lost": 0, "push": 0, "units": 0.0, "sized": 0.0, "staked": 0.0, "live": 0,
+               "beat": 0, "judged": 0, "clvSum": 0.0, "clvN": 0} for k in KINDS + ("all",)}
     for r in rows:
         for p in r.get("picks", []):
             gr = p.get("grade")
@@ -238,7 +256,10 @@ def scoreboard(rows: list) -> dict:
             for k in (kind, "all"):
                 s = out[k]
                 s["n"] += 1
-                s["units"] += gr["units"]
+                s["units"] += gr["units"]                         # per 1-unit bet (flat)
+                size = p.get("units") or units_for(dict(p, good=True))
+                s["sized"] += gr["units"] * size                  # as sized by the unit rules
+                s["staked"] += size
                 s["won" if gr["won"] else "push" if gr["won"] is None else "lost"] += 1
                 if not p.get("reconstructed"):
                     s["live"] += 1
@@ -250,6 +271,7 @@ def scoreboard(rows: list) -> dict:
                         s["clvN"] += 1
     for s in out.values():
         s["units"] = round(s["units"], 3)
+        s["sized"], s["staked"] = round(s["sized"], 3), round(s["staked"], 2)
         total = s.pop("clvSum")
         s["clvAvg"] = round(total / s["clvN"], 1) if s["clvN"] else None
     return out

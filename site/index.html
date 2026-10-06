@@ -48,6 +48,15 @@
   </section>
 
   <section>
+    <div class="eyebrow">Unit size</div>
+    <div class="panel unitpanel">
+      <div class="field"><label for="bBank">Your Kalshi bankroll ($)</label>
+        <input id="bBank" class="num" type="number" min="0" step="1" inputmode="decimal" placeholder="e.g. 500"></div>
+      <div id="bUnit"></div>
+    </div>
+  </section>
+
+  <section>
     <div class="eyebrow">Add a bet</div>
     <form class="panel betform" id="betForm" autocomplete="off">
       <div class="field wide"><label for="bGame">Game</label><select id="bGame" required></select></div>

@@ -655,7 +655,7 @@ def build(now: datetime, refresh_stats: bool = False, pregame: bool = False) -> 
         "blendW": blend_w, "hfa": round(hfa, 1), "windMph": WIND_MPH, "model": model_name,
         "oddsFetched": odds["fetched"] if odds else None, "oddsGames": len(shop), "gapEv": GAP_EV,
         "gapBooks": GAP_MIN_BOOKS, "exchangeGames": len(live), "pickShifts": shifts, "injuriesOk": inj is not None,
-        "modelMinEdge": MODEL_MIN_EDGE, "modelRecord": record,
+        "modelMinEdge": MODEL_MIN_EDGE, "modelRecord": record, "unitPct": P.UNIT_PCT,
         "fees": EXCHANGE_FEE,
         "games": rows, "summary": dict(season_summary(rows), picks=P.scoreboard(rows),
                                        pickLogStarted=pick_log.get("_meta", {}).get("started"),

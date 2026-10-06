@@ -209,6 +209,25 @@ async function liveTick(){
   liveTimer=setTimeout(liveTick,fast?30000:300000);
 }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) liveTick(); });
+/* Unit sizing: 1 unit = D.unitPct (2%) of the Kalshi bankroll the viewer types into My bets (kept in this browser
+   only). Each pick's size in units comes from picks.units_for (evidence-based); this only turns it into dollars. */
+const BANK_KEY='btb.kalshiBankroll', UPCT=()=>D.unitPct||2;
+const bankroll=()=>{try{const v=Number(localStorage.getItem(BANK_KEY)); return v>0?v:null;}catch(_){return null;}};
+const unitUsd=()=>{const b=bankroll(); return b?b*UPCT()/100:null;};
+const fmtU=x=>`${+Number(x).toFixed(2)}u`;
+const usdAmt=x=>'$'+(x<10?x.toFixed(2):Math.round(x).toLocaleString('en-US'));
+const unitChip=p=>{ if(!p.units) return ''; const u=unitUsd();
+  return `<span class="ustake" title="${fmtU(p.units)} = ${+(p.units*UPCT()).toFixed(2)}% of your Kalshi bankroll">${fmtU(p.units)}${u?` · ${usdAmt(p.units*u)}`:''}</span>`; };
+const pctOf=u=>`${+(u*UPCT()).toFixed(2)}%`;
+function unitKey(){
+  const u=unitUsd(), row=(size,label,tag)=>`<span class="ukey-i"><b>${size}</b><span class="push">${pctOf(parseFloat(size))}</span>${tag?`<span class="tag ${tag}">${label}</span>`:esc(label)}</span>`;
+  return `<div class="ukey" role="note"><span class="ukey-h">Unit key</span>
+    <span class="ukey-i ukey-main"><b>1u</b> = <b>${UPCT()}%</b> of your Kalshi bankroll${u?` = <b>${usdAmt(u)}</b>`:''}</span>
+    ${row('1.5u','Wind under, great price (edge 6%+)','under')}${row('1u','Wind under','under')}
+    ${row('0.75u','Price gap the model agrees with','gap')}${row('0.5u','Price gap','gap')}${row('0.5u','Wind under, roof must be open','roof')}
+    ${row('0.25u','Model pick (no proven edge)','lean')}
+    ${u?'':'<span class="ukey-i push">Enter your Kalshi bankroll in <a href="index.html#bets">My bets</a> to see dollar amounts.</span>'}</div>`;
+}
 const priceTxt=pr=>!pr?'':pr.cents!=null?`${Number(pr.cents).toFixed(0)}¢ on ${esc(pr.book)}`:`${odds(pr.odds)} at sportsbooks`;
 /* ======================= week page ======================= */
 function weekPage(){
@@ -290,7 +309,7 @@ function weekPage(){
     const recTxt=p=>{const r=(D.modelRecord||{})[p.rec]; return r&&r.n?`<div class="prec">Model picks this strong have returned
       <b class="${cls(r.roi)}">${signed(r.roi)}%</b> over ${r.n.toLocaleString('en-US')} bets (${esc(r.seasons.replace('-','–'))}). Small stake or skip.</div>`:'';};
     const row=(p,i)=>`<div class="pick ${i===0?'top':''}"><span class="rank">${i+1}</span><div class="pmain">
-      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${priceTxt(p.price)}</span>${pickEdge(p)}</div>
+      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${priceTxt(p.price)}</span>${unitChip(p)}${pickEdge(p)}</div>
       <div class="pwhy">${(p.src||[]).map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}
         <span>${esc((p.why||[]).join(' · '))}</span>${p.grade?res(p.grade.units)+clv(p.grade):''}</div>${modelOnly(p)?recTxt(p):''}${started?'':`<div class="pact">${logBtn(g,p)}</div>`}</div></div>`;
     const conflict=new Set(good.map(p=>p.key.split('|')[0])).size<good.length?
@@ -374,9 +393,9 @@ function weekPage(){
     wrap.hidden=false;
     const SHOW=8;
     $('#plays').className='plays';
-    $('#plays').innerHTML=list.map(({g,p},i)=>`<div class="best ${i>=SHOW?'more':''}"><span class="rank">${i+1}</span>
+    $('#plays').innerHTML=unitKey()+list.map(({g,p},i)=>`<div class="best ${i>=SHOW?'more':''}"><span class="rank">${i+1}</span>
       <div class="bmain"><div class="bline"><span class="duo">${logo(g.away,'sm')}${logo(g.home,'sm')}</span><b>${esc(p.text)}</b>
-        <span class="pprice">${priceTxt(p.price)}</span></div>
+        <span class="pprice">${priceTxt(p.price)}</span>${unitChip(p)}</div>
         <div class="bwhy"><span>${esc(g.awayName)} at ${esc(g.homeName)} · ${esc(g.ko)}</span>
           ${(p.src||[]).map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}</div></div>
       <div class="bedge">${pickEdge(p)}</div>
@@ -561,6 +580,13 @@ function betsView(){
   $('#bSide').addEventListener('change',prefill);
   ['bCents','bQty','bPoint','bVenue'].forEach(id=>$('#'+id).addEventListener('input',preview));
   sides();
+  const bankTxt=()=>{const u=unitUsd(); $('#bUnit').innerHTML=unitKey()
+    +(u?'':'<p class="why">Your bankroll is saved in this browser only and never sent anywhere.</p>');};
+  const b0=bankroll(); if(b0) $('#bBank').value=b0;
+  $('#bBank').addEventListener('input',()=>{const v=Number($('#bBank').value);
+    try{ if(v>0) localStorage.setItem(BANK_KEY,String(v)); else localStorage.removeItem(BANK_KEY); }catch(_){}
+    bankTxt();});
+  bankTxt();
   fillBet=({gid,key})=>{
     const g=GAME.get(gid), p=g&&(g.picks||[]).find(x=>x.key===key); if(!p) return;
     if(![...$('#bGame').options].some(o=>o.value===gid)) $('#bGame').insertAdjacentHTML('afterbegin',opt(g));
@@ -572,9 +598,13 @@ function betsView(){
     const c=pr.cents!=null?pr.cents:pr.odds!=null?(pr.odds<0?-pr.odds/(100-pr.odds):100/(pr.odds+100))*100:null;
     if(c!=null) $('#bCents').value=Number(c).toFixed(0);
     $('#bReason').value={wind:'wind',roof:'wind',gap:'gap',lean:'lean',spread:'lean'}[p.edgeFrom]||'other';
-    $('#bNote').value=`Suggested: ${p.text}, ${signed(p.edge)}% edge`.slice(0,140);
+    $('#bNote').value=`Suggested: ${p.units?fmtU(p.units)+' ':''}${p.text}, ${signed(p.edge)}% edge`.slice(0,140);
+    const u=unitUsd(), cc=Number($('#bCents').value)/100;
+    if(p.units&&u&&cc>0&&cc<1){ const per=cc+feePer($('#bVenue').value,cc); $('#bQty').value=Math.max(1,Math.floor(p.units*u/per)); }
     preview();
-    $('#bStatus').textContent='Filled in from the pick: set the price you actually paid and how many contracts, then Save.';
+    $('#bStatus').textContent=unitUsd()&&p.units
+      ?`Filled in: ${fmtU(p.units)} = ${usdAmt(p.units*unitUsd())}. Set the price you actually paid, then Save.`
+      :'Filled in from the pick: set the price you actually paid and how many contracts, then Save. (Enter your Kalshi bankroll above to size it in units.)';
     $('#betForm').scrollIntoView({behavior:'smooth',block:'center'});
     $('#bQty').focus({preventScroll:true});
   };
@@ -669,8 +699,9 @@ function seasonPage(){
     const line=(label,o,tag)=>`<tr${tag===null?' class="sel"':''}><td>${tag?`<span class="tag ${tag}">${label}</span>`:`<b>${label}</b>`}</td>
       <td class="n">${o.n}</td><td>${o.n?`${o.won}–${o.lost}${o.push?`–${o.push}`:''}`:'<span class="push">none yet</span>'}</td>
       <td class="n ${cls(o.units)}">${o.n?per100(o.units):'—'}</td><td class="n ${cls(o.units)}">${o.n?signed(o.units/o.n*100)+'%':'—'}</td>
+      <td class="n ${cls(o.sized)}">${o.n?`${o.sized>0?'+':o.sized<0?MINUS:''}${fmtU(Math.abs(o.sized))} <span class="push small">on ${fmtU(o.staked)}</span>`:'—'}</td>
       <td>${o.judged?`<b class="${o.beat/o.judged>0.5?'ok':'no'}">${o.beat} of ${o.judged}</b>${o.clvAvg!=null?` <span class="push">· ${signed(o.clvAvg)}% avg</span>`:''}`:'<span class="push">once logged picks finish</span>'}</td></tr>`;
-    $('#pickBoard').innerHTML=`<thead><tr><th>Kind of bet</th><th class="n">Bets</th><th>Won–lost</th><th class="n">Profit on $100 each</th><th class="n">Return</th><th>Beat the closing price</th></tr></thead>
+    $('#pickBoard').innerHTML=`<thead><tr><th>Kind of bet</th><th class="n">Bets</th><th>Won–lost</th><th class="n">Profit on $100 each</th><th class="n">Return</th><th class="n">As sized (units)</th><th>Beat the closing price</th></tr></thead>
       <tbody>${KIND.map(([k,l,t])=>line(l,B[k],t)).join('')}${line('All suggestions',B.all,null)}</tbody>`;
     const st=s.pickLogStarted;
     $('#pickBoardNote').textContent=`Every bet the “Bets to take” boxes suggested, graded at the price shown when it first appeared.`

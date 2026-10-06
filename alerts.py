@@ -137,6 +137,51 @@ def run(data: dict) -> int:
     return n
 
 
+PREGAME_HOURS = 2.5    # "Kickoff soon" covers games starting within this many hours
+
+
+def _price_txt(pr: dict) -> str:
+    if pr.get("cents") is not None:
+        return f"{pr['cents']:.0f}c on {pr['book']}"
+    o = pr.get("odds")
+    return f"{o:+.0f} at sportsbooks" if o is not None else "no price yet"
+
+
+def pregame(data: dict) -> int:
+    """Game-day check (weekly.py --pregame): one "Kickoff soon" alert per kickoff window with the best bets
+    on games starting within PREGAME_HOURS, at the latest prices, or a plain "pass". Sent once per window."""
+    if not topic():
+        return 0
+    soon = [g for g in data["games"] if g["status"] == "upcoming" and 0 < _hours_to_kickoff(g, data) <= PREGAME_HOURS]
+    if not soon:
+        return 0
+    key = "pregame:" + min(g["koIso"] for g in soon)
+    sent = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {}
+    if key in sent:
+        return 0
+    when = min(soon, key=lambda g: g["koIso"])["ko"].split(" · ")[1]
+    picks = sorted(((g, p) for g in soon for p in g.get("picks", []) if p.get("good")), key=lambda gp: -gp[1]["edge"])
+    if picks:
+        lines = []
+        for i, (g, p) in enumerate(picks[:6], 1):
+            model = p.get("edgeFrom") in ("lean", "spread") and p.get("model") is not None
+            edge = f"model edge {p['model']:+.1f}% (no proven edge)" if model else f"{p['edge']:+.1f}% edge"
+            why = f", wind {g['wind']:.0f} mph" if p.get("edgeFrom") in ("wind", "roof") and g.get("wind") is not None else ""
+            size = f"{p['units']:g}u - " if p.get("units") else ""
+            lines.append(f"{i}) {size}{p['text']} - {_price_txt(p.get('price') or {})} - {edge}{why} - {g['awayName']} at {g['homeName']}")
+        more = f"\n+{len(picks) - 6} more on the site." if len(picks) > 6 else ""
+        title = f"Kickoff soon: {len(picks)} bet{'s' if len(picks) != 1 else ''} for the {when} games"
+        body = ("\n".join(lines) + more + "\n1u = 2% of your Kalshi bankroll. Latest prices; check the live order book "
+                "before betting.")
+    else:
+        title = f"Kickoff soon: no bets for the {when} games"
+        body = "Nothing on these games shows a real edge at the latest prices, so pass."
+    send(title, body, "alarm_clock")
+    sent[key] = {"title": title, "active": False}
+    STATE.write_text(json.dumps(sent, indent=1, sort_keys=True), encoding="utf-8")
+    return 1
+
+
 if __name__ == "__main__":
     if "--test" in sys.argv:
         if not topic():

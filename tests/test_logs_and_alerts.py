@@ -94,5 +94,40 @@ class AlertsOnce(unittest.TestCase):
             self.assertEqual(len(sent), 1)
 
 
+class KickoffSoon(unittest.TestCase):
+    def game(self, gid, ko, picks):
+        return {"id": gid, "status": "upcoming", "koIso": ko, "ko": "Sun Oct 11 · 12:00 PM CT", "awayName": "Bears",
+                "homeName": "Packers", "wind": 15.0, "picks": picks}
+
+    def run_pregame(self, data, state, sent):
+        with mock.patch.object(alerts, "STATE", state), \
+             mock.patch.object(alerts, "topic", lambda create=False: "test-channel"), \
+             mock.patch.object(alerts, "send", lambda title, body, tags="", click="": sent.append((title, body))):
+            return alerts.pregame(data)
+
+    def test_one_alert_per_window_best_bet_first(self):
+        wind = {"good": True, "text": "Under 44.5", "edge": 6.8, "edgeFrom": "wind", "price": {"cents": 50.0, "book": "Kalshi"}}
+        model = {"good": True, "text": "Packers to win", "edge": -3.0, "edgeFrom": "lean", "model": 8.0, "price": {"odds": -130}}
+        data = {"updated": "2026-10-11T10:30", "games": [self.game("g1", "2026-10-11T12:00", [model, wind]),
+                                                        self.game("g2", "2026-10-11T15:25", [wind])]}
+        with tempfile.TemporaryDirectory() as tmp:
+            state, sent = Path(tmp) / "alerts_sent.json", []
+            self.assertEqual(self.run_pregame(data, state, sent), 1)
+            self.assertEqual(self.run_pregame(data, state, sent), 0)              # same window: once
+        title, body = sent[0]
+        self.assertIn("2 bets", title)                                            # the 3:25 game isn't in this window
+        self.assertTrue(body.startswith("1) Under 44.5 - 50c on Kalshi - +6.8% edge, wind 15 mph"))
+        self.assertIn("model edge +8.0% (no proven edge)", body)
+
+    def test_nothing_soon_or_nothing_to_bet(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state, sent = Path(tmp) / "alerts_sent.json", []
+            far = {"updated": "2026-10-11T07:00", "games": [self.game("g1", "2026-10-11T12:00", [])]}
+            self.assertEqual(self.run_pregame(far, state, sent), 0)                # 5 hours out: not yet
+            near = dict(far, updated="2026-10-11T11:00")
+            self.assertEqual(self.run_pregame(near, state, sent), 1)
+        self.assertIn("no bets", sent[0][0])
+
+
 if __name__ == "__main__":
     unittest.main()
