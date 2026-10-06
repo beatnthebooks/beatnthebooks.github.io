@@ -41,9 +41,11 @@ class LeanShift(unittest.TestCase):
     def test_skips_training_seasons_and_this_season(self):
         def rec(season, home_won):
             return {"g": game(season, 24 if home_won else 10, 10 if home_won else 24), "p": 0.9}  # lean = home
-        recs = [rec(2018, True)] * 20 + [rec(2018, False)] * 20
+        recs = [rec(2020, True)] * 20 + [rec(2020, False)] * 20
         base = W.fit_lean_shift(recs, 0.3, 2026)
-        more = W.fit_lean_shift(recs + [rec(2010, True)] * 80 + [rec(2026, True)] * 80, 0.3, 2026)
+        # 2010 and 2018: the model's tuning seasons (first unseen season is 2019 since Oct 6); 2026: this season
+        more = W.fit_lean_shift(recs + [rec(2010, True)] * 80 + [rec(2018, True)] * 80 + [rec(2026, True)] * 80,
+                                0.3, 2026)
         self.assertAlmostEqual(base["shift"], more["shift"])
         self.assertEqual(more["n"], 40)
 
@@ -58,9 +60,9 @@ class SpreadMath(unittest.TestCase):
         self.assertLess(W.spread_cover(0.4, 3.0, 11.7, 0.28), 0.5)
 
     def test_record_uses_unseen_seasons_and_strong_picks_only(self):
-        g = dict(game(2018, 24, 10), spread=3.0, hso=-110.0, aso=-110.0)
+        g = dict(game(2020, 24, 10), spread=3.0, hso=-110.0, aso=-110.0)
         strong = [{"g": g, "p": 0.95}] * 5                    # big edges on both ML and spread
-        early = [{"g": dict(g, season=2010), "p": 0.95}] * 50  # tuning seasons: ignored
+        early = [{"g": dict(g, season=s), "p": 0.95} for s in (2010, 2018)] * 25   # tuning seasons: ignored
         weak = [{"g": g, "p": 0.53}] * 50                     # model ~ market (52%): no strong pick
         rec = W.model_record(strong + early + weak, 0.28, 11.7, 2026)
         self.assertEqual(rec["ml"]["n"], 5)

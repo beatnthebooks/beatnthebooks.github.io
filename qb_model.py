@@ -20,6 +20,9 @@ Protocol (same as the rest of the project): the QB settings are chosen on 2006-2
 (log loss), then 2016-2025 is scored once. Compared with the current model and the market,
 at closing prices, and against opening lines (does the line move toward the new model?).
 
+Oct 6 2026: player_value.py added a league-wide QB scale (abs_mult) and a position-importance scale for missing
+players (pv, w_imp, q_frac); both passed their tests and are the site's model now (results/qb_model_settings.json).
+
 Data: data/nflverse/player_stats_<1999-2024>.csv and stats_player_week_<2025-2026>.csv.
 
 Usage:  py qb_model.py
@@ -102,12 +105,19 @@ def load_injuries() -> dict:
 def run_qb(games, stats, k=20.0, hfa=55.0, regress=0.5, mov=True, rest_pts=6.0, qb_pen=0.0,
            val="box", mult=0.0, alpha=0.1, team_alpha=0.1, prior_sd=0.5,
            team_epa=None, epa_mult=0.0, epa_alpha=0.15,
-           inj=None, w_off=0.0, w_def=0.0, w_q=0.0, qb_at_open=False, **_ignored):
+           inj=None, w_off=0.0, w_def=0.0, w_q=0.0, qb_at_open=False,
+           abs_mult=0.0, pv=None, w_imp=0.0, w_pepa=0.0, q_frac=0.0, **_ignored):
     """Like rift_real.run, plus the QB adjustment and (optionally) team EPA efficiency.
     qb_at_open=True predicts each game as of when its line opens: a team's starter is assumed to
     be whoever started its previous game this season (week 1 uses the actual starter, since
     offseason moves are known by then). Ratings still update with the real starters.
+    abs_mult (player_value.py part 1): also count the team's usual QB level against the LEAGUE average, so the
+    Elo rating stops carrying the QB (0 = the original; = mult puts every QB on one absolute scale).
+    pv / w_imp / w_pepa / q_frac (part 2): {(season, week, team): (importance out, importance questionable,
+    EPA/game out, EPA/game questionable)} from player_value.player_features; Elo lost = w_imp x importance +
+    w_pepa x EPA, Questionable players counted at q_frac.
     Returns (records, ratings)."""
+    pv_elo = lambda t: 0.0 if not t else w_imp * (t[0] + q_frac * t[1]) + w_pepa * (t[2] + q_frac * t[3])
     Rt = defaultdict(lambda: 1500.0)
     qb_val, team_val = {}, {}
     off, dfn = defaultdict(float), defaultdict(float)   # EMA offensive EPA made / allowed per game
@@ -141,10 +151,11 @@ def run_qb(games, stats, k=20.0, hfa=55.0, regress=0.5, mov=True, rest_pts=6.0, 
         m, sd = league()
 
         def adj_for(team, qb):
-            if not qb or mult == 0:
+            if not qb or (mult == 0 and abs_mult == 0):
                 return 0.0
             v = qb_val.get(qb, m - prior_sd * sd)
-            return mult * (v - team_val.get(team, m))
+            tv = team_val.get(team, m)
+            return mult * (v - tv) + abs_mult * (tv - m)
 
         hflag, aflag = R._qb_flag(qb_hist, h, hqb), R._qb_flag(qb_hist, a, aqb)
         adj = 0.0 if g["neutral"] else hfa
@@ -156,6 +167,8 @@ def run_qb(games, stats, k=20.0, hfa=55.0, regress=0.5, mov=True, rest_pts=6.0, 
         if inj is not None and (w_off or w_def or w_q):
             adj += inj_penalty(inj.get((g["season"], g["week"], a)), w_off, w_def, w_q) \
                 - inj_penalty(inj.get((g["season"], g["week"], h)), w_off, w_def, w_q)
+        if pv is not None and (w_imp or w_pepa):
+            adj += pv_elo(pv.get((g["season"], g["week"], a))) - pv_elo(pv.get((g["season"], g["week"], h)))
         diff = Rt[h] + adj - Rt[a]
         p = 1.0 / (1.0 + 10.0 ** (-diff / 400.0))
         recs.append({"g": g, "p": p, "hflag": hflag, "aflag": aflag,      # rh/ra: strength before the game
@@ -221,17 +234,42 @@ def ensure_stats(current_season: int, refresh_current: bool) -> None:
             print(f"  couldn't download {name} ({exc}); using what's there")
 
 
+def ensure_injury_files(current_season: int, refresh_current: bool) -> None:
+    """Injury reports and snap counts (2013 on) for the player-importance scale: download missing seasons, and
+    re-download the current one if asked (it grows every week). Same nflverse release as the player stats."""
+    import urllib.request
+    NV.mkdir(parents=True, exist_ok=True)
+    for yr in range(2013, current_season + 1):
+        for kind in ("injuries", "snap_counts"):
+            path = NV / f"{kind}_{yr}.csv"
+            if path.exists() and not (refresh_current and yr == current_season):
+                continue
+            try:
+                with urllib.request.urlopen(f"{STATS_URL}/{kind}/{kind}_{yr}.csv", timeout=120) as resp:
+                    data = resp.read()
+                tmp = path.with_suffix(".tmp")
+                tmp.write_bytes(data)
+                tmp.replace(path)
+            except Exception as exc:
+                print(f"  couldn't download {kind}_{yr}.csv ({exc}); using what's there")
+
+
 class Model:
-    """The site's model: QB ratings + team EPA on top of Elo, with the settings tuned on
-    2006-2015 (results/qb_model_settings.json)."""
+    """The site's model (results/qb_model_settings.json): Elo + QB ratings on a league-wide scale + team EPA
+    (tuned 2006-2015) + missing players on a position-importance scale (tuned 2013-2018); see player_value.py."""
     def __init__(self):
         saved = json.loads(SETTINGS.read_text(encoding="utf-8"))
         self.params, self.blend_w = saved["params"], saved["blend_w"]
+        self.first_unseen = saved.get("first_unseen_season", 2016)
         self.stats = load_qb_stats()
         self.team_epa = load_team_epa()
+        self.pv = None
+        if self.params.get("w_imp") or self.params.get("w_pepa"):
+            import player_value as PV
+            self.pv = PV.player_features(epa=None if self.params.get("w_pepa") else {})
 
     def run(self, games):
-        return run_qb(games, self.stats, team_epa=self.team_epa, **self.params)
+        return run_qb(games, self.stats, team_epa=self.team_epa, pv=self.pv, **self.params)
 
 
 def ll_on(recs, seasons):
@@ -378,14 +416,17 @@ def main():
     opener_check("original", cur, w_cur)
     opener_check("QB + EPA", qbe, w_qbe)
 
-    # Adopted: QB + team EPA. The injury layer (all non-QB positions by snap share) improved the
+    # Adopted Oct 4: QB + team EPA. The injury layer (all non-QB positions by snap share) improved the
     # training seasons but not 2016-2025 (log loss 0.6290 -> 0.6291, close ROI -5.5% -> -6.3%), and
     # its weights (offense 0, defense at the grid maximum) look like noise from 3 seasons of reports.
-    out = ROOT / "results" / "qb_model_settings.json"
+    # Since Oct 6 the site's settings come from player_value.py, so this research run writes its own file
+    # (it used to overwrite results/qb_model_settings.json).
+    out = ROOT / "results" / "qb_model_settings_v1.json"
     out.write_text(json.dumps({"params": best, "blend_w": w_qbe,
                                "injury_layer_rejected": {"weights": {k: final[k] for k in ("w_off", "w_def", "w_q")},
                                                          "blend_w": w_new}}, indent=2), encoding="utf-8")
-    print(f"\nWrote {out.relative_to(ROOT)} (adopted: QB + team EPA; injury layer rejected)")
+    print(f"\nWrote {out.relative_to(ROOT)} (QB + team EPA; injury layer rejected). The site's model is in "
+          f"results/qb_model_settings.json, from player_value.py.")
 
 
 if __name__ == "__main__":

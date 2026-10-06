@@ -48,7 +48,7 @@ import alerts
 import picks as P
 from edge_lab import DEV, _inverse, _solve, devig, fit_sigma, load, logit, sigmoid
 from odds import EXCHANGE_FEE, add_live_exchanges, get_odds, log_snapshots, match_games
-from qb_model import Model as QBModel, ensure_stats
+from qb_model import Model as QBModel, ensure_injury_files, ensure_stats
 from rift_real import TEAM_NAME, am_to_dec, run
 from update_board import now_central
 from wind_check import STADIUMS, WIND_MPH, fetch, forecast, game_wind, stadium_key
@@ -178,7 +178,8 @@ def _fit_offset_logit(X, offset, y, iters=40):
 # +5.1% and returned -5.4%, and the biggest predicted lean edges did worst (-7.3%). Wind speed above 10 mph didn't
 # separate better unders from worse ones, so one shift per bet type.
 PICKS_FIT_FROM = 2006
-LEAN_FIT_FROM = 2016   # the model's settings were tuned on 2006-2015, so leans only count from its first unseen season
+LEAN_FIT_FROM = 2019   # leans only count from the model's first unseen season: its player-importance weights were
+                       # tuned on 2013-2018 (player_value.py, Oct 6 2026; before that the model was tuned on 2006-2015)
 
 
 def fit_wind_shift(games: list, season: int) -> dict:
@@ -505,7 +506,7 @@ def season_models(games: list, season: int, site_recs: list, site_blend: float) 
     add("Elo, core only", elo_core)
     add("+ rest + backup-QB flag", elo_full)
     add(f"Blend, {round(w_elo * 100)}% Elo (the old lean)", elo_full, w_elo)
-    add("QB ratings + team efficiency (today’s model)", site_recs, kind="site")
+    add("QB scale + player importance + team efficiency (today’s model)", site_recs, kind="site")
     add(f"Blend, {round(site_blend * 100)}% of today’s model (its picks)", site_recs, site_blend, kind="site")
     P, M, O, _ = RR.collect(site_recs, {season})
     if M:
@@ -590,13 +591,14 @@ def team_table(games, model_run, season: int, ratings: dict) -> list:
 
 
 def pick_model(season: int, refresh: bool):
-    """The QB + team-efficiency model when its settings and stats are available, else the
+    """The QB + player-importance + team-efficiency model when its settings and stats are available, else the
     original Elo. Returns (run(games) -> (recs, ratings), blend weight, home field, name)."""
     saved = json.loads(PARAMS.read_text(encoding="utf-8"))
     try:
         ensure_stats(season, refresh_current=refresh)
+        ensure_injury_files(season, refresh_current=refresh)
         m = QBModel()
-        return m.run, m.blend_w, m.params.get("hfa", 55.0), "qb+epa"
+        return m.run, m.blend_w, m.params.get("hfa", 55.0), "qb+players+epa" if m.pv else "qb+epa"
     except Exception as exc:
         print(f"  QB model unavailable ({exc}); using the original Elo")
         params = saved["params"]

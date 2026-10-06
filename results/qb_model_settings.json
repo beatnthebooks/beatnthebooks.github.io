@@ -1,4 +1,5 @@
 {
+  "source": "player_value.py, Oct 6 2026: league-wide QB scale (part 1, tuned 2006-2015) + position-importance injury scale (part 2, tuned 2013-2018). Both lowered test log loss; see results/player_value.txt",
   "params": {
     "k": 20,
     "hfa": 55,
@@ -12,10 +13,35 @@
     "alpha": 0.2,
     "team_alpha": 0.2,
     "prior_sd": 1.0,
-    "epa_mult": 3.0,
-    "epa_alpha": 0.08
+    "epa_mult": 2.0,
+    "epa_alpha": 0.05,
+    "abs_mult": 0.5,
+    "w_imp": 24.0,
+    "w_pepa": 0.0,
+    "q_frac": 0.5
   },
-  "blend_w": 0.28,
+  "blend_w": 0.42,
+  "first_unseen_season": 2019,
+  "previous": {
+    "params": {
+      "k": 20,
+      "hfa": 55,
+      "hfa_mode": "fixed",
+      "regress": 0.5,
+      "mov": true,
+      "rest_pts": 6,
+      "qb_pen": 75,
+      "val": "box",
+      "mult": 2.0,
+      "alpha": 0.2,
+      "team_alpha": 0.2,
+      "prior_sd": 1.0,
+      "epa_mult": 3.0,
+      "epa_alpha": 0.08
+    },
+    "blend_w": 0.28,
+    "note": "QB ratings + team EPA (qb_model.py, Oct 4 2026)"
+  },
   "injury_layer_rejected": {
     "weights": {
       "w_off": 0.0,

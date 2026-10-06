@@ -38,7 +38,7 @@
   </section>
 
   <section class="kpis" style="margin-top:16px">
-    <div class="kpi" id="modelYear"><div class="v bad">−5.5%</div><div class="l">Our model alone, betting every edge at the final line<br><span>2016–2025 · it can’t beat the closing line</span></div></div>
+    <div class="kpi" id="modelYear"><div class="v bad">−6.9%</div><div class="l">Our model alone, betting every edge at the final line<br><span>2019–2025 · it can’t beat the closing line</span></div></div>
     <div class="kpi"><div class="v">1 pt</div><div class="l">Kalshi and Polymarket vs the sportsbooks’ final price<br><span>average gap in win chance an hour before kickoff, 331 games</span></div></div>
     <div class="kpi"><div class="v good">+14.2%</div><div class="l">Wind unders using forecasts, 2022–2025 (168 bets)</div></div>
     <div class="kpi"><div class="v">49</div><div class="l">Signals tested against the market; one survived</div></div>
@@ -95,10 +95,28 @@
         the week. That check accidentally knew each game’s starting QB before the line opened. Redone with only
         what’s known when lines open, it’s 56% (bet365) and 54% (Pinnacle), and the picks didn’t beat the opening
         price once the bookmaker’s margin is counted. See section 7.</li>
-      <li><b>Injuries at every position were tested too</b> (official reports 2013–2025, each player valued by how
-        much he plays). They didn’t make the model more accurate on the test seasons, so they aren’t used: by
-        kickoff the market has already priced them. Instead, the site watches injury news live and alerts you when
-        a key player is ruled out, in case Kalshi or Polymarket are slow to react.</li>
+      <li><b>Injuries at every position were tested too</b> (official reports 2013–2025, each player valued only by how
+        much he plays). That version didn’t make the model more accurate on the test seasons, so it wasn’t used.
+        The site also watches injury news live and alerts you when a key player is ruled out, in case Kalshi or
+        Polymarket are slow to react.</li>
+    </ul>
+    <h3 class="subhead">October 6 upgrade: player value on an importance scale</h3>
+    <ul>
+      <li><b>One league-wide quarterback scale.</b> Before, a quarterback was only compared with his own team’s usual
+        level, so a team that lost its star for a season (the Bengals without Burrow in 2025) kept a low rating after
+        he came back. Now each team’s usual quarterback also counts against the league average. Tuned on 2006–2015,
+        tested once on 2016–2025: more accurate in 8 of 10 seasons.</li>
+      <li><b>Every other position on an importance scale.</b> Each player on the final injury report counts by his
+        position’s value × how much he plays: receivers and pass rushers 1.0, corners and offensive tackles 0.9,
+        linebackers, safeties, tight ends and defensive tackles 0.6, guards and centers 0.5, running backs 0.4 (set in advance from
+        published positional-value research). A full-time starter at a 1.0 position who is out costs his team
+        24 Elo, about 1 point on the spread; questionable players count half. A “skill” bonus from each receiver’s
+        and back’s production was tested too and added nothing beyond playing time. Tuned on 2013–2018, tested once
+        on 2019–2025.</li>
+      <li><b>Result, on 2019–2025 (seasons it never saw):</b> accuracy score 0.6319 → 0.6302, closing a small part of
+        the gap to the closing line (0.6088). Its picks still lost at the final line, just less: every edge −9.0% →
+        −7.0%, picks with a 5%+ edge −10.3% → −8.3% (moneyline) and −13.6% → −5.9% (spread). Winners picked slipped
+        from 64.1% to 63.5%. A real but small improvement; it doesn’t beat the market.</li>
     </ul>
 
     <h2>5. Searching for an edge against the market</h2>
@@ -190,18 +208,19 @@
     <thead><tr><th>Bet</th><th>Edge comes from</th><th class="n">Model’s own estimate</th><th class="n">What it really returned</th></tr></thead>
     <tbody>
       <tr><td>Wind under</td><td>How often windy unders beat the market, 2006 on</td><td class="n">+2.2%</td><td class="n ok">+11.8%</td></tr>
-      <tr><td>Model pick</td><td>How the model’s picks did in seasons it never saw, 2016 on</td><td class="n">+5.1%</td><td class="n no">−5.4%</td></tr>
+      <tr><td>Model pick</td><td>How the model’s picks did in seasons it never saw, 2019 on</td><td class="n">+7.3%</td><td class="n no">−7.1%</td></tr>
       <tr><td>Price gap</td><td>The sportsbooks’ fair price (no long record yet)</td><td class="n">—</td><td class="n">39 bets, too few</td></tr>
     </tbody></table></div>
   <section class="prose" style="margin-top:8px">
     <ul>
-      <li>The table covers 2016–2025 at final prices. The model’s biggest predicted edges did worst (−7.3%), so ranking by
-        them would put the worst bet first.</li>
-      <li>Checked on seasons they weren’t fitted on: the model-pick estimate (−5.0%) matched what happened (−6.3%,
-        2021–25). The wind estimate runs low (+2.7% vs +11.8%), which is the safe direction.</li>
+      <li>The table is at final prices (wind 2016–2025; model picks 2019–2025, the seasons today’s model never saw).
+        The model’s biggest predicted edges did worst (top fifth −9.4%), so ranking by them tends to put the worst bet
+        first.</li>
+      <li>Checked on seasons they weren’t fitted on (previous model): the model-pick estimate (−5.0%) matched what
+        happened (−6.3%, 2021–25). The wind estimate runs low (+2.7% vs +11.8%), which is the safe direction.</li>
       <li><b>Model picks on the moneyline and the spread</b> are suggested when the model’s own edge is 5% or more
         (about six a week). They show that number in purple, next to how picks that strong have really done in
-        2016–2025: −6.1% on the moneyline (539 bets) and −4.6% on the spread (525 bets), plus this season’s record.
+        2019–2025: −8.3% on the moneyline (590 bets) and −5.9% on the spread (617 bets), plus this season’s record.
         <b>Since Oct 6, 2026 they’re ranked by the model’s own edge</b> (the purple number), because this season the model’s
         picks have done better than the wind unders. That’s a small sample against ten seasons where ranking this way
         would have put the worst bets first, so the Season page’s scoreboard is the judge.</li>

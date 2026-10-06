@@ -847,7 +847,7 @@ function methodPage(){
   if(tile&&L&&L.n){
     const r=L.units/L.n*100;
     tile.innerHTML=`<div class="v ${r>0?'good':r<0?'bad':''}">${signed(r)}%</div><div class="l">Our model’s picks this season, at the final line<br>
-      <span>${D.season}: ${L.won} won, ${L.lost} lost (${plural(L.n,'bet')}), ${per100(L.units)} on $100 bets · 2016–2025: −5.5%, so a hot start isn’t proof</span></div>`;
+      <span>${D.season}: ${L.won} won, ${L.lost} lost (${plural(L.n,'bet')}), ${per100(L.units)} on $100 bets · 2019–2025: −7.0%, so a hot start isn’t proof</span></div>`;
   }
 }
 

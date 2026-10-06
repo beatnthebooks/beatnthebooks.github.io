@@ -1,0 +1,90 @@
+player_value.py
+Mason asked for a model that grasps player value on an importance scale. Rules fixed before running:
+  a part is adopted only if it lowers log loss on its own test seasons vs the model it would replace.
+
+================================================================================================
+PART 1 · ONE LEAGUE-WIDE QB SCALE (tune 2006-2015, test 2016-2025 once)
+================================================================================================
+Current site model: training log loss 0.61851
+Tried 282 settings on the training seasons.
+Chosen (with league-wide QB scale): abs_mult=0.5 mult=2.0 alpha=0.2 new-QB prior=1.0 sd below avg, regress=0.5, team EPA x2.0 (alpha 0.05) -> training log loss 0.61771
+Control (same re-tuning, no new term): mult=2.0 alpha=0.2 prior=1.0 regress=0.5 EPA x3.0 -> training log loss 0.61851
+
+OUT-OF-SAMPLE TEST 2016-2025 (closing moneylines; return = betting every side the model likes, $1 flat)
+                                         LogLoss    Acc    Return, every edge     edges over 3%
+  current site model                      0.6290  64.3%          -5.5% (2332)      -5.1% (1965)
+  re-tuned, no QB scale (control)         0.6290  64.3%          -5.5% (2332)      -5.1% (1965)
+  NEW: league-wide QB scale               0.6280  64.6%          -6.1% (2341)      -5.4% (1942)
+  current blend (w=0.28)                  0.6110                 -5.4% (1486)      -7.0% ( 784)
+  NEW blend (w=0.3)                       0.6111                 -4.5% (1525)      -7.0% ( 843)
+  closing market                          0.6091
+  Per game, new minus current log loss: -0.94 per 1000 (t = -2.20; |t| < 2 = could be luck)
+
+BY SEASON (log loss, lower is better)
+  2016: current 0.6153  new 0.6136  market 0.6222   <- new better
+  2017: current 0.6147  new 0.6146  market 0.5932   <- new better
+  2018: current 0.6358  new 0.6332  market 0.6143   <- new better
+  2019: current 0.6435  new 0.6411  market 0.6166   <- new better
+  2020: current 0.6215  new 0.6215  market 0.5906   
+  2021: current 0.6437  new 0.6433  market 0.6240   <- new better
+  2022: current 0.6339  new 0.6323  market 0.6060   <- new better
+  2023: current 0.6450  new 0.6460  market 0.6270   
+  2024: current 0.6053  new 0.6036  market 0.5892   <- new better
+  2025: current 0.6302  new 0.6301  market 0.6078   <- new better
+  New model more accurate in 8 of 10 seasons.
+
+THE SITE'S MODEL PICKS (model edge 5%+, blend, closing prices, 2016-2025)
+  current                                moneyline -6.1% on 539 bets · spread -4.6% on 525 bets
+  new                                    moneyline -5.7% on 580 bets · spread -3.8% on 570 bets
+
+THIS SEASON SO FAR (2026, played games; informative only)
+  current 0.6336 · new 0.6364 · market 0.6509
+  current                                Bengals at Dolphins (week 5): Dolphins 42.8% to win (market about 24%)
+  new                                    Bengals at Dolphins (week 5): Dolphins 41.6% to win (market about 24%)
+
+PART 1 VERDICT: ADOPT (test log loss 0.6290 -> 0.6280)
+
+================================================================================================
+PART 2 · IMPORTANCE SCALE FOR EVERY OTHER POSITION, on top of the league-wide QB model
+         (tune 2013-2018, test 2019-2025 once)
+================================================================================================
+Team-games with an injury report: 7,017. Average per team-game: importance out 0.80, questionable 1.08, skill EPA/game out 0.53
+Biggest single absences in 2024 by importance (position weight x snap share) and skill (EPA/game):
+  2024 wk 5 NYG Malik Nabers             WR  importance 0.91  EPA/game 6.3
+  2024 wk 6 NYG Malik Nabers             WR  importance 0.91  EPA/game 6.3
+  2024 wk 3 PHI A.J. Brown               WR  importance 0.95  EPA/game 5.0
+  2024 wk 5 BUF Khalil Shakir            WR  importance 0.59  EPA/game 6.1
+  2024 wk18 PHI A.J. Brown               WR  importance 0.87  EPA/game 4.8
+  2024 wk18 PHI DeVonta Smith            WR  importance 0.89  EPA/game 4.4
+  2024 wk18 LA  Puka Nacua               WR  importance 0.70  EPA/game 5.0
+  2024 wk 8 NYJ Allen Lazard             WR  importance 0.87  EPA/game 4.2
+
+Tried 165 weightings on 2013-2018. Chosen: 24.0 Elo per full-time player at weight 1.0, 0.0 Elo per EPA/game of a missing receiver/back, questionable counted at 0.5
+  training log loss 0.61627 -> 0.61446
+
+OUT-OF-SAMPLE TEST 2019-2025 (closing moneylines)
+                                         LogLoss    Acc    Return, every edge     edges over 3%
+  league-wide QB model                    0.6311  64.2%          -8.5% (1628)      -9.0% (1347)
+  NEW: + importance scale                 0.6302  63.5%          -6.9% (1643)      -7.1% (1352)
+  league-wide QB model blend (w=0.36)     0.6128                 -8.3% (1142)     -12.3% ( 670)
+  NEW blend (w=0.42)                      0.6132                 -7.0% (1218)      -8.3% ( 766)
+  closing market                          0.6088
+  Per game, new minus base log loss: -0.97 per 1000 (t = -0.62)
+
+BY SEASON (log loss)
+  2019: base 0.6411  new 0.6464  market 0.6166   
+  2020: base 0.6215  new 0.6199  market 0.5906   <- new better
+  2021: base 0.6433  new 0.6438  market 0.6240   
+  2022: base 0.6323  new 0.6281  market 0.6060   <- new better
+  2023: base 0.6460  new 0.6456  market 0.6270   <- new better
+  2024: base 0.6036  new 0.5997  market 0.5892   <- new better
+  2025: base 0.6301  new 0.6281  market 0.6078   <- new better
+  New model more accurate in 5 of 7 seasons.
+
+THE SITE'S MODEL PICKS (model edge 5%+, blend, closing prices, 2019-2025)
+  league-wide QB model                   moneyline -10.0% on 476 bets · spread -9.9% on 479 bets
+  + importance scale                     moneyline -8.3% on 590 bets · spread -5.9% on 617 bets
+
+PART 2 VERDICT: ADOPT (test log loss 0.6311 -> 0.6302)
+
+Wrote results\player_value.txt and results\player_value_settings.json

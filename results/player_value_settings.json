@@ -1,0 +1,84 @@
+{
+  "part1": {
+    "adopt": true,
+    "params": {
+      "k": 20,
+      "hfa": 55,
+      "hfa_mode": "fixed",
+      "regress": 0.5,
+      "mov": true,
+      "rest_pts": 6,
+      "qb_pen": 75,
+      "val": "box",
+      "mult": 2.0,
+      "alpha": 0.2,
+      "team_alpha": 0.2,
+      "prior_sd": 1.0,
+      "epa_mult": 2.0,
+      "epa_alpha": 0.05,
+      "abs_mult": 0.5
+    },
+    "blend_w": 0.3,
+    "control": {
+      "k": 20,
+      "hfa": 55,
+      "hfa_mode": "fixed",
+      "regress": 0.5,
+      "mov": true,
+      "rest_pts": 6,
+      "qb_pen": 75,
+      "val": "box",
+      "mult": 2.0,
+      "alpha": 0.2,
+      "team_alpha": 0.2,
+      "prior_sd": 1.0,
+      "epa_mult": 3.0,
+      "epa_alpha": 0.08,
+      "abs_mult": 0.0
+    },
+    "test_ll": {
+      "current": 0.6289868097935931,
+      "new": 0.6280491798917034,
+      "control": 0.6289868097935931,
+      "market": 0.6091314866511517
+    }
+  },
+  "part2": {
+    "adopt": true,
+    "params": {
+      "w_imp": 24.0,
+      "w_pepa": 0.0,
+      "q_frac": 0.5
+    },
+    "blend_w": 0.42,
+    "base": "league-wide QB model",
+    "test_ll": {
+      "base": 0.6311358043543102,
+      "new": 0.6301653420273333,
+      "market": 0.6088123643666623
+    }
+  },
+  "pos_weights": {
+    "WR": 1.0,
+    "DE": 1.0,
+    "CB": 0.9,
+    "T": 0.9,
+    "OT": 0.9,
+    "LB": 0.6,
+    "OLB": 0.6,
+    "ILB": 0.6,
+    "MLB": 0.6,
+    "S": 0.6,
+    "FS": 0.6,
+    "SS": 0.6,
+    "DB": 0.6,
+    "TE": 0.6,
+    "DT": 0.6,
+    "NT": 0.6,
+    "G": 0.5,
+    "OG": 0.5,
+    "C": 0.5,
+    "RB": 0.4,
+    "FB": 0.1
+  }
+}
