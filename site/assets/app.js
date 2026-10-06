@@ -59,7 +59,27 @@ function vsFair(ev){
 }
 
 /* ======================= shared chrome ======================= */
+/* Scoreboard strip above the header on every page: this week's games, live during games (ESPN). */
+function scoreStrip(){
+  const wk=D.currentWeek, gs=D.games.filter(g=>g.wk===wk), bar=$('header.bar');
+  if(!gs.length||!bar) return;
+  let sb=$('#scoreStrip');
+  if(!sb){ sb=document.createElement('div'); sb.id='scoreStrip'; sb.className='sb'; sb.setAttribute('aria-label','Scores'); bar.before(sb); }
+  const tile=g=>{
+    const L=liveOf(g), f=g.status==='final'||(L&&L.state==='post'), on=L&&L.state==='in';
+    const hs=L?L.hs:g.hs, as=L?L.as:g.as, show=f||!!L;
+    const [day,time]=g.ko.split(' · ');
+    const st=f?'Final':on?L.detail:g.status==='live'?'In progress':`${day.split(' ')[0]} ${time.replace(' CT','')}`;
+    const row=(code,s,o)=>`<div class="sb-t ${f&&s<o?'lose':''}">${logo(code,'xs')}<span class="sb-c">${esc(code)}</span>`
+      +`${on&&L.poss===code?'<span class="poss">●</span>':''}${show?`<span class="sc">${s??''}</span>`:''}</div>`;
+    return `<a class="sb-g ${on?'on':''}" href="index.html#week${g.wk}"><span class="sb-st ${f?'final':on?'live':''}">`
+      +`${on?'<span class="livedot"></span>':''}${esc(st)}</span>${row(g.away,as,hs)}${row(g.home,hs,as)}</a>`;
+  };
+  sb.innerHTML=`<div class="sb-in"><a class="sb-wk" href="index.html#week${wk}">${esc(wkName(wk))}<span>${plural(gs.length,'game')}</span></a>${gs.map(tile).join('')}</div>`;
+}
 function chrome(){
+  scoreStrip();
+  watchLive(()=>D.currentWeek,()=>scoreStrip());
   $$('[data-stamp]').forEach(el=>el.textContent='Updated '+D.updatedLabel);
   const oddsTxt=D.oddsFetched?` Kalshi, Polymarket and sportsbook prices last checked ${new Date(D.oddsFetched).toLocaleString([], {weekday:'short',hour:'numeric',minute:'2-digit'})}.`:'';
   $$('[data-foot]').forEach(el=>el.textContent=`Updated ${D.updatedLabel}.${oddsTxt}`);
@@ -165,6 +185,30 @@ async function fetchLive(games,wk){
   }
   return changed;
 }
+/* One live loop for the page: each subscriber names a week to watch (or null) and redraws what changed.
+   Polls only weeks with a non-final game dated today or earlier; 30 s while a game is on, else every 5 min;
+   a hidden tab gets one check, then waits until it's visible again. */
+const liveSubs=[];
+let liveTimer=null, liveFirst=true;
+const watchLive=(weekFn,onChange)=>liveSubs.push({weekFn,onChange});
+async function liveTick(){
+  clearTimeout(liveTimer);
+  const today=new Date().toISOString().slice(0,10);
+  let fast=false;
+  for(const wk of [...new Set(liveSubs.map(s=>s.weekFn()).filter(w=>w!=null))]){
+    const gs=D.games.filter(g=>g.wk===wk);
+    const due=gs.some(g=>g.status!=='final'&&g.date<=today&&!(LIVE.get(g.id)&&LIVE.get(g.id).state==='post'));
+    if(!due||(document.hidden&&!liveFirst)) continue;
+    try{
+      const changed=await fetchLive(gs,wk);
+      if(changed.length) liveSubs.filter(s=>s.weekFn()===wk).forEach(s=>s.onChange(changed,gs));
+      if(gs.some(g=>(LIVE.get(g.id)||{}).state==='in')) fast=true;
+    }catch(_){}
+  }
+  liveFirst=false;
+  liveTimer=setTimeout(liveTick,fast?30000:300000);
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) liveTick(); });
 const priceTxt=pr=>!pr?'':pr.cents!=null?`${Number(pr.cents).toFixed(0)}¢ on ${esc(pr.book)}`:`${odds(pr.odds)} at sportsbooks`;
 /* ======================= week page ======================= */
 function weekPage(){
@@ -369,7 +413,7 @@ function weekPage(){
     if(b){ week=Number(b.dataset.wk); filter='all';
       $$('#filters button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f==='all'));
       try{history.replaceState(null,'','#week'+week);}catch(_){}
-      render(); return; }
+      render(); setTimeout(liveTick,50); return; }
     const f=e.target.closest('[data-f]');
     if(f){ filter=f.dataset.f; $$('#filters button').forEach(x=>x.setAttribute('aria-pressed',x===f)); render(); }
   });
@@ -387,27 +431,12 @@ function weekPage(){
   }
   window.addEventListener('hashchange',route);
   route();
-  // live scores: poll ESPN on game days for the week on screen; fast while a game is on
-  let liveTimer=null, liveFirst=true;
-  async function liveTick(){
-    clearTimeout(liveTimer);
-    const gs=D.games.filter(g=>g.wk===week), today=new Date().toISOString().slice(0,10);
-    const due=gs.some(g=>g.status!=='final'&&g.date<=today&&!(LIVE.get(g.id)&&LIVE.get(g.id).state==='post'));
-    let fast=false;
-    if(due&&(!document.hidden||liveFirst)&&location.hash!=='#bets'){     // hidden tabs: one check, then wait
-      liveFirst=false;
-      try{
-        const changed=await fetchLive(gs,week);
-        changed.forEach(g=>{const el=document.getElementById('g-'+g.id); if(el) el.outerHTML=card(g);});
-        if(changed.length) bestBets(gs);
-        fast=gs.some(g=>(LIVE.get(g.id)||{}).state==='in');
-      }catch(_){}
-    }
-    liveTimer=setTimeout(liveTick,fast?30000:300000);
-  }
-  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) liveTick(); });
+  // live scores for the week on screen (shared loop above)
+  watchLive(()=>location.hash==='#bets'?null:week,(changed,gs)=>{
+    changed.forEach(g=>{const el=document.getElementById('g-'+g.id); if(el) el.outerHTML=card(g);});
+    bestBets(gs);
+  });
   window.addEventListener('hashchange',()=>setTimeout(liveTick,50));
-  liveTick();
 }
 
 /* ======================= bet tracker ======================= */
@@ -755,4 +784,5 @@ window.EDGE_TEST={betMath,fairNow,feePer,betText};   // for tests/tracker_test.h
 chrome();
 const page=($('main')||{}).dataset?.page;
 ({week:weekPage,season:seasonPage,teams:teamsPage,method:methodPage}[page]||(()=>{}))();
+liveTick();
 })();
