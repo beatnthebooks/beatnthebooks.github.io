@@ -17,7 +17,7 @@
      "book": "Polymarket",
      "cents": 42.0
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -67,6 +67,38 @@
      "13 mph wind forecast"
     ]
    }
+  },
+  "total|under|45.5": {
+   "first": {
+    "dec": 1.8475,
+    "edge": 5.2,
+    "price": {
+     "odds": -118
+    },
+    "ts": "2026-10-05T19:22"
+   },
+   "last": {
+    "dec": 1.8475,
+    "edge": 5.2,
+    "price": {
+     "odds": -118
+    },
+    "ts": "2026-10-05T19:22"
+   },
+   "pick": {
+    "edgeFrom": "wind",
+    "mk": "total",
+    "point": 45.5,
+    "side": "under",
+    "src": [
+     "wind"
+    ],
+    "suggested": false,
+    "text": "Under 45.5",
+    "why": [
+     "12 mph wind forecast"
+    ]
+   }
   }
  },
  "2026_05_CIN_MIA": {
@@ -87,7 +119,7 @@
      "book": "Polymarket",
      "cents": 24.0
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -121,7 +153,7 @@
     "price": {
      "odds": -108
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -155,7 +187,7 @@
     "price": {
      "odds": -115
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "wind",
@@ -191,7 +223,7 @@
      "book": "Polymarket",
      "cents": 45.0
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -263,7 +295,7 @@
     "price": {
      "odds": -110
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "roof",
@@ -331,7 +363,7 @@
     "price": {
      "odds": -115
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "wind",
@@ -399,7 +431,7 @@
     "price": {
      "odds": -102
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "wind",
@@ -464,12 +496,12 @@
    },
    "last": {
     "dec": 5.254,
-    "edge": 5.5,
+    "edge": 3.2,
     "price": {
      "book": "Kalshi",
      "cents": 18.0
     },
-    "ts": "2026-10-05T19:01"
+    "ts": "2026-10-05T19:22"
    },
    "pick": {
     "edgeFrom": "lean",
