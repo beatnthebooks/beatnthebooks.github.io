@@ -116,8 +116,9 @@ class KickoffSoon(unittest.TestCase):
             self.assertEqual(self.run_pregame(data, state, sent), 0)              # same window: once
         title, body = sent[0]
         self.assertIn("2 bets", title)                                            # the 3:25 game isn't in this window
-        self.assertTrue(body.startswith("1) Under 44.5 - 50c on Kalshi - +6.8% edge, wind 15 mph"))
-        self.assertIn("model edge +8.0% (no proven edge)", body)
+        # ranked by the edge shown (Mason, Oct 6): the model's own +8.0% before the wind under's +6.8%
+        self.assertTrue(body.startswith("1) Packers to win - -130 at sportsbooks - model edge +8.0% (no proven edge)"))
+        self.assertIn("2) Under 44.5 - 50c on Kalshi - +6.8% edge, wind 15 mph", body)
 
     def test_nothing_soon_or_nothing_to_bet(self):
         with tempfile.TemporaryDirectory() as tmp:

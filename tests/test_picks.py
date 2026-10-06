@@ -117,8 +117,18 @@ class Ranking(unittest.TestCase):
         strong = card(mkt={"lean": "home", "fair": 0.55, "leanEv": 6.0, "leanEdge": -4.0, "leanDec": 1.77, "leanOdds": -130},
                       spreadLean={"side": "home", "point": -3.5, "ev": 7.5, "edge": -2.5, "dec": 1.91, "odds": -110})
         P = PK.game_picks(strong, 5.0)
-        self.assertEqual([p["text"] for p in P], ["Packers -3.5", "Packers to win"])   # ranked by real edge
+        self.assertEqual([p["text"] for p in P], ["Packers -3.5", "Packers to win"])   # by the model's edge, 7.5 > 6.0
         self.assertTrue(all(p["good"] and p["suggested"] for p in P))
+
+    def test_model_picks_rank_by_the_edge_shown(self):
+        # Mason, Oct 6 2026: a model pick ranks by the model's own edge (9.9 shown), above a wind under showing 3.1,
+        # even though its realistic edge (-1.0) is lower
+        r = card(signal="under", windPick=WIND,
+                 mkt={"lean": "away", "fair": 0.42, "leanEv": 9.9, "leanEdge": -1.0, "leanDec": 2.4, "leanCents": 40.0,
+                      "leanBook": "Polymarket"})
+        P = PK.game_picks(r, 5.0)
+        self.assertEqual([p["text"] for p in P], ["Bears to win", "Under 44.5"])
+        self.assertEqual([PK.rank_edge(p) for p in P], [9.9, 3.1])
 
 
 class UnitSizing(unittest.TestCase):

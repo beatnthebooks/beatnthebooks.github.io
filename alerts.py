@@ -160,7 +160,8 @@ def pregame(data: dict) -> int:
     if key in sent:
         return 0
     when = min(soon, key=lambda g: g["koIso"])["ko"].split(" · ")[1]
-    picks = sorted(((g, p) for g in soon for p in g.get("picks", []) if p.get("good")), key=lambda gp: -gp[1]["edge"])
+    from picks import rank_edge                         # same order as the site: by the edge shown on each pick
+    picks = sorted(((g, p) for g in soon for p in g.get("picks", []) if p.get("good")), key=lambda gp: -rank_edge(gp[1]))
     if picks:
         lines = []
         for i, (g, p) in enumerate(picks[:6], 1):

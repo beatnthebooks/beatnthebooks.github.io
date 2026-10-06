@@ -3,8 +3,9 @@ picks.py
 ========
 The "Bets to take" on each game card, the log of every suggestion the site made, and the season scoreboard.
 
-  * game_picks(row): every bet on one game, best first by realistic edge (see weekly.real_edge). Wind unders,
-    price gaps, and model picks on the moneyline/spread when the model's own edge >= MODEL_MIN_EDGE.
+  * game_picks(row): every bet on one game, best first by rank_edge (the edge shown: realistic edge, see
+    weekly.real_edge, or the model's own edge for model picks). Wind unders, price gaps, and model picks on the
+    moneyline/spread when the model's own edge >= MODEL_MIN_EDGE.
   * update_log(rows): data/pick_log.json keeps each suggestion the FIRST time it appears (price, edge, reasons)
     and its last price before kickoff. Frozen at kickoff, so the record can't be rewritten with hindsight.
   * apply_log(rows, games): finished and in-progress games show the suggestions as logged before kickoff, graded
@@ -44,6 +45,15 @@ def units_for(p: dict) -> float:
 KINDS = ("wind", "gap", "lean", "spread")                              # scoreboard rows (roof counts as wind)
 
 
+def rank_edge(p: dict) -> float:
+    """What picks are ranked by: the edge number shown on the pick. Model picks use the model's own edge, other bets
+    their realistic edge. (Mason's call, Oct 6 2026, after model picks beat wind unders over 2026's first weeks:
+    "trust your edge more". Over 2016-25 the biggest model edges did worst, so the scoreboard is the judge.)"""
+    if p.get("edgeFrom") in ("lean", "spread") and p.get("model") is not None:
+        return p["model"]
+    return p["edge"]
+
+
 def _pt(x) -> str:
     return f"{float(x):g}"
 
@@ -61,7 +71,7 @@ def _price(o: dict) -> dict:
 # ----------------------------------------------------------------------
 
 def game_picks(row: dict, min_model_edge: float) -> list:
-    """Every bet on this game, best first by realistic edge. A bet suggested by two signals is listed once
+    """Every bet on this game, best first by rank_edge. A bet suggested by two signals is listed once
     with both reasons. 'good' = worth taking (edge > 0, or a model pick strong enough to suggest)."""
     out = []
     team = lambda s: row["homeName"] if s == "home" else row["awayName"]
@@ -128,7 +138,7 @@ def game_picks(row: dict, min_model_edge: float) -> list:
         p["good"] = p["edge"] > 0 or p["suggested"]
         p["src"] = list(dict.fromkeys(p["src"]))
         p["units"] = units_for(p)
-    out.sort(key=lambda p: -p["edge"])
+    out.sort(key=lambda p: -rank_edge(p))
     return out
 
 
@@ -225,7 +235,7 @@ def apply_log(rows: list, games_by_gid: dict, log: dict) -> None:
                          edge=e["first"]["edge"], good=True, logged=e["first"]["ts"])
                 p.setdefault("units", units_for(p))       # picks logged before unit sizing existed
                 ps.append(p)
-            ps.sort(key=lambda p: -p["edge"])
+            ps.sort(key=lambda p: -rank_edge(p))
             r["picks"] = ps
         else:
             for p in r.get("picks", []):

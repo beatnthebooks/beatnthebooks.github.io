@@ -182,10 +182,9 @@
     </ul>
 
     <h2>9. How each game’s bets are ranked</h2>
-    <p>Every game card starts with its bets, best edge first. Edge is the expected profit per $1 at the price you’d
-      actually pay. Each game is ranked on its own, so a cheap price gap can outrank a wind under, and the other way
-      round. A model's own edge numbers can’t be trusted as-is, so each bet's chance of winning starts from the market’s
-      fair price and is adjusted by what that kind of bet has really done:</p>
+    <p>Every game card starts with its bets, best edge first, and the Best bets list uses the same order. Edge is the
+      expected profit per $1 at the price you’d actually pay. For wind unders and price gaps, each bet's chance of winning
+      starts from the market’s fair price and is adjusted by what that kind of bet has really done:</p>
   </section>
   <div class="tablebox" style="margin-top:4px"><table>
     <thead><tr><th>Bet</th><th>Edge comes from</th><th class="n">Model’s own estimate</th><th class="n">What it really returned</th></tr></thead>
@@ -202,8 +201,10 @@
         2021–25). The wind estimate runs low (+2.7% vs +11.8%), which is the safe direction.</li>
       <li><b>Model picks on the moneyline and the spread</b> are suggested when the model’s own edge is 5% or more
         (about six a week). They show that number in purple, next to how picks that strong have really done in
-        2016–2025: −6.1% on the moneyline (539 bets) and −4.6% on the spread (525 bets). They’re ranked by that
-        record, so a bet with a positive record comes first.</li>
+        2016–2025: −6.1% on the moneyline (539 bets) and −4.6% on the spread (525 bets), plus this season’s record.
+        <b>Since Oct 6, 2026 they’re ranked by the model’s own edge</b> (the purple number), because this season the model’s
+        picks have done better than the wind unders. That’s a small sample against ten seasons where ranking this way
+        would have put the worst bets first, so the Season page’s scoreboard is the judge.</li>
       <li><b>Unit sizes:</b> 1 unit (1u) = 2% of your Kalshi bankroll. Wind unders 1u (1.5u when the price makes the
         edge 6% or more; 0.5u when the roof must be open), price gaps 0.5u (0.75u when the model agrees), model picks 0.25u.
         Sizes follow the evidence, not the edge alone: our edge estimates aren’t reliable enough to bet more just because
