@@ -137,6 +137,11 @@ function monthTicks(d0,d1){
 const EVID={wind:['under','Wind · tested'],roof:['roof','Wind · roof must be open'],gap:['gap','Price gap · unproven'],
   lean:['lean','Model pick · no proven edge'],spread:['lean','Model pick · no proven edge']};
 const fmtLogged=s=>{const d=new Date(s+':00'); return isNaN(d)?s:`${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}, ${((d.getHours()+11)%12)+1}:${String(d.getMinutes()).padStart(2,'0')} ${d.getHours()<12?'AM':'PM'} CT`;};
+const modelOnly=p=>p.edgeFrom==='lean'||p.edgeFrom==='spread';
+const pickEdge=p=>modelOnly(p)&&p.model!=null
+  ?`<span class="pedge model">${signed(p.model)}%<small> model edge</small></span>`
+  :`<span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span>`;
+const logBtn=(g,p)=>`<button type="button" class="btn small logbet" data-gid="${esc(g.id)}" data-key="${esc(p.key)}">Log this bet</button>`;
 const priceTxt=pr=>!pr?'':pr.cents!=null?`${Number(pr.cents).toFixed(0)}¢ on ${esc(pr.book)}`:`${odds(pr.odds)} at sportsbooks`;
 /* ======================= week page ======================= */
 function weekPage(){
@@ -206,16 +211,12 @@ function weekPage(){
     const clv=gr=>!gr||gr.beat==null?'':gr.clv!=null
       ?`<span class="pill ${gr.beat?'ok':'no'}">${gr.beat?'Beat':'Worse than'} the closing price ${signed(gr.clv)}%</span>`
       :`<span class="pill ${gr.beat?'ok':'no'}">${Math.abs(gr.clvPts)} pt ${gr.beat?'better':'worse'} than the closing line</span>`;
-    const modelOnly=p=>p.edgeFrom==='lean'||p.edgeFrom==='spread';
-    const edgeTxt=p=>modelOnly(p)&&p.model!=null
-      ?`<span class="pedge model">${signed(p.model)}%<small> model edge</small></span>`
-      :`<span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span>`;
     const recTxt=p=>{const r=(D.modelRecord||{})[p.rec]; return r&&r.n?`<div class="prec">Model picks this strong have returned
       <b class="${cls(r.roi)}">${signed(r.roi)}%</b> over ${r.n.toLocaleString('en-US')} bets (${esc(r.seasons.replace('-','–'))}). Small stake or skip.</div>`:'';};
     const row=(p,i)=>`<div class="pick ${i===0?'top':''}"><span class="rank">${i+1}</span><div class="pmain">
-      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${priceTxt(p.price)}</span>${edgeTxt(p)}</div>
+      <div class="pline"><b>${esc(p.text)}</b><span class="pprice">${priceTxt(p.price)}</span>${pickEdge(p)}</div>
       <div class="pwhy">${(p.src||[]).map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}
-        <span>${esc((p.why||[]).join(' · '))}</span>${p.grade?res(p.grade.units)+clv(p.grade):''}</div>${modelOnly(p)?recTxt(p):''}</div></div>`;
+        <span>${esc((p.why||[]).join(' · '))}</span>${p.grade?res(p.grade.units)+clv(p.grade):''}</div>${modelOnly(p)?recTxt(p):''}${started?'':`<div class="pact">${logBtn(g,p)}</div>`}</div></div>`;
     const conflict=new Set(good.map(p=>p.key.split('|')[0])).size<good.length?
       '<div class="why">Two picks bet against each other on the same market: take the higher one, or pass.</div>':'';
     const none=!good.length?`<div class="nobet"><b>No bet${started?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':started?'Nothing on this game showed a real edge before kickoff.':'Nothing on this game shows a real edge at the available prices, so pass.'}</div>`:'';
@@ -271,6 +272,37 @@ function weekPage(){
       ${f?`<footer class="gfoot">${results(g)}</footer>`:''}
     </article>`;
   }
+  /* Best bets: every pick worth taking this week, across all games, best edge first (same order as the cards) */
+  function bestBets(gs){
+    const open=games=>games.filter(g=>g.status==='upcoming')
+      .flatMap(g=>(g.picks||[]).filter(p=>p.good).map(p=>({g,p}))).sort((a,b)=>b.p.edge-a.p.edge);
+    let list=open(gs), ahead=false;
+    if(!list.length&&week===D.currentWeek){                  // e.g. only Monday night left: show next week's
+      list=open(D.games.filter(g=>g.wk===week+1)); ahead=list.length>0;
+    }
+    const wrap=$('#playsWrap');
+    if(!list.length){                                        // nothing left to bet: the week's graded record
+      const done=gs.flatMap(g=>(g.picks||[]).filter(p=>p.grade&&p.good));
+      wrap.hidden=!done.length; if(!done.length) return;
+      const u=done.reduce((s,p)=>s+p.grade.units,0), w=done.filter(p=>p.grade.won).length, l=done.filter(p=>p.grade.won===false).length;
+      $('#playsTitle').textContent=`${wkName(week)} picks`;
+      $('#plays').className='plays';
+      $('#plays').innerHTML=`<div class="bestsum">${plural(done.length,'pick')} graded · ${w}–${l} · <b class="${cls(u)}">${per100(u)}</b> on $100 bets <a href="season.html">Full scoreboard</a></div>`;
+      return;
+    }
+    $('#playsTitle').textContent=ahead?`Best bets · next up, ${wkName(week+1)}`:week===D.currentWeek?'Best bets this week':`Best bets · ${wkName(week)}`;
+    wrap.hidden=false;
+    const SHOW=8;
+    $('#plays').className='plays';
+    $('#plays').innerHTML=list.map(({g,p},i)=>`<div class="best ${i>=SHOW?'more':''}"><span class="rank">${i+1}</span>
+      <div class="bmain"><div class="bline"><span class="duo">${logo(g.away,'sm')}${logo(g.home,'sm')}</span><b>${esc(p.text)}</b>
+        <span class="pprice">${priceTxt(p.price)}</span></div>
+        <div class="bwhy"><span>${esc(g.awayName)} at ${esc(g.homeName)} · ${esc(g.ko)}</span>
+          ${(p.src||[]).map(s=>`<span class="tag ${EVID[s][0]}">${EVID[s][1]}</span>`).join('')}</div></div>
+      <div class="bedge">${pickEdge(p)}</div>
+      <div class="bact">${logBtn(g,p)}<a href="#g-${esc(g.id)}">See game</a></div></div>`).join('')
+      +(list.length>SHOW?`<button type="button" class="btn ghost small showall" data-showall>Show all ${list.length}</button>`:'');
+  }
   function render(){
     rail();
     const gs=D.games.filter(g=>g.wk===week);
@@ -285,21 +317,18 @@ function weekPage(){
       <div class="kpi"><div class="v ${sig.length?'good':''}">${sig.length}</div><div class="l">Under signals<br><span>windy outdoor games</span></div></div>
       <div class="kpi"><div class="v ${gaps.length?'good':''}">${D.oddsFetched?gaps.length:'n/a'}</div><div class="l">Price gaps<br><span>${D.oddsFetched?`Kalshi/Polymarket ${D.gapEv}%+ better than fair`:'needs sportsbook prices (private version)'}</span></div></div>
       <div class="kpi"><div class="v">${leans}</div><div class="l">Model leans<br><span>no proven edge</span></div></div>`;
-    const open=sig.filter(g=>g.status==='upcoming');
-    $('#playsWrap').hidden=!(open.length||gaps.length);
-    $('#plays').innerHTML=open.map(g=>`<div class="play"><span class="tag under">Under signal</span>
-      <span class="what"><span class="duo">${logo(g.away,'sm')}${logo(g.home,'sm')}</span>${esc(g.awayName)} at ${esc(g.homeName)}</span>
-      <span class="why">${g.wind.toFixed(0)} mph wind forecast · ${esc(g.ko)} · re-check the forecast before kickoff</span>
-      <a href="#g-${esc(g.id)}">See game</a></div>`).join('')
-      +gaps.flatMap(g=>g.gaps.map(x=>`<div class="play"><span class="tag gap">Price gap</span>
-      <span class="what"><span class="duo">${logo(g.away,'sm')}${logo(g.home,'sm')}</span>${gapTxt(g,x)}</span><span class="ok">${x.ev.toFixed(1)}% better than fair</span>
-      <span class="why">${esc(g.awayName)} at ${esc(g.homeName)} · not yet proven · check the live price first</span>
-      <a href="#g-${esc(g.id)}">See game</a></div>`)).join('');
+    bestBets(gs);
     const shown=gs.filter(g=>filter==='all'||(filter==='wind'&&g.signal)||(filter==='gap'&&g.gaps&&g.gaps.length)||(filter==='lean'&&g.mkt&&g.mkt.lean)||(filter==='final'&&g.status==='final'));
     shown.sort((a,b)=>(a.signal==='under'||(a.gaps&&a.gaps.length)?0:1)-(b.signal==='under'||(b.gaps&&b.gaps.length)?0:1));
     $('#games').innerHTML=shown.map(card).join('')||`<div class="empty">No games match this filter in ${esc(wkName(week))}.</div>`;
   }
   document.addEventListener('click',e=>{
+    const lb=e.target.closest('[data-key][data-gid]');
+    if(lb){ pendingLog={gid:lb.dataset.gid,key:lb.dataset.key};
+      if(location.hash==='#bets') route(); else location.hash='#bets';
+      return; }
+    const sa=e.target.closest('[data-showall]');
+    if(sa){ $('#plays').classList.add('all'); sa.remove(); return; }
     const b=e.target.closest('[data-wk]');
     if(b){ week=Number(b.dataset.wk); filter='all';
       $$('#filters button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f==='all'));
@@ -316,7 +345,8 @@ function weekPage(){
     if(wm&&weeks.includes(Number(wm[1]))) week=Number(wm[1]);
     $('#betsView').hidden=!bets; $('#weekView').hidden=bets; $('#rail').hidden=bets;
     $('#navWeek').toggleAttribute('aria-current',!bets); $('#navBets').toggleAttribute('aria-current',bets);
-    if(bets){ $('#navBets').setAttribute('aria-current','page'); betsView(); }
+    if(bets){ $('#navBets').setAttribute('aria-current','page'); betsView();
+      if(pendingLog&&fillBet){ const pl=pendingLog; pendingLog=null; fillBet(pl); } }
     else { $('#navWeek').setAttribute('aria-current','page'); render(); }
   }
   window.addEventListener('hashchange',route);
@@ -403,6 +433,7 @@ function vsCloseTxt(r){
 }
 
 let betsReady=false, store=null, bets=[];
+let pendingLog=null, fillBet=null;      // "Log this bet": the pick to copy into the form
 function betsView(){
   if(betsReady) return; betsReady=true;
   // ---- form ----
@@ -444,6 +475,23 @@ function betsView(){
   $('#bSide').addEventListener('change',prefill);
   ['bCents','bQty','bPoint','bVenue'].forEach(id=>$('#'+id).addEventListener('input',preview));
   sides();
+  fillBet=({gid,key})=>{
+    const g=GAME.get(gid), p=g&&(g.picks||[]).find(x=>x.key===key); if(!p) return;
+    if(![...$('#bGame').options].some(o=>o.value===gid)) $('#bGame').insertAdjacentHTML('afterbegin',opt(g));
+    $('#bGame').value=gid; $('#bMarket').value=p.mk; sides();
+    $('#bSide').value=p.side; prefill();
+    if(p.point!=null) $('#bPoint').value=p.point;
+    const pr=p.price||{}, book=String(pr.book||'');
+    $('#bVenue').value=/kalshi/i.test(book)?'kalshi':/polymarket/i.test(book)?'polymarket':'other';
+    const c=pr.cents!=null?pr.cents:pr.odds!=null?(pr.odds<0?-pr.odds/(100-pr.odds):100/(pr.odds+100))*100:null;
+    if(c!=null) $('#bCents').value=Number(c).toFixed(0);
+    $('#bReason').value={wind:'wind',roof:'wind',gap:'gap',lean:'lean',spread:'lean'}[p.edgeFrom]||'other';
+    $('#bNote').value=`Suggested: ${p.text}, ${signed(p.edge)}% edge`.slice(0,140);
+    preview();
+    $('#bStatus').textContent='Filled in from the pick: set the price you actually paid and how many contracts, then Save.';
+    $('#betForm').scrollIntoView({behavior:'smooth',block:'center'});
+    $('#bQty').focus({preventScroll:true});
+  };
 
   $('#betForm').addEventListener('submit',async e=>{
     e.preventDefault();

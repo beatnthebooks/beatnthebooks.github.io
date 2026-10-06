@@ -114,6 +114,28 @@ section{margin-top:30px}
 .play .duo .tl + .tl{margin-left:-6px}
 .play a{font-size:14.5px;font-weight:700;margin-left:auto}
 
+/* ---------- best bets (top of the week page) ---------- */
+.best{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:6px 16px;align-items:center;
+  background:var(--card);border:1px solid var(--edge-soft);border-radius:16px;padding:12px 16px;transition:border-color .15s}
+.best:hover{border-color:rgba(139,92,246,.4)}
+.plays:not(.all) .best.more{display:none}
+.bline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.bline .duo{display:inline-flex}
+.bline .duo .tl + .tl{margin-left:-6px}
+.bline b{font-family:var(--font-display);font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.bwhy{font-size:13.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin-top:4px}
+.bwhy .tag{font-size:10px;padding:1px 7px}
+.bedge .pedge{margin-left:0}
+.bact{display:flex;gap:12px;align-items:center}
+.bact a{font-size:14px;font-weight:700;white-space:nowrap}
+.showall{align-self:flex-start;color:var(--fg-2)}
+.showall:hover{color:var(--fg)}
+.bestsum{background:var(--card);border:1px solid var(--edge-soft);border-radius:16px;padding:14px 16px;font-size:15px;color:var(--fg-2)}
+.bestsum a{margin-left:10px;font-weight:700}
+.pact{margin-top:8px}
+.btn.logbet{background:transparent;color:var(--purple-soft);border:1px solid var(--edge);box-shadow:none;padding:5px 13px}
+.btn.logbet:hover{background:var(--purple-bg);color:#fff;filter:none}
+
 /* ---------- team logo badges ---------- */
 .tl{--tc:#4c3a8f;--s:36px;position:relative;flex:none;display:inline-grid;place-items:center;width:var(--s);height:var(--s);border-radius:50%;
   vertical-align:middle;background:var(--surface-2);
@@ -160,9 +182,9 @@ section{margin-top:30px}
 .picks .bh{margin-bottom:6px}
 .pick{display:flex;gap:12px;align-items:flex-start;padding:10px 2px;border-top:1px solid var(--line-2)}
 .picks .bh + .pick{border-top:none}
-.pick .rank{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin-top:1px;
+.pick .rank,.best .rank{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin-top:1px;
   font:700 12.5px/1 var(--font-display);background:var(--raise);color:var(--fg-2);box-shadow:inset 0 0 0 1px var(--line)}
-.pick.top .rank{background:var(--grad);color:#fff;box-shadow:var(--glow)}
+.pick.top .rank,.best:first-child .rank{background:var(--grad);color:#fff;box-shadow:var(--glow)}
 .pmain{flex:1;min-width:0}
 .pline{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}
 .pline b{font-family:var(--font-display);font-size:15.5px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:var(--fg)}
@@ -303,6 +325,10 @@ footer .fbrand em{font-style:normal;color:var(--purple-soft)}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .betform{grid-template-columns:repeat(2,minmax(0,1fr))}
   .pagehead h1{font-size:44px}
+}
+@media (max-width:700px){
+  .best{grid-template-columns:auto minmax(0,1fr);padding:12px}
+  .best .bedge,.best .bact{grid-column:2}
 }
 @media (max-width:520px){
   .bar{position:static;padding:8px 8px 0}
