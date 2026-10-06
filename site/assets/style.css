@@ -13,9 +13,9 @@
   --card:linear-gradient(180deg,#16121f,#110f17);
   --link:#b9a6ff;
   --home:#8b5cf6; --away:#4a4560; --mkt-home:#5b46a8; --mkt-away:#302b40;
-  --good:#34d399; --good-bg:#0f2a21;
+  --good:#4ade80; --good-bg:#0f2a21;
   --warn:#fbbf24; --warn-bg:#2b2210;
-  --bad:#f87171; --bad-bg:#2d1518;
+  --bad:#fb7185; --bad-bg:#2d1518;
   --series-1:#9085e9; --series-2:#d95926;
   --grid:#1d1928; --axis:#3a3350;
   --font-display:"Unbounded",system-ui,sans-serif;
@@ -486,6 +486,17 @@ main.wrap{animation:pagein .5s ease both}
 .rv{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
 .rv.in{opacity:1;transform:none}
 .game,#playsWrap,#teamName{scroll-margin-top:96px}
+/* reading text never sits bare on the moving field: notes get a glass strip, Method-page sections a glass panel,
+   and small loose text a dark halo */
+.lede,.oddshelp{width:fit-content;background:rgba(12,10,18,.82);border:1px solid var(--line-2);border-radius:14px;padding:10px 14px}
+.prose{background:rgba(12,10,18,.84);border:1px solid var(--edge-soft);border-radius:22px;padding:2px 24px 22px}
+.prose > h2:first-child,.prose > .eyebrow:first-child{margin-top:22px}
+@media (min-width:900px){
+  .lede,.oddshelp{background:rgba(12,10,18,.6);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  .prose{background:rgba(12,10,18,.62);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+}
+@media (max-width:520px){ .prose{padding:2px 16px 18px} }
+.why,.pagehead .sub,footer{text-shadow:0 1px 2px rgba(5,4,8,.9),0 0 14px rgba(9,8,13,.95)}
 /* menu icons appear only on phones, where the menu becomes a bottom tab bar */
 .nav svg{display:none}
 @media (max-width:1359px){ .cmdk-btn{width:36px;padding:0;justify-content:center} .cmdk-btn span,.cmdk-btn kbd{display:none} .brandrow{gap:8px 26px} }
@@ -508,5 +519,31 @@ main.wrap{animation:pagein .5s ease both}
   .wkarrows button{width:34px;height:34px}
 }
 @media (max-width:400px){ .brand .word{font-size:14px} .brand img{width:32px;height:32px} }
+
+/* ---------- text that pops (Oct 5; Mason's pick: "B and C together" of 3 previews in build/pop/) ---------- */
+/* B · sunset gradient (violet → pink → orange) on page titles (slow shimmer), big numbers, bet names and section heads */
+:root{--sunset:linear-gradient(90deg,#a78bfa 0%,#f472b6 55%,#fb923c 100%)}
+.pagehead h1{background:linear-gradient(90deg,#c4b5fd,#f472b6,#fb923c,#f472b6,#c4b5fd);background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 6s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.kpi .v,.pline b,.bline b,.nobet b,.prose h2,.rhead{background:var(--sunset);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi .v,.prose h2{width:fit-content}
+.kpi .v.good,.v.good{background:none;color:var(--good)} .kpi .v.bad,.v.bad{background:none;color:var(--bad)}
+.eyebrow{color:#fff;background:linear-gradient(90deg,rgba(124,58,237,.6),rgba(236,72,153,.5),rgba(249,115,22,.4));border-color:rgba(244,114,182,.5)}
+.facts dd{color:#fbcfe8}
+.bh,.ukey-h,.sb-wk{color:#f9a8d4}
+.brand .word em{background:linear-gradient(90deg,#f9a8d4,#fdba74);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wk[aria-pressed="true"]{color:#fff;box-shadow:inset 0 -3px 0 #f472b6}
+.ustake{color:#fff;background:linear-gradient(90deg,rgba(124,58,237,.45),rgba(236,72,153,.4));box-shadow:inset 0 0 0 1px rgba(244,114,182,.5)}
+.pick.top .rank,.best:first-child .rank{background:linear-gradient(135deg,#7c3aed,#ec4899 60%,#f97316)}
+/* C · team colors: every team name in its own color (app.js puts --tc on the element), lightened to read on black;
+   logos on cards and the scoreboard get a ring in that color. Losing teams on finished games stay grey. */
+.trow,.sb-t,.teamlink,.tteam,#teamName{--tcl:color-mix(in oklab,var(--tc,#a78bfa) 50%,white)}
+.trow a,.teamlink,.tteam,#teamName span,.sb-t .sb-c{color:var(--tcl)}
+.trow a,#teamName span{text-shadow:0 0 18px color-mix(in oklab,var(--tc,#a78bfa) 70%,transparent)}
+.trow.lose a,.sb-t.lose .sb-c{color:var(--muted);text-shadow:none}
+.trow .tl,.sb-t .tl{box-shadow:0 0 0 2px var(--tcl),0 0 14px var(--tc)}
+.trow a:hover,.teamlink:hover{color:#fff}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.livedot{animation:none}
   .bgfx .grain,main.wrap,.cmdk,.cmdk-box{animation:none}.rv{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.pagehead h1{animation:none}}

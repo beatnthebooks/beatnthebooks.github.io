@@ -32,7 +32,9 @@ const TCOLOR={ARI:'#97233F',ATL:'#A71930',BAL:'#5b3fb5',BUF:'#00338D',CAR:'#0085
   PIT:'#FFB612',SF:'#AA0000',SEA:'#69BE28',TB:'#D50A0A',TEN:'#4B92DB',WAS:'#773141'};
 const logo=(code,size='')=>`<span class="tl ${size}" style="--tc:${TCOLOR[code]||'#4c3a8f'}" aria-hidden="true"><b>${esc(code)}</b>`+
   `<img src="https://a.espncdn.com/i/teamlogos/nfl/500-dark/${esc((ESPN[code]||code).toLowerCase())}.png" alt="" loading="lazy" decoding="async"></span>`;
-const withLogo=(code,name,size='xs')=>`<span class="tteam">${logo(code,size)}${esc(name)}</span>`;
+/* the team's color on the element holding its name, so the name can show in it (style.css: "team colors") */
+const tcv=code=>`--tc:${TCOLOR[code]||'#4c3a8f'}`;
+const withLogo=(code,name,size='xs')=>`<span class="tteam" style="${tcv(code)}">${logo(code,size)}${esc(name)}</span>`;
 const inBadge=t=>t&&t.tagName==='IMG'&&t.parentElement&&t.parentElement.classList.contains('tl');
 document.addEventListener('load',e=>{if(inBadge(e.target)) e.target.parentElement.classList.add('ok');},true);    // letters until the logo arrives
 document.addEventListener('error',e=>{if(inBadge(e.target)) e.target.remove();},true);
@@ -70,7 +72,7 @@ function scoreStrip(){
     const hs=L?L.hs:g.hs, as=L?L.as:g.as, show=f||!!L;
     const [day,time]=g.ko.split(' · ');
     const st=f?'Final':on?L.detail:g.status==='live'?'In progress':`${day.split(' ')[0]} ${time.replace(' CT','')}`;
-    const row=(code,s,o)=>`<div class="sb-t ${f&&s<o?'lose':''}">${logo(code,'xs')}<span class="sb-c">${esc(code)}</span>`
+    const row=(code,s,o)=>`<div class="sb-t ${f&&s<o?'lose':''}" style="${tcv(code)}">${logo(code,'xs')}<span class="sb-c">${esc(code)}</span>`
       +`${on&&L.poss===code?'<span class="poss">●</span>':''}${show?`<span class="sc">${s??''}</span>`:''}</div>`;
     return `<a class="sb-g ${on?'on':''}" href="index.html#week${g.wk}"><span class="sb-st ${f?'final':on?'live':''}">`
       +`${on?'<span class="livedot"></span>':''}${esc(st)}</span>${row(g.away,as,hs)}${row(g.home,hs,as)}</a>`;
@@ -343,7 +345,7 @@ function weekPage(){
     const mk=g.mkt, sp=g.spread, tt=g.total;
     const fav=sp?favorite(sp.line,g):null, modelFav=favorite(g.eloLine,g);
     const notes=(g.notes||[]).map(n=>`<div class="note">${esc(n)}</div>`).join('');
-    const team=(code,name,score,win)=>`<div class="trow ${f?(win?'win':'lose'):''}"><span class="tname">${logo(code)}<a href="${teamHref(code)}">${esc(name)}</a>${L&&L.state==='in'&&L.poss===code?'<span class="poss" title="Has the ball">●</span>':''}</span>${showScore?`<span class="score">${score}</span>`:''}</div>`;
+    const team=(code,name,score,win)=>`<div class="trow ${f?(win?'win':'lose'):''}" style="${tcv(code)}"><span class="tname">${logo(code)}<a href="${teamHref(code)}">${esc(name)}</a>${L&&L.state==='in'&&L.poss===code?'<span class="poss" title="Has the ball">●</span>':''}</span>${showScore?`<span class="score">${score}</span>`:''}</div>`;
     return `<article class="game ${g.signal==='under'?'sig-card':''}" id="g-${esc(g.id)}">
       <header class="ghead">
         <div class="gmeta"><span>${esc(g.ko)}</span>${status}${intl?`<span class="chip venue">${esc(g.stadium)}</span>`:''}</div>
@@ -770,7 +772,7 @@ function teamsPage(){
   const table=()=>{
     $('#power').innerHTML=`<thead><tr><th class="n">Rank</th><th>Team</th><th>Record</th><th class="n">Win chance</th><th>Change</th><th aria-hidden="true"></th></tr></thead>
       <tbody>${T.map((r,i)=>`<tr class="${r.team===sel?'sel':''}"><td class="n">${i+1}</td>
-        <td><button type="button" class="teamlink" data-team="${esc(r.team)}">${logo(r.team,'sm')}${esc(r.name)}</button></td>
+        <td><button type="button" class="teamlink" data-team="${esc(r.team)}" style="${tcv(r.team)}">${logo(r.team,'sm')}${esc(r.name)}</button></td>
         <td>${esc(r.record)}</td><td class="n"><b>${pct(vsAvg(r.rating))}</b></td>
         <td>${change(r)}</td>
         <td style="width:22%"><span class="rbar" style="width:${8+92*(vsAvg(r.rating)-min)/Math.max(0.01,max-min)}%"></span></td></tr>`).join('')}</tbody>`;
@@ -778,6 +780,7 @@ function teamsPage(){
   const detail=()=>{
     const t=T.find(x=>x.team===sel), rank=T.indexOf(t)+1;
     $('#teamName').innerHTML=logo(t.team,'lg')+`<span>${esc(t.name)}</span>`;
+    $('#teamName').style.setProperty('--tc',TCOLOR[t.team]||'#4c3a8f');
     $('#teamSub').textContent=`Ranked ${rank} of 32 · ${t.record} this season · would beat an average team ${pct(vsAvg(t.rating))} of the time`;
     const pts=t.hist.map((h,i)=>({x:i,y:Math.round(vsAvg(h[1])*1000)/10}));
     const xTicks=[]; t.hist.forEach((h,i)=>{ if(i===0||h[3]!==t.hist[i-1][3]) xTicks.push({x:i,label:`${h[3]} season`}); });
@@ -918,7 +921,7 @@ function stadiumBg(page){
   size(); addEventListener('resize',size);
   // full strength at the top of the page, calmer behind the reading further down (most on the Method page)
   const floor=page==='method'?.32:.55; let op=-1;
-  const dim=()=>{const v=Math.round((1-Math.min(1,scrollY/900)*(1-floor))*100)/100; if(v!==op){op=v; cv.style.opacity=v;}};
+  const dim=()=>{const v=Math.round((1-Math.min(1,scrollY/600)*(1-floor))*100)/100; if(v!==op){op=v; cv.style.opacity=v;}};
   dim(); addEventListener('scroll',dim,{passive:true});
   if(REDUCE){ frame(7); addEventListener('resize',()=>frame(7)); return; }
   const fps=innerWidth<700?24:30, t0=performance.now(); let last=-1e9;
