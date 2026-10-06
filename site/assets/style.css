@@ -26,11 +26,11 @@
 }
 
 *{box-sizing:border-box}
-html{background:var(--bg);scrollbar-color:#3a3350 var(--bg)}
-body{color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;margin:0;min-height:100vh;
-  background:radial-gradient(1100px 520px at 50% -200px,rgba(124,58,237,.30),transparent 70%),
+/* the glow sits on html so the moving stadium (.bgfx, z-index −1) can show through a transparent body */
+html{background:radial-gradient(1100px 520px at 50% -200px,rgba(124,58,237,.30),transparent 70%),
     radial-gradient(700px 420px at 100% 0%,rgba(76,58,143,.20),transparent 70%),var(--bg);
-  background-repeat:no-repeat;
+  background-repeat:no-repeat;background-color:var(--bg);scrollbar-color:#3a3350 var(--bg)}
+body{color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;margin:0;min-height:100vh;background:transparent;
   font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 .wrap{max-width:1140px;margin:0 auto;padding-inline:16px;padding-block:0 56px}
 h1,h2,h3{font-family:var(--font-display);margin:0;letter-spacing:.01em;text-transform:uppercase;text-wrap:balance;color:var(--fg)}
@@ -426,4 +426,87 @@ footer .fbrand em{font-style:normal;color:var(--purple-soft)}
   .prose h2{font-size:19px}
   #teamName{font-size:24px!important}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.livedot{animation:none}}
+
+/* ---------- motion + navigation (Oct 5; Mason picked "C · Stadium" of 3 moving backgrounds) ---------- */
+/* moving stadium: a canvas drawn by app.js (stadiumBg), with film grain and a vignette over it */
+.bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:var(--bg)}
+.bgfx canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bgfx .grain{position:absolute;inset:-100px;opacity:.09;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .9s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-30px,20px)}40%{transform:translate(25px,-35px)}60%{transform:translate(-15px,40px)}80%{transform:translate(35px,10px)}}
+.bgfx .vig{position:absolute;inset:0;background:radial-gradient(130% 90% at 50% 35%,transparent 55%,rgba(4,3,7,.7) 100%)}
+/* frosted-glass cards on wide screens so the field shows through; phones keep the solid cards */
+@media (min-width:900px){
+  .game,.kpi,.best,.ukey,.tablebox,.panel{-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}
+  .game{background:linear-gradient(180deg,rgba(24,19,36,.66),rgba(15,13,22,.74))}
+  .kpi{background:linear-gradient(180deg,rgba(48,34,90,.45),rgba(16,14,24,.6))}
+  .best{background:rgba(20,17,30,.62)}
+}
+/* search button in the brand bar + the search box */
+.nav a{white-space:nowrap}
+.cmdk-btn{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 10px 0 12px;border-radius:999px;cursor:pointer;flex:none;
+  border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.25);color:#fff;font:600 13px var(--font-body);white-space:nowrap}
+.cmdk-btn:hover{background:rgba(0,0,0,.4)}
+.cmdk-btn svg,.nav svg{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cmdk-btn svg{width:16px;height:16px;stroke-width:2}
+.cmdk-btn kbd{font:700 10.5px var(--font-body);padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.14);color:#e9ddff}
+.cmdk{position:fixed;inset:0;z-index:100;background:rgba(5,4,8,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  display:flex;justify-content:center;align-items:flex-start;padding:12vh 16px 16px;animation:fadein .15s ease}
+.cmdk[hidden]{display:none}
+.cmdk-box{width:min(640px,100%);background:#13101c;border:1px solid var(--edge);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.6);overflow:hidden;
+  animation:pop .18s cubic-bezier(.2,.9,.3,1.2)}
+.cmdk-box input{width:100%;border:none;border-bottom:1px solid var(--line);background:transparent;color:var(--fg);font:500 17px var(--font-body);padding:18px 20px;outline:none}
+.cmdk-list{max-height:52vh;overflow-y:auto;padding:6px}
+.cmdk-grp{font:700 10.5px var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:10px 12px 4px}
+.cmdk-it{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--fg-2);font-size:15px}
+.cmdk-it .sub{margin-left:auto;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.cmdk-it.on{background:linear-gradient(90deg,rgba(124,58,237,.3),rgba(124,58,237,.08));color:#fff}
+.cmdk-logos{display:inline-flex;flex:none} .cmdk-logos .tl{--s:24px} .cmdk-logos .tl+.tl{margin-left:-6px}
+.cmdk-ico{width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:var(--raise);color:var(--purple-soft);font-size:11px;font-weight:800;flex:none}
+.cmdk-foot{padding:9px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.cmdk-none{padding:18px;color:var(--muted)}
+@keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+/* week arrows beside the title */
+.pagehead h1{display:inline-block}
+.wkarrows{display:inline-flex;gap:8px;margin-left:16px;vertical-align:middle}
+.wkarrows button{width:40px;height:40px;border-radius:50%;border:1px solid var(--edge);background:rgba(18,16,25,.7);color:#fff;cursor:pointer;
+  font:700 18px/1 var(--font-body);transition:background .15s,transform .15s}
+.wkarrows button:hover{background:var(--purple-bg);transform:translateY(-1px)}
+.wkarrows button:disabled{opacity:.3;cursor:default;transform:none}
+/* back to top */
+.totop{position:fixed;right:18px;bottom:18px;z-index:50;width:46px;height:46px;border-radius:50%;border:1px solid var(--edge);cursor:pointer;
+  background:var(--grad);color:#fff;font:800 18px/1 var(--font-body);box-shadow:var(--glow);opacity:0;transform:translateY(12px);pointer-events:none;
+  transition:opacity .2s,transform .2s}
+.totop.show{opacity:1;transform:none;pointer-events:auto}
+/* page fade-in, cards sliding in as you scroll, jump targets clear of the pinned bar */
+main.wrap{animation:pagein .5s ease both}
+@keyframes pagein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+.game,#playsWrap,#teamName{scroll-margin-top:96px}
+/* menu icons appear only on phones, where the menu becomes a bottom tab bar */
+.nav svg{display:none}
+@media (max-width:1359px){ .cmdk-btn{width:36px;padding:0;justify-content:center} .cmdk-btn span,.cmdk-btn kbd{display:none} .brandrow{gap:8px 26px} }
+@media (max-width:1100px){ .bar .stamp{display:none} }
+@media (max-width:700px){
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  .brandrow{padding-bottom:10px;flex-wrap:nowrap;gap:0 12px}
+  .brandrow .spring{display:none}
+  .brand{min-width:0}
+  .cmdk-btn{margin-left:auto}
+  .nav{position:fixed;left:0;right:0;bottom:0;z-index:60;height:auto;width:auto;margin:0;display:grid;grid-template-columns:repeat(5,1fr);
+    background:rgba(9,8,13,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--edge);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));-webkit-mask-image:none;mask-image:none;overflow:visible}
+  .nav a{flex-direction:column;justify-content:center;gap:3px;padding:6px 2px;font-size:10px;letter-spacing:.06em;color:var(--muted)}
+  .nav svg{display:block;width:22px;height:22px}
+  .nav a[aria-current="page"]{color:#fff}
+  .nav a[aria-current="page"]::after{left:30%;right:30%;top:0;bottom:auto;height:3px;border-radius:0 0 3px 3px;background:var(--purple)}
+  .totop{bottom:calc(88px + env(safe-area-inset-bottom))}
+  .wkarrows{margin-left:10px}
+  .wkarrows button{width:34px;height:34px}
+}
+@media (max-width:400px){ .brand .word{font-size:14px} .brand img{width:32px;height:32px} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.livedot{animation:none}
+  .bgfx .grain,main.wrap,.cmdk,.cmdk-box{animation:none}.rv{opacity:1;transform:none}}

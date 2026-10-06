@@ -827,9 +827,228 @@ function methodPage(){
   }
 }
 
+/* ======================= motion + navigation ======================= */
+/* Oct 5: Mason picked "C · Stadium" of 3 moving backgrounds (previews in build/motion/), plus search,
+   week arrows, a phone tab bar and scroll reveals. Everything still works, and stays still, with
+   prefers-reduced-motion. */
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Moving background: a football field gliding toward you (yard lines, hash marks, numbers), two light
+   towers with sweeping beams, dust in the light. Canvas at ≤30 fps (24 on phones), paused in hidden tabs,
+   one still frame with reduced motion. Scrolling moves you down the field; the camera drifts with the mouse. */
+function stadiumBg(page){
+  const layer=document.createElement('div'); layer.className='bgfx'; layer.setAttribute('aria-hidden','true');
+  const cv=document.createElement('canvas'); layer.appendChild(cv);
+  layer.insertAdjacentHTML('beforeend','<i class="grain"></i><i class="vig"></i>');
+  document.body.prepend(layer);
+  const ctx=cv.getContext('2d'); if(!ctx) return;
+  const M={x:innerWidth/2,on:false};
+  addEventListener('pointermove',e=>{M.x=e.clientX; M.on=e.pointerType==='mouse';},{passive:true});
+  document.documentElement.addEventListener('pointerleave',()=>{M.on=false;});
+  let W=0,H=0,dpr=1,motes=[],cx=0;
+  const size=()=>{
+    const d=Math.min(1.5,devicePixelRatio||1), w=Math.round(innerWidth*d), h=Math.round(innerHeight*d);
+    if(w===W&&Math.abs(h-H)<160*d) return;                 // phone address bar showing/hiding: just stretch
+    dpr=d; W=cv.width=w; H=cv.height=h;
+    motes=Array.from({length:innerWidth<700?28:70},()=>({x:Math.random(),y:Math.random(),s:.6+Math.random()*1.8,v:.008+Math.random()*.025,ph:Math.random()*6.283}));
+  };
+  const glow=(x,y,r,stops)=>{const g=ctx.createRadialGradient(x,y,0,x,y,r); stops.forEach(([o,c])=>g.addColorStop(o,c)); ctx.fillStyle=g; ctx.fillRect(x-r,y-r,2*r,2*r);};
+  const a3=v=>v.toFixed(3);
+  function frame(t){
+    ctx.globalCompositeOperation='source-over'; ctx.clearRect(0,0,W,H);
+    const hz=H*.42, F=H*.95, camH=6.5, zmin=camH*F/(H-hz)*.92, zfar=125, half=26.67;   // field is 53⅓ yards wide
+    cx+=(((M.on?M.x/innerWidth:.5)-.5)*16-cx)*.04;
+    const camZ=t*6+scrollY*.035;
+    const px=(x,z)=>W/2+(x-cx)*F/z, py=z=>hz+camH*F/z;
+    const fade=z=>Math.max(0,Math.min(1,1-(z-zmin)/(zfar-zmin)))**.9;
+    glow(W/2,hz,W*.6,[[0,'rgba(124,58,237,.42)'],[.35,'rgba(76,29,149,.18)'],[1,'rgba(9,8,13,0)']]);       // sky glow
+    for(let Y=Math.floor((camZ+zmin)/5)*5-5; Y<camZ+zfar; Y+=5){                                              // mowing stripes
+      const za=Math.max(zmin*.8,Y-camZ), zb=Math.max(zmin*.8,Y+5-camZ); if(zb<=za) continue;
+      const a=.55*fade((za+zb)/2);
+      ctx.fillStyle=((Y/5)%2+2)%2===1?`rgba(46,24,96,${a3(a)})`:`rgba(28,15,60,${a3(a)})`;
+      ctx.beginPath(); ctx.moveTo(px(-half,za),py(za)); ctx.lineTo(px(half,za),py(za)); ctx.lineTo(px(half,zb),py(zb)); ctx.lineTo(px(-half,zb),py(zb)); ctx.fill();
+    }
+    ctx.globalCompositeOperation='lighter';
+    [-half,half].forEach(x=>{ for(let z=zmin*.8; z<zfar; z*=1.18){ const z2=Math.min(zfar,z*1.18);                  // sidelines
+      ctx.strokeStyle=`rgba(216,204,255,${a3(.75*fade(z))})`; ctx.lineWidth=Math.max(1,40*dpr/z);
+      ctx.beginPath(); ctx.moveTo(px(x,z),py(z)); ctx.lineTo(px(x,z2),py(z2)); ctx.stroke(); }});
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    for(let Y=Math.ceil(camZ+zmin*.8); Y<camZ+zfar; Y++){                                                         // yard lines, numbers, hashes
+      const z=Y-camZ, a=fade(z), yy=py(z);
+      if(Y%5===0){
+        const major=Y%10===0;
+        ctx.strokeStyle=`rgba(196,181,253,${a3((major?.9:.55)*a)})`; ctx.lineWidth=Math.max(1,(major?55:38)*dpr/z);
+        ctx.beginPath(); ctx.moveTo(px(-half,z),yy); ctx.lineTo(px(half,z),yy); ctx.stroke();
+        ctx.strokeStyle=`rgba(139,92,246,${a3(.35*a)})`; ctx.lineWidth=Math.max(3,(major?260:160)*dpr/z);
+        ctx.beginPath(); ctx.moveTo(px(-half,z),yy); ctx.lineTo(px(half,z),yy); ctx.stroke();
+        const N=((Y%100)+100)%100;
+        if(major&&N&&z<70){
+          const lab=String(N<=50?N:100-N), zn=z+1.2, s=F/zn*.022;
+          ctx.fillStyle=`rgba(221,214,254,${a3(.7*a)})`; ctx.font='800 100px Unbounded, system-ui, sans-serif';
+          [-15.5,15.5].forEach(x=>{ ctx.save(); ctx.translate(px(x,zn),py(zn)); ctx.scale(s,s*camH/zn*1.6); ctx.fillText(lab,0,0); ctx.restore(); });
+        }
+      } else if(z<65){
+        ctx.strokeStyle=`rgba(196,181,253,${a3(.5*a)})`; ctx.lineWidth=Math.max(1,30*dpr/z);
+        [-3.1,3.1,-half+.5,half-.5].forEach(x=>{ ctx.beginPath(); ctx.moveTo(px(x-.35,z),yy); ctx.lineTo(px(x+.35,z),yy); ctx.stroke(); });
+      }
+    }
+    const hg=ctx.createLinearGradient(0,hz-H*.02,0,hz+H*.1); hg.addColorStop(0,'rgba(124,58,237,.35)'); hg.addColorStop(1,'rgba(124,58,237,0)');
+    ctx.fillStyle=hg; ctx.fillRect(0,hz-H*.02,W,H*.12);                                                            // horizon haze
+    [[W*.07,H*.2,.6],[W*.93,H*.2,-.6]].forEach(([lx,ly,dir],k)=>{                                                   // light towers
+      for(let b=0;b<2;b++){
+        const ang=Math.PI/2-dir*(.55+b*.32)+.22*Math.sin(t*(.35+b*.12)+k*2+b), sp=.085, len=H*1.6;
+        const g=ctx.createLinearGradient(lx,ly,lx+Math.cos(ang)*len,ly+Math.sin(ang)*len);
+        g.addColorStop(0,'rgba(221,214,254,.34)'); g.addColorStop(.45,'rgba(167,139,250,.12)'); g.addColorStop(1,'rgba(139,92,246,0)');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(lx,ly);
+        ctx.lineTo(lx+Math.cos(ang-sp)*len,ly+Math.sin(ang-sp)*len); ctx.lineTo(lx+Math.cos(ang+sp)*len,ly+Math.sin(ang+sp)*len); ctx.fill();
+        const hit=(hz+H*.2-ly)/Math.sin(ang);                                                                        // pool of light on the field
+        ctx.save(); ctx.translate(lx+Math.cos(ang)*hit,hz+H*.2); ctx.scale(1,.32); glow(0,0,W*.12,[[0,'rgba(196,181,253,.22)'],[1,'rgba(139,92,246,0)']]); ctx.restore();
+      }
+      const fl=.85+.15*Math.sin(t*9+k*3)*Math.sin(t*2.3+k);
+      glow(lx,ly,H*.32*fl,[[0,'rgba(255,255,255,.55)'],[.08,'rgba(221,214,254,.45)'],[.3,'rgba(139,92,246,.16)'],[1,'rgba(139,92,246,0)']]);
+      ctx.save(); ctx.translate(lx,ly); ctx.scale(6,.18); glow(0,0,H*.12,[[0,'rgba(233,221,255,.5)'],[1,'rgba(139,92,246,0)']]); ctx.restore();
+      ctx.fillStyle='rgba(255,255,255,.95)'; const s=3.2*dpr;
+      for(let r=0;r<3;r++) for(let c=0;c<6;c++) ctx.fillRect(lx-(2.5-c)*s*2.6-s/2,ly-(1-r)*s*2.6-s/2,s,s);
+    });
+    motes.forEach(m=>{ m.y-=m.v/30; if(m.y<-.05){m.y=1.05; m.x=Math.random();}                                      // dust
+      ctx.fillStyle=`rgba(221,214,254,${a3(.25+.35*(.5+.5*Math.sin(t*1.7+m.ph)))})`;
+      ctx.beginPath(); ctx.arc((m.x+.02*Math.sin(t*.6+m.ph))*W,m.y*H,m.s*dpr,0,6.283); ctx.fill(); });
+    ctx.globalCompositeOperation='source-over';
+  }
+  size(); addEventListener('resize',size);
+  // full strength at the top of the page, calmer behind the reading further down (most on the Method page)
+  const floor=page==='method'?.32:.55; let op=-1;
+  const dim=()=>{const v=Math.round((1-Math.min(1,scrollY/900)*(1-floor))*100)/100; if(v!==op){op=v; cv.style.opacity=v;}};
+  dim(); addEventListener('scroll',dim,{passive:true});
+  if(REDUCE){ frame(7); addEventListener('resize',()=>frame(7)); return; }
+  const fps=innerWidth<700?24:30, t0=performance.now(); let last=-1e9;
+  const tick=now=>{requestAnimationFrame(tick); if(document.hidden||now-last<1000/fps-2) return; last=now; frame((now-t0)/1000);};
+  requestAnimationFrame(tick);
+}
+
+/* Search (Ctrl+K, / or the magnifier): pages, weeks, teams and this/next week's games. Week arrows and
+   ← → keys on the week page, back-to-top, cards sliding in as you scroll, numbers counting up, and menu
+   icons that turn the menu into a bottom tab bar on phones. */
+function navExtras(page){
+  const PAGEFILE={week:'index.html',season:'season.html',teams:'teams.html',method:'method.html'};
+  const svg=d=>`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+  const ICON={'index.html':svg('<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/>'),
+    'index.html#bets':svg('<path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/>'),
+    'season.html':svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+    'teams.html':svg('<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/>'),
+    'method.html':svg('<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/>')};
+  $$('.nav a').forEach(a=>{const k=a.getAttribute('href'); if(ICON[k]&&!a.querySelector('svg')) a.innerHTML=ICON[k]+`<span>${esc(a.textContent)}</span>`;});
+
+  /* ---- search ---- */
+  const cur=D.currentWeek, weeks=[...new Set(D.games.map(g=>g.wk))].sort((a,b)=>a-b);
+  const ITEMS=[
+    {grp:'Pages',label:'This week',href:`index.html#week${cur}`,ico:'◉'},
+    {grp:'Pages',label:'Best bets',href:`index.html#week${cur}`,goto:'playsWrap',ico:'★'},
+    {grp:'Pages',label:'My bets',href:'index.html#bets',ico:'$'},
+    {grp:'Pages',label:'Season & scoreboard',href:'season.html',ico:'▲'},
+    {grp:'Pages',label:'Teams & power ratings',href:'teams.html',ico:'◆'},
+    {grp:'Pages',label:'Method & research',href:'method.html',ico:'?'},
+    ...(D.teams||[]).map(t=>({grp:'Teams',label:t.name,href:teamHref(t.team),goto:'teamName',teams:[t.team],sub:t.record})),
+    ...D.games.filter(g=>g.wk===cur||g.wk===cur+1).map(g=>({grp:'Games',label:`${g.awayName} at ${g.homeName}`,href:`index.html#week${g.wk}`,
+      goto:'g-'+g.id,teams:[g.away,g.home],sub:`${wkShort(g.wk)} · ${g.ko.split(' · ')[0]}`})),
+    ...weeks.map(w=>({grp:'Weeks',label:wkName(w),href:`index.html#week${w}`,ico:SHORT[w]||String(w),sub:w===cur?'this week':''}))
+  ].map(it=>({...it,keys:`${it.label} ${(it.teams||[]).join(' ')}`.toLowerCase().split(/[\s·&]+/).filter(Boolean)}));
+  const bar=$('.brandrow');
+  let btn=null;
+  if(bar){ btn=document.createElement('button'); btn.type='button'; btn.className='cmdk-btn'; btn.setAttribute('aria-label','Search the site');
+    btn.innerHTML=svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>')+'<span>Search</span><kbd>Ctrl K</kbd>';
+    bar.insertBefore(btn,bar.querySelector('.stamp')); btn.addEventListener('click',()=>open()); }
+  const ov=document.createElement('div'); ov.className='cmdk'; ov.hidden=true;
+  ov.innerHTML=`<div class="cmdk-box" role="dialog" aria-modal="true" aria-label="Search the site">
+    <input type="text" placeholder="Search teams, games, weeks, pages…" aria-label="Search" aria-controls="cmdkList" autocomplete="off" spellcheck="false">
+    <div class="cmdk-list" id="cmdkList" role="listbox"></div><div class="cmdk-foot">↑ ↓ to move · Enter to open · Esc to close</div></div>`;
+  document.body.appendChild(ov);
+  const inp=ov.querySelector('input'), list=ov.querySelector('.cmdk-list');
+  let shown=[], sel=0;
+  function draw(){
+    const q=inp.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    shown=q.length?ITEMS.filter(it=>q.every(w=>it.keys.some(k=>k.startsWith(w)))).slice(0,40)
+      :ITEMS.filter(it=>it.grp==='Pages'||(it.grp==='Games'&&it.href.endsWith('#week'+cur)));
+    sel=Math.min(sel,Math.max(0,shown.length-1));
+    let last='';
+    list.innerHTML=shown.map((it,i)=>{const h=it.grp!==last?`<div class="cmdk-grp">${it.grp}</div>`:''; last=it.grp;
+      const icon=it.teams?`<span class="cmdk-logos">${it.teams.map(c=>logo(c,'xs')).join('')}</span>`:`<span class="cmdk-ico">${esc(it.ico)}</span>`;
+      return h+`<div class="cmdk-it${i===sel?' on':''}" data-i="${i}" role="option" aria-selected="${i===sel}">${icon}<span>${esc(it.label)}</span>${it.sub?`<span class="sub">${esc(it.sub)}</span>`:''}</div>`;}).join('')
+      ||'<div class="cmdk-none">Nothing found.</div>';
+    const on=list.querySelector('.on'); if(on) on.scrollIntoView({block:'nearest'});
+  }
+  function open(){ ov.hidden=false; inp.value=''; sel=0; draw(); inp.focus(); }
+  function close(){ if(ov.hidden) return; ov.hidden=true; if(btn) btn.focus({preventScroll:true}); }
+  function go(it){
+    if(!it) return; close();
+    const [file,hash='']=it.href.split('#');
+    if(file!==PAGEFILE[page]){ try{sessionStorage.setItem('btb.goto',it.goto||'');}catch(_){} location.href=it.href; return; }
+    if(page==='teams'&&hash){ const b=$(`[data-team="${CSS.escape(decodeURIComponent(hash))}"]`); if(b) b.click(); }
+    else if(location.hash!=='#'+hash) location.hash=hash;
+    setTimeout(()=>goTo(it.goto||(page==='week'?'':'top')),120);
+  }
+  function goTo(id){
+    if(id==='top'){ scrollTo({top:0,behavior:REDUCE?'auto':'smooth'}); return; }
+    const el=id&&document.getElementById(id); if(!el||!el.offsetParent) return;
+    el.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'start'});
+    if(el.classList.contains('game')&&el.animate) el.animate([{boxShadow:'0 0 0 3px #a78bfa'},{boxShadow:'0 0 0 0 rgba(167,139,250,0)'}],{duration:1800});
+  }
+  inp.addEventListener('input',()=>{sel=0; draw();});
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){sel=Math.min(sel+1,shown.length-1); draw(); e.preventDefault();}
+    else if(e.key==='ArrowUp'){sel=Math.max(sel-1,0); draw(); e.preventDefault();}
+    else if(e.key==='Enter'){e.preventDefault(); go(shown[sel]);}
+    else if(e.key==='Escape'){close();}
+  });
+  list.addEventListener('click',e=>{const it=e.target.closest('[data-i]'); if(it) go(shown[+it.dataset.i]);});
+  ov.addEventListener('click',e=>{if(e.target===ov) close();});
+  setTimeout(()=>{let id=''; try{id=sessionStorage.getItem('btb.goto')||''; sessionStorage.removeItem('btb.goto');}catch(_){} if(id) goTo(id);},350);
+
+  /* ---- week arrows beside the title (week page) ---- */
+  let step=null;
+  if(page==='week'&&$('#weekTitle')){
+    const box=document.createElement('span'); box.className='wkarrows';
+    box.innerHTML='<button type="button" aria-label="Previous week">‹</button><button type="button" aria-label="Next week">›</button>';
+    $('#weekTitle').after(box);
+    const [prev,next]=box.children, at=()=>{const b=$$('#rail .wk'); return [b,b.findIndex(x=>x.getAttribute('aria-pressed')==='true')];};
+    step=d=>{const [b,i]=at(); if(i>=0&&b[i+d]) b[i+d].click();};
+    const sync=()=>{const [b,i]=at(); prev.disabled=i<=0; next.disabled=i<0||i>=b.length-1;};
+    prev.addEventListener('click',()=>step(-1)); next.addEventListener('click',()=>step(1));
+    new MutationObserver(sync).observe($('#rail'),{childList:true}); sync();
+  }
+  document.addEventListener('keydown',e=>{
+    const typing=/^(input|select|textarea)$/i.test((e.target||{}).tagName||'')||(e.target&&e.target.isContentEditable);
+    if((e.key==='k'||e.key==='K')&&(e.ctrlKey||e.metaKey)){ e.preventDefault(); ov.hidden?open():close(); return; }
+    if(!ov.hidden||typing||e.ctrlKey||e.metaKey||e.altKey) return;
+    if(e.key==='/'){ e.preventDefault(); open(); return; }
+    if(step&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&!$('#weekView').hidden) step(e.key==='ArrowLeft'?-1:1);
+  });
+
+  /* ---- back to top ---- */
+  const top=document.createElement('button'); top.type='button'; top.className='totop'; top.setAttribute('aria-label','Back to top'); top.textContent='↑';
+  document.body.appendChild(top); top.addEventListener('click',()=>scrollTo({top:0,behavior:REDUCE?'auto':'smooth'}));
+  addEventListener('scroll',()=>top.classList.toggle('show',scrollY>700),{passive:true});
+
+  /* ---- slide-in on scroll + count-up (things already on screen just show; anything redrawn later just appears) ---- */
+  if(REDUCE||!('IntersectionObserver' in window)) return;
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in'); io.unobserve(e.target);}}),{rootMargin:'0px 0px -40px 0px'});
+  $$('.game,.best,.kpi,.tablebox,.panel,.chart,.prose h2,.ukey').forEach((el,i)=>{
+    const r=el.getBoundingClientRect(); if(!el.offsetParent||r.top<innerHeight) return;
+    el.classList.add('rv'); el.style.transitionDelay=(i%3)*70+'ms'; io.observe(el);});
+  $$('.kpi .v').forEach(el=>{
+    const node=el.firstChild; if(el.childNodes.length!==1||!node||node.nodeType!==3) return;
+    const m=node.textContent.match(/^([^\d−-]*)([−-]?)([\d,]+(?:\.\d+)?)(.*)$/); if(!m) return;
+    const target=parseFloat(m[3].replace(/,/g,'')), dec=(m[3].split('.')[1]||'').length, t0=performance.now(), final=node.textContent;
+    const tick=t=>{const k=Math.min(1,(t-t0)/900), v=target*(1-Math.pow(1-k,3));
+      node.textContent=k<1?m[1]+m[2]+v.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+m[4]:final; if(k<1) requestAnimationFrame(tick);};
+    requestAnimationFrame(tick);
+  });
+}
+
 window.EDGE_TEST={betMath,fairNow,feePer,betText};   // for tests/tracker_test.html
 chrome();
 const page=($('main')||{}).dataset?.page;
 ({week:weekPage,season:seasonPage,teams:teamsPage,method:methodPage}[page]||(()=>{}))();
 liveTick();
+if(page){ stadiumBg(page); navExtras(page); }
 })();
