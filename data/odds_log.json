@@ -110,16 +110,16 @@
   "last": {
    "books": 0,
    "fair": {
-    "home": 0.6164
+    "home": 0.6038
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
      "book": "Polymarket",
      "cents": 39.0,
      "dec": 2.4882,
-     "ev": -4.6,
+     "ev": -1.4,
      "fee": 1.19,
      "key": "polymarket",
      "live": true,
@@ -130,7 +130,7 @@
      "book": "Kalshi",
      "cents": 61.0,
      "dec": 1.5958,
-     "ev": -1.6,
+     "ev": -3.6,
      "fee": 1.67,
      "key": "kalshi",
      "live": true,
@@ -184,7 +184,7 @@
    "fair": {
     "home": 0.5934
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -256,7 +256,7 @@
    "fair": {
     "home": 0.4279
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -328,30 +328,30 @@
    "fair": {
     "home": 0.2522
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
-     "book": "Kalshi",
+     "book": "Polymarket",
      "cents": 76.0,
-     "dec": 1.294,
-     "ev": -3.2,
-     "fee": 1.28,
-     "key": "kalshi",
+     "dec": 1.3002,
+     "ev": -2.8,
+     "fee": 0.91,
+     "key": "polymarket",
      "live": true,
      "point": null,
      "price": -317
     },
     "home": {
      "book": "Polymarket",
-     "cents": 24.0,
-     "dec": 4.0141,
-     "ev": 1.2,
-     "fee": 0.91,
+     "cents": 25.0,
+     "dec": 3.8554,
+     "ev": -2.8,
+     "fee": 0.94,
      "key": "polymarket",
      "live": true,
      "point": null,
-     "price": 317
+     "price": 300
     }
    },
    "spread": {},
@@ -400,7 +400,7 @@
    "fair": {
     "home": 0.5427
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -472,7 +472,7 @@
    "fair": {
     "home": 0.3775
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -487,15 +487,15 @@
      "price": -170
     },
     "home": {
-     "book": "Polymarket",
-     "cents": 38.0,
-     "dec": 2.5525,
-     "ev": -3.6,
-     "fee": 1.18,
-     "key": "polymarket",
+     "book": "Kalshi",
+     "cents": 37.0,
+     "dec": 2.5885,
+     "ev": -2.3,
+     "fee": 1.63,
+     "key": "kalshi",
      "live": true,
      "point": null,
-     "price": 163
+     "price": 170
     }
    },
    "spread": {},
@@ -544,30 +544,30 @@
    "fair": {
     "home": 0.325
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
      "book": "Polymarket",
-     "cents": 69.0,
-     "dec": 1.4272,
-     "ev": -3.7,
-     "fee": 1.07,
+     "cents": 70.0,
+     "dec": 1.4075,
+     "ev": -5.0,
+     "fee": 1.05,
      "key": "polymarket",
      "live": true,
      "point": null,
-     "price": -223
+     "price": -233
     },
     "home": {
      "book": "Kalshi",
-     "cents": 31.0,
-     "dec": 3.0772,
-     "ev": 0.0,
-     "fee": 1.5,
+     "cents": 30.0,
+     "dec": 3.1776,
+     "ev": 3.3,
+     "fee": 1.47,
      "key": "kalshi",
      "live": true,
      "point": null,
-     "price": 223
+     "price": 233
     }
    },
    "spread": {},
@@ -614,27 +614,27 @@
   "last": {
    "books": 0,
    "fair": {
-    "home": 0.2492
+    "home": 0.2522
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
-     "book": "Kalshi",
-     "cents": 75.0,
-     "dec": 1.3104,
-     "ev": -1.6,
-     "fee": 1.31,
-     "key": "kalshi",
+     "book": "Polymarket",
+     "cents": 76.0,
+     "dec": 1.3002,
+     "ev": -2.8,
+     "fee": 0.91,
+     "key": "polymarket",
      "live": true,
      "point": null,
-     "price": -300
+     "price": -317
     },
     "home": {
      "book": "Polymarket",
      "cents": 25.0,
      "dec": 3.8554,
-     "ev": -3.9,
+     "ev": -2.8,
      "fee": 0.94,
      "key": "polymarket",
      "live": true,
@@ -688,7 +688,7 @@
    "fair": {
     "home": 0.5635
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -760,7 +760,7 @@
    "fair": {
     "home": 0.6309
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -832,27 +832,27 @@
    "fair": {
     "home": 0.4573
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
      "book": "Polymarket",
-     "cents": 56.0,
-     "dec": 1.7473,
-     "ev": -5.2,
-     "fee": 1.23,
+     "cents": 55.0,
+     "dec": 1.7782,
+     "ev": -3.5,
+     "fee": 1.24,
      "key": "polymarket",
      "live": true,
      "point": null,
-     "price": -127
+     "price": -122
     },
     "home": {
-     "book": "Polymarket",
+     "book": "Kalshi",
      "cents": 45.0,
-     "dec": 2.1627,
-     "ev": -1.1,
-     "fee": 1.24,
-     "key": "polymarket",
+     "dec": 2.1398,
+     "ev": -2.1,
+     "fee": 1.73,
+     "key": "kalshi",
      "live": true,
      "point": null,
      "price": 122
@@ -904,7 +904,7 @@
    "fair": {
     "home": 0.6092
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -976,7 +976,7 @@
    "fair": {
     "home": 0.7478
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1048,19 +1048,19 @@
    "fair": {
     "home": 0.583
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
-     "book": "Polymarket",
-     "cents": 42.0,
-     "dec": 2.3139,
-     "ev": -3.5,
-     "fee": 1.22,
-     "key": "polymarket",
+     "book": "Kalshi",
+     "cents": 41.0,
+     "dec": 2.3423,
+     "ev": -2.3,
+     "fee": 1.69,
+     "key": "kalshi",
      "live": true,
      "point": null,
-     "price": 138
+     "price": 144
     },
     "home": {
      "book": "Polymarket",
@@ -1120,7 +1120,7 @@
    "fair": {
     "home": 0.7867
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1192,19 +1192,19 @@
    "fair": {
     "home": 0.8271
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
-     "book": "Kalshi",
-     "cents": 15.0,
-     "dec": 6.2923,
-     "ev": 8.8,
-     "fee": 0.89,
-     "key": "kalshi",
+     "book": "Polymarket",
+     "cents": 17.0,
+     "dec": 5.648,
+     "ev": -2.3,
+     "fee": 0.71,
+     "key": "polymarket",
      "live": true,
      "point": null,
-     "price": 567
+     "price": 488
     },
     "home": {
      "book": "Kalshi",
@@ -1264,7 +1264,7 @@
    "fair": {
     "home": 0.4365
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1279,12 +1279,12 @@
      "price": -127
     },
     "home": {
-     "book": "Kalshi",
+     "book": "Polymarket",
      "cents": 44.0,
-     "dec": 2.187,
-     "ev": -4.5,
-     "fee": 1.72,
-     "key": "kalshi",
+     "dec": 2.2108,
+     "ev": -3.5,
+     "fee": 1.23,
+     "key": "polymarket",
      "live": true,
      "point": null,
      "price": 127
@@ -1336,8 +1336,8 @@
    "fair": {
     "home": 0.3364
    },
-   "live": "2026-10-07T00:03:29+00:00",
-   "mine": 1,
+   "live": "2026-10-07T03:04:54+00:00",
+   "mine": 2,
    "ml": {
     "away": {
      "book": "Kalshi",
@@ -1352,14 +1352,14 @@
     },
     "home": {
      "book": "Kalshi",
-     "cents": 33.0,
-     "dec": 2.8945,
-     "ev": -2.6,
-     "fee": 1.55,
+     "cents": 32.0,
+     "dec": 2.983,
+     "ev": 0.3,
+     "fee": 1.52,
      "key": "kalshi",
      "live": true,
      "point": null,
-     "price": 203
+     "price": 212
     }
    },
    "spread": {},
@@ -1408,16 +1408,16 @@
    "fair": {
     "home": 0.5514
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
-     "book": "Polymarket",
+     "book": "Kalshi",
      "cents": 49.0,
-     "dec": 1.9901,
-     "ev": -10.7,
-     "fee": 1.25,
-     "key": "polymarket",
+     "dec": 1.9705,
+     "ev": -11.6,
+     "fee": 1.75,
+     "key": "kalshi",
      "live": true,
      "point": null,
      "price": 104
@@ -1480,7 +1480,7 @@
    "fair": {
     "home": 0.4739
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1495,12 +1495,12 @@
      "price": -122
     },
     "home": {
-     "book": "Polymarket",
+     "book": "Kalshi",
      "cents": 48.0,
-     "dec": 2.0305,
-     "ev": -3.8,
-     "fee": 1.25,
-     "key": "polymarket",
+     "dec": 2.0102,
+     "ev": -4.7,
+     "fee": 1.75,
+     "key": "kalshi",
      "live": true,
      "point": null,
      "price": 108
@@ -1552,8 +1552,8 @@
    "fair": {
     "home": 0.4365
    },
-   "live": "2026-10-07T00:03:29+00:00",
-   "mine": 1,
+   "live": "2026-10-07T03:04:54+00:00",
+   "mine": 2,
    "ml": {
     "away": {
      "book": "Kalshi",
@@ -1567,15 +1567,15 @@
      "price": -133
     },
     "home": {
-     "book": "Kalshi",
-     "cents": 45.0,
-     "dec": 2.1398,
-     "ev": -6.6,
-     "fee": 1.73,
-     "key": "kalshi",
+     "book": "Polymarket",
+     "cents": 46.0,
+     "dec": 2.1168,
+     "ev": -7.6,
+     "fee": 1.24,
+     "key": "polymarket",
      "live": true,
      "point": null,
-     "price": 122
+     "price": 117
     }
    },
    "spread": {},
@@ -1624,7 +1624,7 @@
    "fair": {
     "home": 0.6092
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1696,8 +1696,8 @@
    "fair": {
     "home": 0.7659
    },
-   "live": "2026-10-07T00:03:29+00:00",
-   "mine": 1,
+   "live": "2026-10-07T03:04:54+00:00",
+   "mine": 2,
    "ml": {
     "away": {
      "book": "Kalshi",
@@ -1712,14 +1712,14 @@
     },
     "home": {
      "book": "Kalshi",
-     "cents": 81.0,
-     "dec": 1.2184,
-     "ev": -6.7,
-     "fee": 1.08,
+     "cents": 80.0,
+     "dec": 1.2327,
+     "ev": -5.6,
+     "fee": 1.12,
      "key": "kalshi",
      "live": true,
      "point": null,
-     "price": -426
+     "price": -400
     }
    },
    "spread": {},
@@ -1768,7 +1768,7 @@
    "fair": {
     "home": 0.4826
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1840,7 +1840,7 @@
    "fair": {
     "home": 0.7409
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1912,30 +1912,30 @@
    "fair": {
     "home": 0.417
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
-     "book": "Kalshi",
-     "cents": 58.0,
-     "dec": 1.6749,
-     "ev": -2.4,
-     "fee": 1.71,
-     "key": "kalshi",
+     "book": "Polymarket",
+     "cents": 59.0,
+     "dec": 1.6609,
+     "ev": -3.2,
+     "fee": 1.21,
+     "key": "polymarket",
      "live": true,
      "point": null,
-     "price": -138
+     "price": -144
     },
     "home": {
      "book": "Polymarket",
-     "cents": 44.0,
-     "dec": 2.2108,
-     "ev": -7.8,
+     "cents": 43.0,
+     "dec": 2.2611,
+     "ev": -5.7,
      "fee": 1.23,
      "key": "polymarket",
      "live": true,
      "point": null,
-     "price": 127
+     "price": 133
     }
    },
    "spread": {},
@@ -1984,7 +1984,7 @@
    "fair": {
     "home": 0.4675
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -1999,15 +1999,15 @@
      "price": -127
     },
     "home": {
-     "book": "Polymarket",
-     "cents": 46.0,
-     "dec": 2.1168,
-     "ev": -1.0,
-     "fee": 1.24,
-     "key": "polymarket",
+     "book": "Kalshi",
+     "cents": 45.0,
+     "dec": 2.1398,
+     "ev": 0.0,
+     "fee": 1.73,
+     "key": "kalshi",
      "live": true,
      "point": null,
-     "price": 117
+     "price": 122
     }
    },
    "spread": {},
@@ -2056,7 +2056,7 @@
    "fair": {
     "home": 0.718
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
@@ -2128,16 +2128,16 @@
    "fair": {
     "home": 0.7768
    },
-   "live": "2026-10-07T00:03:29+00:00",
+   "live": "2026-10-07T03:04:54+00:00",
    "mine": 2,
    "ml": {
     "away": {
-     "book": "Kalshi",
+     "book": "Polymarket",
      "cents": 24.0,
-     "dec": 3.9562,
-     "ev": -11.7,
-     "fee": 1.28,
-     "key": "kalshi",
+     "dec": 4.0141,
+     "ev": -10.4,
+     "fee": 0.91,
+     "key": "polymarket",
      "live": true,
      "point": null,
      "price": 317
