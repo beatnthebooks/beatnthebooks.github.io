@@ -98,6 +98,9 @@ def fetch(key: str) -> dict:
             "remaining": remaining, "used": used}
 
 
+FORCE_MIN_MINUTES = 45     # a forced pull (game-day check, injury news) is skipped if the odds are this fresh
+
+
 def get_odds(force: bool = False) -> dict | None:
     """Cached odds, refreshed when stale and a key is set. None if neither exists."""
     cache = json.loads(CACHE.read_text(encoding="utf-8")) if CACHE.exists() else None
@@ -105,8 +108,11 @@ def get_odds(force: bool = False) -> dict | None:
     if not key:
         return cache
     max_age = timedelta(hours=float(setting("ODDS_MIN_HOURS", "6")))
-    if cache and not force and _utc_now() - _parse_time(cache["fetched"]) < max_age:
+    age = _utc_now() - _parse_time(cache["fetched"]) if cache else None
+    if cache and not force and age < max_age:
         return cache
+    if cache and force and age < timedelta(minutes=FORCE_MIN_MINUTES):
+        return cache                           # e.g. a game-day check right after a regular run: no second charge
     try:
         fresh = fetch(key)
     except Exception as exc:                   # bad key, no network, quota used up
