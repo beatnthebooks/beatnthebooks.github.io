@@ -330,12 +330,17 @@ function weekPage(){
         <span>${esc((p.why||[]).join(' · '))}</span>${p.grade?res(p.grade.units)+clv(p.grade):''}</div>${modelOnly(p)?recTxt(p):''}${started?'':`<div class="pact">${logBtn(g,p)}${betLinks(g,p)}</div>`}</div></div>`;
     const conflict=new Set(good.map(p=>p.key.split('|')[0])).size<good.length?
       '<div class="why">Two picks bet against each other on the same market: take the higher one, or pass.</div>':'';
-    const none=!good.length?`<div class="nobet"><b>No bet${started?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':started?'Nothing on this game showed a real edge before kickoff.':'Nothing on this game shows a real edge at the available prices, so pass.'}</div>`:'';
+    // wind unders become bets only the day before kickoff (forecasts further out aren't reliable); withdrawn = the wind
+    // was gone by kickoff (or the roof was closed), so it isn't graded
+    const watch=g.windWatch&&!started?`<div class="nobet"><b>Wind watch.</b> ${Math.round(g.wind)} mph forecast. If it holds, the under
+      becomes a bet from ${esc(g.windWatch.fromLabel)}; forecasts further out aren’t reliable enough to bet.</div>`:'';
+    const gone=(g.withdrawn||[]).map(x=>`<div class="why">Withdrawn: ${esc(x.text)}, ${esc(x.why)}. Not counted.</div>`).join('');
+    const none=!good.length&&!watch?`<div class="nobet"><b>No bet${started?' was suggested':''}.</b> ${!g.mkt&&!g.windPick?'Waiting for betting lines.':started?'Nothing on this game showed a real edge before kickoff.':'Nothing on this game shows a real edge at the available prices, so pass.'}</div>`:'';
     const skip=weak.length&&!started?`<div class="skips"><span class="why">Not worth it at this price:</span> ${weak.map(p=>
       `<span class="skip">${esc(p.text)} <span class="no">${signed(p.edge)}%</span> <span class="tag ${EVID[p.src[0]][0]}">${EVID[p.src[0]][1]}</span></span>`).join('')}</div>`:'';
     const note=good.some(p=>p.reconstructed)?'<div class="why">Reconstructed at closing prices: this game was played before the site started saving its suggestions.</div>'
-      :good.some(p=>p.logged)?`<div class="why">As first shown ${esc(fmtLogged(good.map(p=>p.logged).sort()[0]))}, graded at that price.</div>`:'';
-    return `<div class="block picks">${head}${good.map(row).join('')}${conflict}${none}${skip}${started?note:''}</div>`;
+      :good.some(p=>p.logged)?`<div class="why">As shown ${esc(fmtLogged(good.map(p=>p.logged).sort()[0]))}, graded at that price.</div>`:'';
+    return `<div class="block picks">${head}${good.map(row).join('')}${watch}${conflict}${none}${skip}${started?note+gone:''}</div>`;
   }
   function results(g){
     if(g.status!=='final') return '';

@@ -196,9 +196,9 @@ class PickLog(unittest.TestCase):
         log = {"_meta": {"started": "2026-10-08T09:00"},
                "g1": {"total|under|44.5": {"pick": {"mk": "total", "side": "under", "point": 44.5, "text": "Under 44.5",
                                                     "src": ["wind"], "edgeFrom": "wind", "why": []},
-                                           "first": {"ts": "2026-10-08T09:00", "dec": 1.92, "price": {}, "edge": 3.1},
-                                           "last": {"ts": "2026-10-10T09:00", "dec": 1.75, "price": {}, "edge": 1.0}}}}
-        logged = card("final")
+                                           "first": {"ts": "2026-10-10T13:00", "dec": 1.92, "price": {}, "edge": 3.1},
+                                           "last": {"ts": "2026-10-11T09:00", "dec": 1.75, "price": {}, "edge": 1.0}}}}
+        logged = card("final", signal="under")                                 # still windy at kickoff
         PK.apply_log([logged], {"g1": g}, log)
         self.assertEqual(logged["picks"][0]["grade"]["units"], 0.92)          # graded at the FIRST price
         after = card("final", id="g2", koIso="2026-10-12T12:00",
@@ -210,6 +210,61 @@ class PickLog(unittest.TestCase):
         PK.apply_log([before], {"g3": g}, log)
         self.assertTrue(before["picks"][0]["reconstructed"])
         self.assertNotIn("beat", before["picks"][0]["grade"])                 # no closing-line test at the close
+
+    # ---- Oct 12 fixes: one bet per market and side; wind only the day before; withdrawn wind isn't graded ----
+    G_FINAL = {"hs": 10, "as": 13, "hml": -150.0, "aml": 130.0, "spread": 3.0, "hso": -110.0, "aso": -110.0,
+               "tot": 44.5, "oo": -110.0, "uo": -110.0}
+
+    @staticmethod
+    def entry(point, first_ts, last_ts, kind="wind", first_dec=1.92, last_dec=1.75):
+        mk, side = ("total", "under") if kind in ("wind", "roof") else ("spread", "home")
+        text = f"Under {point:g}" if mk == "total" else f"Packers {point:+g}"
+        return {"pick": {"mk": mk, "side": side, "point": point, "text": text, "src": [kind], "edgeFrom": kind, "why": []},
+                "first": {"ts": first_ts, "dec": first_dec, "price": {}, "edge": 3.1},
+                "last": {"ts": last_ts, "dec": last_dec, "price": {}, "edge": 1.0}}
+
+    def test_a_moving_line_is_one_bet(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "pick_log.json"
+            for t_, pt in (("2026-10-10T13:00", 44.5), ("2026-10-11T09:00", 43.5)):
+                r = card(signal="under", windPick=dict(WIND, point=pt))
+                r["picks"] = PK.game_picks(r, 5.0)
+                log = self.run_log([r], t_, path)
+            self.assertEqual(list(log["g1"]), ["total|under|44.5"])          # not a second "43.5" bet
+            self.assertEqual(log["g1"]["total|under|44.5"]["last"]["point"], 43.5)
+
+    def test_old_duplicate_lines_count_once_at_the_first(self):
+        log = {"_meta": {"started": "2026-10-01T09:00"},
+               "g1": {"spread|home|2.5": self.entry(2.5, "2026-10-06T09:00", "2026-10-07T09:00", "spread", 1.95),
+                      "spread|home|1.5": self.entry(1.5, "2026-10-08T09:00", "2026-10-11T09:00", "spread", 1.98)}}
+        r = card("final")
+        PK.apply_log([r], {"g1": self.G_FINAL}, log)
+        self.assertEqual(len(r["picks"]), 1)
+        self.assertEqual((r["picks"][0]["point"], r["picks"][0]["dec"]), (2.5, 1.95))
+
+    def test_wind_gone_by_kickoff_or_roof_closed_is_withdrawn(self):
+        log = {"_meta": {"started": "2026-10-01T09:00"},
+               "g1": {"total|under|44.5": self.entry(44.5, "2026-10-10T13:00", "2026-10-10T16:00")}}
+        calm = card("final", wind=6.0)                                       # no signal at kickoff
+        PK.apply_log([calm], {"g1": self.G_FINAL}, log)
+        self.assertEqual(calm["picks"], [])
+        self.assertIn("6 mph", calm["withdrawn"][0]["why"])
+        closed = card("final")
+        del closed["wind"]                                                     # roof closed: no wind on the card
+        PK.apply_log([closed], {"g1": self.G_FINAL}, log)
+        self.assertEqual(closed["withdrawn"][0]["why"], "the roof was closed")
+        self.assertEqual(PK.scoreboard([calm, closed])["wind"]["n"], 0)
+
+    def test_wind_shown_days_early_is_graded_at_its_last_price(self):
+        log = {"_meta": {"started": "2026-10-01T09:00"},       # an old log: first shown six days before kickoff
+               "g1": {"total|under|44.5": self.entry(44.5, "2026-10-05T17:16", "2026-10-11T09:00")}}
+        r = card("final", signal="under")
+        PK.apply_log([r], {"g1": self.G_FINAL}, log)
+        self.assertEqual((r["picks"][0]["dec"], r["picks"][0]["logged"]), (1.75, "2026-10-11T09:00"))
+
+    def test_wind_watch_is_not_a_bet_yet(self):
+        r = card(signal="under", windPick=WIND, windWatch={"from": "2026-10-10T12:00", "fromLabel": "Sat Oct 10"})
+        self.assertEqual(PK.game_picks(r, 5.0), [])
 
     def test_scoreboard_counts_by_main_reason(self):
         rows = [{"picks": [{"edgeFrom": "roof", "grade": {"units": 0.9, "won": True, "clv": 2.0, "beat": True}},

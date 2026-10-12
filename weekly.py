@@ -111,10 +111,19 @@ def update_wind_log(games, season: int, now: datetime) -> dict:
                 log[g["gid"]] = {"wind": round(w, 1), "src": "live",
                                  "asof": now.isoformat(timespec="minutes")}
 
-    # 2) kicked off but never logged: backfill from the archived short-range forecast
+    # 2) kicked off but never logged, or last logged long before kickoff (the PC was off near game time):
+    #    backfill from the archived short-range forecast, so the kickoff value is what a near-kickoff run would see
+    def stale(e, ko):
+        try:
+            return e.get("src") == "live" and datetime.fromisoformat(e["asof"]) < ko - timedelta(hours=6)
+        except (TypeError, ValueError, KeyError):
+            return False
+
     missing = defaultdict(list)
     for g in outdoor:
-        if kickoff_ct(g) <= now and g["gid"] not in log:
+        ko = kickoff_ct(g)
+        e = log.get(g["gid"])
+        if ko <= now and (e is None or stale(e, ko)):
             missing[stadium_key(g)].append(g)
     for sid, gs in missing.items():
         lat, lon = STADIUMS[sid]
@@ -468,6 +477,9 @@ def game_row(r, blend_w: float, wind_log: dict, shop: dict, now: datetime, shift
         row["windAsof"] = w["asof"]
         if w["wind"] >= WIND_MPH:
             row["signal"] = "under" if g["roof"] in OUTDOOR else "roof"
+            if row["status"] == "upcoming" and ko - now > timedelta(hours=P.WIND_BET_HOURS):
+                bet_from = ko - timedelta(hours=P.WIND_BET_HOURS)     # longer-range forecasts aren't reliable
+                row["windWatch"] = {"from": bet_from.isoformat(timespec="minutes"), "fromLabel": ko_label(bet_from)}
             if shifts:
                 wp = wind_pick(g, s, shifts["wind"]["shift"])
                 if wp:

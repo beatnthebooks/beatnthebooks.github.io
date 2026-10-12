@@ -6,7 +6,7 @@ app and subscribe to the private channel name in ntfy_topic.txt.
 
 Sent by weekly.py after every rebuild, for games that haven't kicked off:
   * a NEW wind under signal (forecast wind >= 10 mph, outdoor/open roof), once kickoff is
-    within 72 hours (longer-range wind forecasts are too rough to act on)
+    within 24 hours, when the under becomes a bet (longer-range wind forecasts are too rough to act on)
   * a NEW price gap (Kalshi/Polymarket >= 2% better than the books' fair price after fees)
   * a wind signal that DISAPPEARED before kickoff (the forecast calmed down)
 Each alert goes out once; data/alerts_sent.json remembers what was sent. The very
@@ -35,7 +35,7 @@ ROOT = Path(__file__).resolve().parent
 TOPIC_FILE = ROOT / "ntfy_topic.txt"
 STATE = ROOT / "data" / "alerts_sent.json"
 SITE = "https://claude.ai/artifact/9rX2NXSmzjCCLBjDaZZEPg"
-WIND_HOURS = 72        # wind alerts only once kickoff is this close
+WIND_HOURS = 24        # wind alerts once the under becomes a bet (= picks.WIND_BET_HOURS; was 72 before Oct 12)
 
 
 def topic(create: bool = False) -> str | None:
@@ -88,7 +88,8 @@ def _signals(data: dict) -> dict:
                 where = "No total posted yet."
             out[f"{g['id']}:wind"] = (
                 f"Wind UNDER: {match}",
-                f"{g['wind']:.1f} mph forecast · {g['ko']}. {where} Flat 1% stake; re-check the forecast before kickoff.",
+                f"{g['wind']:.1f} mph forecast · {g['ko']}. {where} The bet window is open (day before kickoff); "
+                f"re-check the forecast before you bet.",
                 "dash")
         for x in g.get("gaps", []):
             side = {"home": g["homeName"], "away": g["awayName"], "over": "Over", "under": "Under"}[x["side"]]

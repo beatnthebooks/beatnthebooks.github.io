@@ -40,6 +40,18 @@ class WindLogFreezes(unittest.TestCase):
         self.assertEqual(out["g_started"]["wind"], 5.0)     # frozen at kickoff
         self.assertEqual(out["g_up"]["wind"], 20.0)         # still refreshing
 
+    def test_forecast_from_days_before_kickoff_is_replaced_by_the_archive(self):
+        # Oct 12: the PC was off near game time, so week 5's saved forecasts were six days old at kickoff
+        now = datetime(2026, 10, 12, 9, 0)
+        g = game("g_old", "2026-10-11", "13:00")
+        arch = {"hourly": {"time": [f"2026-10-11T{h:02d}:00" for h in range(24)], "wind_speed_10m": [4.0] * 24}}
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "wind_log.json"
+            log.write_text(json.dumps({"g_old": {"wind": 12.0, "src": "live", "asof": "2026-10-05T17:16"}}))
+            with mock.patch.object(weekly, "WIND_LOG", log), mock.patch.object(weekly, "fetch", lambda url: arch):
+                out = weekly.update_wind_log([g], 2026, now)
+        self.assertEqual((out["g_old"]["wind"], out["g_old"]["src"]), (4.0, "archive"))
+
 
 class OddsLog(unittest.TestCase):
     def test_exchange_only_prices_log_twice(self):
@@ -56,7 +68,7 @@ class OddsLog(unittest.TestCase):
         self.assertEqual(log["g1"]["last"]["live"], "2026-10-05T15:00:00+00:00")
 
 
-def data(signals, now="2026-10-09T12:00"):
+def data(signals, now="2026-10-10T18:00"):                     # 18 hours before kickoff: inside the bet window
     games = []
     for gid, sig in signals.items():
         games.append({"id": gid, "status": "upcoming", "koIso": "2026-10-11T12:00", "awayName": "Bears",
@@ -86,11 +98,11 @@ class AlertsOnce(unittest.TestCase):
             self.run_alerts(data({"g1": True, "g2": True}), state, sent)
             self.assertTrue(sent[-1].startswith("Wind UNDER again"))           # and came back
 
-    def test_no_wind_alert_more_than_72_hours_out(self):
+    def test_no_wind_alert_more_than_24_hours_out(self):
         with tempfile.TemporaryDirectory() as tmp:
             state, sent = Path(tmp) / "alerts_sent.json", []
             self.run_alerts(data({}), state, sent)                            # summary
-            self.run_alerts(data({"g1": True}, now="2026-10-05T12:00"), state, sent)
+            self.run_alerts(data({"g1": True}, now="2026-10-09T12:00"), state, sent)   # 48 hours out: a watch, not a bet
             self.assertEqual(len(sent), 1)
 
 

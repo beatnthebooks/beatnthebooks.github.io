@@ -19,6 +19,7 @@ Standard library only.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from edge_lab import devig
@@ -27,6 +28,11 @@ ROOT = Path(__file__).resolve().parent
 LOG = ROOT / "data" / "pick_log.json"
 EDGE_FROM = {"wind": 0, "roof": 0, "gap": 1, "lean": 2, "spread": 2}   # whose edge number shows when signals merge
 UNIT_PCT = 2.0     # 1 unit = 2% of Mason's Kalshi bankroll (his rule, Oct 5 2026)
+# Wind unders become bets only this close to kickoff: the backtest used forecasts from about a day before. Earlier
+# they're a "wind watch" (weekly.game_row sets row["windWatch"]), not logged. Oct 12 2026: week 5's unders were first
+# shown six days out and 5 of 9 lost their wind by kickoff.
+WIND_BET_HOURS = 24
+WIND_KINDS = ("wind", "roof")
 
 
 def units_for(p: dict) -> float:
@@ -93,7 +99,7 @@ def game_picks(row: dict, min_model_edge: float) -> list:
     has = lambda key: any(x["key"] == key for x in out)
 
     wp = row.get("windPick")
-    if wp and row.get("signal") in ("under", "roof"):
+    if wp and row.get("signal") in ("under", "roof") and not row.get("windWatch"):
         kind = "roof" if row["signal"] == "roof" else "wind"
         add({"key": f"total|under|{_pt(wp['point'])}", "mk": "total", "side": "under", "point": wp["point"],
              "text": f"Under {_pt(wp['point'])}", "edge": wp["edge"], "dec": wp["dec"], "edgeFrom": kind,
@@ -192,7 +198,9 @@ def load_log() -> dict:
 
 
 def update_log(rows: list, now_iso: str, log: dict | None = None) -> dict:
-    """Record each good pick on games not yet started: first sighting kept, last price refreshed."""
+    """Record each good pick on games not yet started: first sighting kept, last price refreshed. One entry per
+    game, market and side: when the line moves during the week the entry's last snapshot follows it (before Oct 12
+    each new line was logged as another bet, so one under could count four times)."""
     log = load_log() if log is None else log
     changed = "_meta" not in log
     log.setdefault("_meta", {"started": now_iso})            # games kicking off after this are judged by the log
@@ -202,8 +210,10 @@ def update_log(rows: list, now_iso: str, log: dict | None = None) -> dict:
         for p in r.get("picks", []):
             if not p["good"]:
                 continue
-            snap = {"ts": now_iso, "dec": p["dec"], "price": p["price"], "edge": p["edge"]}
-            e = log.setdefault(r["id"], {}).get(p["key"])
+            snap = {"ts": now_iso, "dec": p["dec"], "price": p["price"], "edge": p["edge"], "point": p.get("point")}
+            game = log.setdefault(r["id"], {})
+            key = next((k for k, x in game.items() if (x["pick"]["mk"], x["pick"]["side"]) == (p["mk"], p["side"])), None)
+            e = game.get(key) if key else None
             if e is None:
                 keep = {k: p[k] for k in ("mk", "side", "point", "text", "src", "edgeFrom", "why", "model", "rec",
                                           "suggested", "units") if k in p}
@@ -218,9 +228,32 @@ def update_log(rows: list, now_iso: str, log: dict | None = None) -> dict:
     return log
 
 
+def _logged_pick(r: dict, es: list):
+    """One bet from a game's log entries for the same market and side (older logs can hold several lines).
+    Returns (pick, None), or (None, reason) for a wind under withdrawn before kickoff."""
+    first_key, first = min(es, key=lambda ke: ke[1]["first"]["ts"])
+    wind = first["pick"].get("edgeFrom") in WIND_KINDS
+    if wind and r.get("signal") not in ("under", "roof"):    # forecast at kickoff under 10 mph, or the roof was closed
+        why = (f"wind forecast fell to {r['wind']:.0f} mph by kickoff" if r.get("wind") is not None
+               else "the roof was closed")
+        return None, {"text": first["pick"]["text"], "why": why}
+    key, e, snap = first_key, first, first["first"]
+    window = (datetime.fromisoformat(r["koIso"]) - timedelta(hours=WIND_BET_HOURS)).isoformat(timespec="minutes")
+    if wind and snap["ts"] < window:          # shown before the 24-hour window (logs before Oct 12): the last price seen
+        key, e = max(es, key=lambda ke: ke[1]["last"]["ts"])
+        snap = e["last"]
+    p = dict(e["pick"], key=key, dec=snap["dec"], price=snap["price"], edge=snap["edge"], good=True, logged=snap["ts"])
+    if snap.get("point") is not None and snap["point"] != p.get("point"):
+        p["text"] = p["text"].replace(_pt(p["point"]), _pt(snap["point"]))
+        p["point"] = snap["point"]
+    p.setdefault("units", units_for(p))       # picks logged before unit sizing existed
+    return p, None
+
+
 def apply_log(rows: list, games_by_gid: dict, log: dict) -> None:
-    """Started games show their logged suggestions (as first shown); finished games are graded. Finished games
-    with nothing logged keep their picks recomputed at the closing price, marked as reconstructed."""
+    """Started games show their logged suggestions (one per market and side, as first shown); finished games are
+    graded. Wind unders whose wind was gone by kickoff (or whose roof was closed) are withdrawn, not graded.
+    Finished games with nothing logged keep their picks recomputed at the closing price, marked as reconstructed."""
     started = log.get("_meta", {}).get("started")
     for r in rows:
         if r["status"] == "upcoming":
@@ -228,15 +261,20 @@ def apply_log(rows: list, games_by_gid: dict, log: dict) -> None:
         g = games_by_gid.get(r["id"])
         entries = log.get(r["id"])
         if entries or (started and r["koIso"] >= started):  # the log was running: it alone says what was shown
-            entries = entries or {}
-            ps = []
-            for key, e in entries.items():
-                p = dict(e["pick"], key=key, dec=e["first"]["dec"], price=e["first"]["price"],
-                         edge=e["first"]["edge"], good=True, logged=e["first"]["ts"])
-                p.setdefault("units", units_for(p))       # picks logged before unit sizing existed
-                ps.append(p)
+            groups = {}
+            for key, e in (entries or {}).items():
+                groups.setdefault((e["pick"]["mk"], e["pick"]["side"]), []).append((key, e))
+            ps, gone = [], []
+            for es in groups.values():
+                p, why = _logged_pick(r, es)
+                if p:
+                    ps.append(p)
+                else:
+                    gone.append(why)
             ps.sort(key=lambda p: -rank_edge(p))
             r["picks"] = ps
+            if gone:
+                r["withdrawn"] = gone
         else:
             for p in r.get("picks", []):
                 p["reconstructed"] = True
