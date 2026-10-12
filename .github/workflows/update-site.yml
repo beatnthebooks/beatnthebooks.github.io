@@ -1,19 +1,25 @@
 name: Update site
 
-# Rebuilds the Edge Board website from fresh nflverse data and wind forecasts,
-# then publishes site/ to GitHub Pages. Runs in GitHub's cloud; no PC needed.
+# Rebuilds Beatn' the Books from fresh nflverse data, wind forecasts, sportsbook odds and Kalshi/Polymarket prices,
+# sends the phone alerts, and publishes site/ to GitHub Pages. Runs in GitHub's cloud; no PC needed.
+# Since Oct 12 2026 this is the ONLY place that pulls odds and sends alerts (the PC's tasks just copy the result to
+# the private claude.ai page), so nothing doubles. Secrets (Settings -> Secrets and variables -> Actions):
+# ODDS_API_KEY and NTFY_TOPIC.
 
 on:
   schedule:
-    # UTC. In Central time: 7am, 10am, 1pm, 4pm, 7pm, 10pm (an hour earlier in winter).
-    # GitHub can start scheduled runs a few minutes late.
+    # UTC. Central (CDT, until Nov 1): 7am, 10am, 1pm, 4pm, 7pm, 10pm. In winter (CST) an hour earlier.
     - cron: "0 0,3,12,15,18,21 * * *"
+    # Game-day checks: fresh prices + one "Kickoff soon" alert, after inactives. CDT: Sun 11:15a, 2:15p, 6:15p;
+    # Mon + Thu 6:15p. GitHub can start these late; they leave ~45 min before kickoff. In CST an hour earlier.
+    - cron: "15 16,19,23 * * 0"
+    - cron: "15 23 * * 1,4"
   workflow_dispatch:        # "Run workflow" button on the Actions tab
   push:
     branches: [main]
 
 permissions:
-  contents: write           # to save data/wind_log.json back to the repo
+  contents: write           # to save data/wind_log.json and data/pick_log.json back to the repo
   pages: write
   id-token: write
 
@@ -31,22 +37,53 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Private state between runs, kept in the Actions cache and never committed to this public repo: the raw
+      # sportsbook odds (The Odds API allows showing odds on a site, not handing out the raw data), the odds
+      # snapshots, and which phone alerts were already sent.
+      - name: Restore private state
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/odds_cache.json
+            data/odds_log.json
+            data/alerts_sent.json
+            data/injury_state.json
+          key: state-${{ github.run_id }}
+          restore-keys: state-
+
       - name: Tests (a failure stops the deploy)
         run: python -m unittest discover -s tests
 
-      - name: Rebuild with fresh data
-        run: python weekly.py --fetch
+      - name: Rebuild with fresh data and send phone alerts
+        run: |
+          if [ "${{ github.event.schedule }}" = "15 16,19,23 * * 0" ] || [ "${{ github.event.schedule }}" = "15 23 * * 1,4" ]; then
+            python weekly.py --fetch --pregame
+          else
+            python weekly.py --fetch
+          fi
         env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}     # optional; add under Settings → Secrets
-          ODDS_BOOKS: ${{ vars.ODDS_BOOKS }}            # optional; e.g. draftkings,fanduel
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}         # optional; phone alerts (see alerts.py)
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          ODDS_BOOKS: ${{ vars.ODDS_BOOKS }}            # optional; blank = Kalshi + Polymarket
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
 
-      - name: Save the logs (wind and odds freeze at kickoff; odds cache limits API use)
+      - name: Save private state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/odds_cache.json
+            data/odds_log.json
+            data/alerts_sent.json
+            data/injury_state.json
+          key: state-${{ github.run_id }}
+
+      - name: Save the public logs (wind forecasts and picks freeze at kickoff)
         run: |
           git config user.name "edge-board-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm --cached --ignore-unmatch -q data/odds_cache.json data/odds_log.json data/alerts_sent.json data/injury_state.json
           git add data/wind_log.json
-          for f in data/odds_cache.json data/odds_log.json data/alerts_sent.json data/pick_log.json; do if [ -f "$f" ]; then git add "$f"; fi; done
+          if [ -f data/pick_log.json ]; then git add data/pick_log.json; fi
           git diff --cached --quiet || git commit -m "Update wind log"
           git push
 
