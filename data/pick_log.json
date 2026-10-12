@@ -1543,12 +1543,13 @@
    },
    "last": {
     "dec": 6.8484,
-    "edge": 7.0,
+    "edge": -3.1,
+    "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 14.0
     },
-    "ts": "2026-10-12T16:04"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -1581,13 +1582,14 @@
     "ts": "2026-10-07T19:01"
    },
    "last": {
-    "dec": 2.983,
-    "edge": -6.2,
+    "dec": 2.9321,
+    "edge": -7.8,
+    "point": null,
     "price": {
-     "book": "Kalshi",
-     "cents": 32.0
+     "book": "Polymarket",
+     "cents": 33.0
     },
-    "ts": "2026-10-12T16:04"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -1865,11 +1867,12 @@
    "last": {
     "dec": 2.5885,
     "edge": -1.9,
+    "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 37.0
     },
-    "ts": "2026-10-12T16:04"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -1899,12 +1902,13 @@
     "ts": "2026-10-11T19:02"
    },
    "last": {
-    "dec": 1.9524,
-    "edge": -7.1,
+    "dec": 2.0,
+    "edge": -7.0,
+    "point": 3.0,
     "price": {
-     "odds": -105
+     "odds": 100
     },
-    "ts": "2026-10-11T19:02"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -2075,11 +2079,12 @@
    "last": {
     "dec": 1.8958,
     "edge": -5.5,
+    "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 51.0
     },
-    "ts": "2026-10-12T16:04"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -2111,10 +2116,11 @@
    "last": {
     "dec": 1.9804,
     "edge": -7.1,
+    "point": -1.5,
     "price": {
      "odds": -102
     },
-    "ts": "2026-10-12T16:04"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -2523,12 +2529,13 @@
    },
    "last": {
     "dec": 2.0102,
-    "edge": -7.2,
+    "edge": -4.1,
+    "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 48.0
     },
-    "ts": "2026-10-12T16:04"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -2558,12 +2565,13 @@
     "ts": "2026-10-11T19:02"
    },
    "last": {
-    "dec": 1.9091,
-    "edge": -7.1,
+    "dec": 1.8333,
+    "edge": -6.8,
+    "point": 1.5,
     "price": {
-     "odds": -110
+     "odds": -120
     },
-    "ts": "2026-10-11T22:04"
+    "ts": "2026-10-12T17:43"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -2828,6 +2836,45 @@
   }
  },
  "2026_06_SEA_DEN": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.3992,
+    "edge": -0.2,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 40.0
+    },
+    "ts": "2026-10-12T17:43"
+   },
+   "last": {
+    "dec": 2.3992,
+    "edge": -0.2,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 40.0
+    },
+    "ts": "2026-10-12T17:43"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 5.1,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Broncos to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 45% to win, the market 43%"
+    ]
+   }
+  },
   "total|under|42.5": {
    "first": {
     "dec": 1.9091,
