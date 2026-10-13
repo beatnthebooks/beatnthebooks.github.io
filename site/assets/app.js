@@ -160,8 +160,9 @@ const EVID={wind:['under','Wind · tested'],roof:['roof','Wind · roof must be o
   lean:['lean','Model pick · no proven edge'],spread:['lean','Model pick · no proven edge']};
 const fmtLogged=s=>{const d=new Date(s+':00'); return isNaN(d)?s:`${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]} ${MONTHS[d.getMonth()]} ${d.getDate()}, ${((d.getHours()+11)%12)+1}:${String(d.getMinutes()).padStart(2,'0')} ${d.getHours()<12?'AM':'PM'} CT`;};
 const modelOnly=p=>p.edgeFrom==='lean'||p.edgeFrom==='spread';
-/* ranked by the edge shown on each pick: the model's own edge for model picks (Mason, Oct 6; same as picks.rank_edge) */
-const rankEdge=p=>modelOnly(p)&&p.model!=null?p.model:p.edge;
+/* ranked by each bet's track record (its realistic edge), the same as picks.rank_edge; back to this on Oct 12 after
+   week 5's top-ranked model picks all lost */
+const rankEdge=p=>p.edge;
 const pickEdge=p=>modelOnly(p)&&p.model!=null
   ?`<span class="pedge model">${signed(p.model)}%<small> model edge</small></span>`
   :`<span class="pedge ${p.edge>0?'ok':'no'}">${signed(p.edge)}%<small> edge</small></span>`;
@@ -315,7 +316,7 @@ function weekPage(){
     const P=g.picks||[], f=g.status==='final', started=g.status!=='upcoming'||!!liveOf(g);
     const good=P.filter(p=>p.good), weak=P.filter(p=>!p.good);
     const head=`<div class="bh">${f?'Picks before kickoff':started?'Picks (locked at kickoff)':'Bets to take'}
-      <span class="why">best first by the edge shown · edge = expected profit per $1 at that price (purple = our model’s own estimate)</span></div>`;
+      <span class="why">best first by each kind of bet’s real record · edge = expected profit per $1 at that price (purple = our model’s own estimate, which runs high)</span></div>`;
     const res=u=>u==null?'':`<span class="pill ${cls(u)}">${u>0?'Won':u<0?'Lost':'Push'} ${per100(u)}</span>`;
     const clv=gr=>!gr||gr.beat==null?'':gr.clv!=null
       ?`<span class="pill ${gr.beat?'ok':'no'}">${gr.beat?'Beat':'Worse than'} the closing price ${signed(gr.clv)}%</span>`
@@ -427,7 +428,7 @@ function weekPage(){
   function bestTile(gs){
     const c=gs.filter(g=>g.status==='upcoming'&&!liveOf(g)).flatMap(g=>(g.picks||[]).filter(p=>p.good).map(p=>({g,p})))
       .sort((a,b)=>rankEdge(b.p)-rankEdge(a.p))[0], lab=`Best edge${week===D.currentWeek?' this week':''}`;
-    return c?`<div class="kpi"><div class="v good">${signed(rankEdge(c.p))}%</div><div class="l">${lab}<br><span>${esc(c.p.text)} · ${esc(c.g.awayName)} at ${esc(c.g.homeName)}${modelOnly(c.p)?' · model’s estimate':''}</span></div></div>`
+    return c?`<div class="kpi"><div class="v ${cls(rankEdge(c.p))==='ok'?'good':cls(rankEdge(c.p))==='no'?'bad':''}">${signed(rankEdge(c.p))}%</div><div class="l">${lab}<br><span>${esc(c.p.text)} · ${esc(c.g.awayName)} at ${esc(c.g.homeName)}</span></div></div>`
       :`<div class="kpi"><div class="v">—</div><div class="l">${lab}<br><span>no bets left to take</span></div></div>`;
   }
   function render(){

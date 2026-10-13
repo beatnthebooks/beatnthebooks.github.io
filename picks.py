@@ -52,11 +52,10 @@ KINDS = ("wind", "gap", "lean", "spread")                              # scorebo
 
 
 def rank_edge(p: dict) -> float:
-    """What picks are ranked by: the edge number shown on the pick. Model picks use the model's own edge, other bets
-    their realistic edge. (Mason's call, Oct 6 2026, after model picks beat wind unders over 2026's first weeks:
-    "trust your edge more". Over 2016-25 the biggest model edges did worst, so the scoreboard is the judge.)"""
-    if p.get("edgeFrom") in ("lean", "spread") and p.get("model") is not None:
-        return p["model"]
+    """What picks are ranked by: each bet's realistic edge, i.e. what bets of its kind have really returned
+    (weekly.real_edge). Oct 6-12 2026 model picks ranked by the model's own edge instead ("trust your edge more");
+    in week 5 the top-ranked model picks (Dolphins, Cardinals, Browns) all lost, as the backtest warned (the biggest
+    model edges did worst), so Mason switched back on Oct 12."""
     return p["edge"]
 
 
