@@ -3556,7 +3556,7 @@
      "book": "Polymarket",
      "cents": 33.0
     },
-    "ts": "2026-10-25T13:10"
+    "ts": "2026-10-25T14:32"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -3588,13 +3588,13 @@
    },
    "last": {
     "dec": 1.9512,
-    "edge": -5.1,
+    "edge": -5.5,
     "point": 4.5,
     "price": {
      "book": "Polymarket",
      "cents": 50.0
     },
-    "ts": "2026-10-25T13:10"
+    "ts": "2026-10-25T14:32"
    },
    "pick": {
     "edgeFrom": "spread",
