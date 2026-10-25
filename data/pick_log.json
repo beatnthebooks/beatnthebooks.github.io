@@ -3556,7 +3556,7 @@
      "book": "Polymarket",
      "cents": 33.0
     },
-    "ts": "2026-10-25T11:37"
+    "ts": "2026-10-25T13:10"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -3594,7 +3594,7 @@
      "book": "Polymarket",
      "cents": 50.0
     },
-    "ts": "2026-10-25T11:37"
+    "ts": "2026-10-25T13:10"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -4570,14 +4570,14 @@
     "ts": "2026-10-20T13:16"
    },
    "last": {
-    "dec": 3.4001,
-    "edge": -7.8,
+    "dec": 3.2206,
+    "edge": -12.7,
     "point": null,
     "price": {
-     "book": "Kalshi",
-     "cents": 28.0
+     "book": "Polymarket",
+     "cents": 30.0
     },
-    "ts": "2026-10-24T13:09"
+    "ts": "2026-10-25T13:10"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4800,14 +4800,14 @@
     "ts": "2026-10-21T13:16"
    },
    "last": {
-    "dec": 1.5241,
-    "edge": -8.9,
+    "dec": 1.5711,
+    "edge": -5.0,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 64.0
+     "cents": 62.0
     },
-    "ts": "2026-10-24T07:12"
+    "ts": "2026-10-25T13:10"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5020,6 +5020,45 @@
   }
  },
  "2026_08_KC_DEN": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.1398,
+    "edge": -2.6,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 45.0
+    },
+    "ts": "2026-10-25T13:10"
+   },
+   "last": {
+    "dec": 2.1398,
+    "edge": -2.6,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 45.0
+    },
+    "ts": "2026-10-25T13:10"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 5.7,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Broncos to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 53% to win, the market 47%"
+    ]
+   }
+  },
   "spread|home|1.5": {
    "first": {
     "dec": 1.9434,
@@ -5173,6 +5212,47 @@
    }
   }
  },
+ "2026_08_NE_MIA": {
+  "ml|home|": {
+   "first": {
+    "dec": 4.7348,
+    "edge": -4.7,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 20.0
+    },
+    "ts": "2026-10-25T13:10"
+   },
+   "last": {
+    "dec": 4.7348,
+    "edge": -4.7,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 20.0
+    },
+    "ts": "2026-10-25T13:10"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 7.5,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Dolphins to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 25% to win, the market 21%"
+    ]
+   }
+  }
+ },
  "2026_08_PHI_WAS": {
   "ml|away|": {
    "first": {
@@ -5210,6 +5290,47 @@
     "units": 0.25,
     "why": [
      "our model gives them 40% to win, the market 36%"
+    ]
+   }
+  }
+ },
+ "2026_08_TEN_CIN": {
+  "ml|home|": {
+   "first": {
+    "dec": 1.3992,
+    "edge": 14.9,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 70.0
+    },
+    "ts": "2026-10-25T13:10"
+   },
+   "last": {
+    "dec": 1.3992,
+    "edge": 14.9,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 70.0
+    },
+    "ts": "2026-10-25T13:10"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 15.4,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Bengals to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 82% to win, the market 83%"
     ]
    }
   }
