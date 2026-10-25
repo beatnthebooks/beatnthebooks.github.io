@@ -3556,7 +3556,7 @@
      "book": "Polymarket",
      "cents": 33.0
     },
-    "ts": "2026-10-25T14:32"
+    "ts": "2026-10-25T16:11"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -3594,7 +3594,7 @@
      "book": "Polymarket",
      "cents": 50.0
     },
-    "ts": "2026-10-25T14:32"
+    "ts": "2026-10-25T16:11"
    },
    "pick": {
     "edgeFrom": "spread",
