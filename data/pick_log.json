@@ -3556,7 +3556,7 @@
      "book": "Polymarket",
      "cents": 33.0
     },
-    "ts": "2026-10-25T19:08"
+    "ts": "2026-10-25T22:20"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -3594,7 +3594,7 @@
      "book": "Polymarket",
      "cents": 50.0
     },
-    "ts": "2026-10-25T19:08"
+    "ts": "2026-10-25T22:20"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -4800,14 +4800,14 @@
     "ts": "2026-10-21T13:16"
    },
    "last": {
-    "dec": 1.5472,
-    "edge": -5.6,
+    "dec": 1.5241,
+    "edge": -7.1,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 63.0
+     "cents": 64.0
     },
-    "ts": "2026-10-25T19:08"
+    "ts": "2026-10-25T22:20"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4838,13 +4838,14 @@
     "ts": "2026-10-21T13:16"
    },
    "last": {
-    "dec": 1.8333,
-    "edge": -6.8,
-    "point": -3.0,
+    "dec": 1.9697,
+    "edge": -4.5,
+    "point": -3.5,
     "price": {
-     "odds": -120
+     "book": "Kalshi",
+     "cents": 49.0
     },
-    "ts": "2026-10-25T19:08"
+    "ts": "2026-10-25T22:20"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -4878,14 +4879,14 @@
     "ts": "2026-10-23T10:21"
    },
    "last": {
-    "dec": 2.2881,
-    "edge": -10.3,
+    "dec": 2.4591,
+    "edge": -3.6,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 42.0
+     "cents": 39.0
     },
-    "ts": "2026-10-25T19:08"
+    "ts": "2026-10-25T22:20"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4999,7 +5000,7 @@
      "book": "Kalshi",
      "cents": 50.0
     },
-    "ts": "2026-10-25T19:08"
+    "ts": "2026-10-25T22:20"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5111,14 +5112,14 @@
     "ts": "2026-10-20T16:17"
    },
    "last": {
-    "dec": 2.187,
-    "edge": -8.7,
+    "dec": 2.4272,
+    "edge": -4.2,
     "point": null,
     "price": {
-     "book": "Kalshi",
-     "cents": 44.0
+     "book": "Polymarket",
+     "cents": 40.0
     },
-    "ts": "2026-10-25T18:31"
+    "ts": "2026-10-25T22:20"
    },
    "pick": {
     "edgeFrom": "lean",
