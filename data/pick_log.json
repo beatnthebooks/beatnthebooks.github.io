@@ -4801,13 +4801,13 @@
    },
    "last": {
     "dec": 1.5585,
-    "edge": -4.9,
+    "edge": -5.1,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 63.0
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4838,14 +4838,14 @@
     "ts": "2026-10-21T13:16"
    },
    "last": {
-    "dec": 2.075,
-    "edge": -1.9,
+    "dec": 2.0274,
+    "edge": -4.1,
     "point": -3.5,
     "price": {
      "book": "Polymarket",
-     "cents": 46.9
+     "cents": 48.1
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -4886,7 +4886,7 @@
      "book": "Kalshi",
      "cents": 39.0
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4993,14 +4993,14 @@
     "ts": "2026-10-20T13:16"
    },
    "last": {
-    "dec": 1.8807,
-    "edge": -7.5,
+    "dec": 1.8965,
+    "edge": -6.7,
     "point": -7.5,
     "price": {
-     "book": "Polymarket",
-     "cents": 51.9
+     "book": "Kalshi",
+     "cents": 51.0
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5034,14 +5034,14 @@
     "ts": "2026-10-25T13:10"
    },
    "last": {
-    "dec": 1.9901,
-    "edge": -8.1,
+    "dec": 2.0305,
+    "edge": -6.3,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 49.0
+     "cents": 48.0
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5079,7 +5079,7 @@
      "book": "Kalshi",
      "cents": 51.0
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5163,7 +5163,7 @@
      "book": "Polymarket",
      "cents": 38.0
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5232,12 +5232,12 @@
    },
    "last": {
     "dec": 1.9259,
-    "edge": -10.0,
+    "edge": -11.0,
     "point": 3.0,
     "price": {
      "odds": -108
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T07:23"
    },
    "pick": {
     "edgeFrom": "spread",
