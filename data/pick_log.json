@@ -4807,7 +4807,7 @@
      "book": "Polymarket",
      "cents": 63.0
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4845,7 +4845,7 @@
      "book": "Polymarket",
      "cents": 48.1
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -4886,7 +4886,7 @@
      "book": "Polymarket",
      "cents": 39.0
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4954,13 +4954,13 @@
     "ts": "2026-10-23T07:13"
    },
    "last": {
-    "dec": 1.9804,
-    "edge": -7.1,
+    "dec": 1.9524,
+    "edge": -8.1,
     "point": 3.0,
     "price": {
-     "odds": -102
+     "odds": -105
     },
-    "ts": "2026-10-26T22:19"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -4982,6 +4982,43 @@
   }
  },
  "2026_08_IND_JAX": {
+  "ml|away|": {
+   "first": {
+    "dec": 4.3748,
+    "edge": 2.2,
+    "point": null,
+    "price": {
+     "book": "Polymarket",
+     "cents": 22.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "last": {
+    "dec": 4.3748,
+    "edge": 2.2,
+    "point": null,
+    "price": {
+     "book": "Polymarket",
+     "cents": 22.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "pick": {
+    "edgeFrom": "gap",
+    "mk": "ml",
+    "point": null,
+    "side": "away",
+    "src": [
+     "gap"
+    ],
+    "suggested": false,
+    "text": "Colts to win",
+    "units": 0.5,
+    "why": [
+     "2.2% cheaper than the sportsbooks\u2019 fair price"
+    ]
+   }
+  },
   "spread|home|-7.5": {
    "first": {
     "dec": 1.9615,
@@ -4993,14 +5030,13 @@
     "ts": "2026-10-20T13:16"
    },
    "last": {
-    "dec": 1.8965,
-    "edge": -6.7,
-    "point": -7.5,
+    "dec": 1.9524,
+    "edge": -7.1,
+    "point": -8.5,
     "price": {
-     "book": "Kalshi",
-     "cents": 51.0
+     "odds": -105
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5041,7 +5077,7 @@
      "book": "Polymarket",
      "cents": 48.0
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5079,7 +5115,7 @@
      "book": "Kalshi",
      "cents": 51.0
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5163,7 +5199,7 @@
      "book": "Polymarket",
      "cents": 38.0
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5231,13 +5267,13 @@
     "ts": "2026-10-20T16:17"
    },
    "last": {
-    "dec": 1.9259,
-    "edge": -11.2,
+    "dec": 2.0,
+    "edge": -7.7,
     "point": 3.0,
     "price": {
-     "odds": -108
+     "odds": 100
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5312,14 +5348,14 @@
     "ts": "2026-10-24T22:15"
    },
    "last": {
-    "dec": 2.7328,
-    "edge": 1.7,
+    "dec": 3.0222,
+    "edge": 5.4,
     "point": null,
     "price": {
-     "book": "Kalshi",
-     "cents": 35.0
+     "book": "Polymarket",
+     "cents": 32.0
     },
-    "ts": "2026-10-25T11:37"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5360,7 +5396,7 @@
      "book": "Kalshi",
      "cents": 17.0
     },
-    "ts": "2026-10-27T10:32"
+    "ts": "2026-10-27T13:25"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -5414,6 +5450,209 @@
     "units": 0.25,
     "why": [
      "our model gives them 82% to win, the market 83%"
+    ]
+   }
+  }
+ },
+ "2026_09_BUF_MIN": {
+  "spread|home|2.5": {
+   "first": {
+    "dec": 1.9524,
+    "edge": -7.1,
+    "point": 2.5,
+    "price": {
+     "odds": -105
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "last": {
+    "dec": 1.9524,
+    "edge": -7.1,
+    "point": 2.5,
+    "price": {
+     "odds": -105
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "pick": {
+    "edgeFrom": "spread",
+    "mk": "spread",
+    "model": 11.2,
+    "point": 2.5,
+    "rec": "spread",
+    "side": "home",
+    "src": [
+     "spread"
+    ],
+    "suggested": true,
+    "text": "Vikings +2.5",
+    "units": 0.25,
+    "why": [
+     "our model has them winning by 2.4; the line says losing by 2.5"
+    ]
+   }
+  }
+ },
+ "2026_09_CIN_ATL": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.8113,
+    "edge": -9.2,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 34.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "last": {
+    "dec": 2.8113,
+    "edge": -9.2,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 34.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 6.3,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Falcons to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 44% to win, the market 33%"
+    ]
+   }
+  }
+ },
+ "2026_09_DAL_IND": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.3992,
+    "edge": -7.5,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 40.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "last": {
+    "dec": 2.3992,
+    "edge": -7.5,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 40.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 7.2,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Colts to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 52% to win, the market 40%"
+    ]
+   }
+  }
+ },
+ "2026_09_DET_MIA": {
+  "ml|home|": {
+   "first": {
+    "dec": 3.9562,
+    "edge": -18.7,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 24.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "last": {
+    "dec": 3.9562,
+    "edge": -18.7,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 24.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 8.4,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Dolphins to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 36% to win, the market 21%"
+    ]
+   }
+  }
+ },
+ "2026_09_NYJ_KC": {
+  "ml|away|": {
+   "first": {
+    "dec": 5.254,
+    "edge": -6.7,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 18.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "last": {
+    "dec": 5.254,
+    "edge": -6.7,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 18.0
+    },
+    "ts": "2026-10-27T13:25"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 7.0,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Jets to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 23% to win, the market 18%"
     ]
    }
   }
