@@ -4571,13 +4571,13 @@
    },
    "last": {
     "dec": 3.7089,
-    "edge": -5.4,
+    "edge": -6.6,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 26.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4801,13 +4801,13 @@
    },
    "last": {
     "dec": 1.5711,
-    "edge": -4.9,
+    "edge": -7.0,
     "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 62.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4839,12 +4839,12 @@
    },
    "last": {
     "dec": 1.8929,
-    "edge": -4.6,
+    "edge": -7.1,
     "point": -3.0,
     "price": {
      "odds": -112
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -4879,13 +4879,13 @@
    },
    "last": {
     "dec": 2.4882,
-    "edge": -6.5,
+    "edge": -4.5,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 39.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4954,12 +4954,12 @@
    },
    "last": {
     "dec": 1.9524,
-    "edge": -8.1,
+    "edge": -6.8,
     "point": 3.0,
     "price": {
      "odds": -105
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5076,7 +5076,7 @@
      "book": "Polymarket",
      "cents": 48.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5114,7 +5114,7 @@
      "book": "Polymarket",
      "cents": 51.9
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5192,13 +5192,13 @@
    },
    "last": {
     "dec": 2.5525,
-    "edge": -5.6,
+    "edge": -2.6,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 38.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5272,7 +5272,7 @@
     "price": {
      "odds": 100
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5313,7 +5313,7 @@
      "book": "Kalshi",
      "cents": 24.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5551,7 +5551,7 @@
     "price": {
      "odds": -110
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5626,14 +5626,14 @@
     "ts": "2026-10-27T13:25"
    },
    "last": {
-    "dec": 2.8113,
-    "edge": -6.8,
+    "dec": 2.7328,
+    "edge": -9.4,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 34.0
+     "cents": 35.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5670,7 +5670,7 @@
     "price": {
      "odds": -115
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5705,13 +5705,13 @@
    },
    "last": {
     "dec": 4.3101,
-    "edge": -11.4,
+    "edge": -0.4,
     "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 22.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5748,7 +5748,7 @@
     "price": {
      "odds": -105
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5860,14 +5860,14 @@
     "ts": "2026-10-27T13:25"
    },
    "last": {
-    "dec": 5.254,
-    "edge": -4.5,
+    "dec": 4.9807,
+    "edge": -4.2,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 18.0
+     "cents": 19.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-29T13:28"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5884,6 +5884,47 @@
     "units": 0.25,
     "why": [
      "our model gives them 23% to win, the market 18%"
+    ]
+   }
+  }
+ },
+ "2026_09_TB_CHI": {
+  "ml|away|": {
+   "first": {
+    "dec": 3.5236,
+    "edge": 2.0,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 27.0
+    },
+    "ts": "2026-10-29T13:28"
+   },
+   "last": {
+    "dec": 3.5236,
+    "edge": 2.0,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 27.0
+    },
+    "ts": "2026-10-29T13:28"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 7.2,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Buccaneers to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 31% to win, the market 30%"
     ]
    }
   }
