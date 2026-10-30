@@ -4577,7 +4577,7 @@
      "book": "Polymarket",
      "cents": 26.0
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4885,7 +4885,7 @@
      "book": "Polymarket",
      "cents": 39.0
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4959,7 +4959,7 @@
     "price": {
      "odds": -105
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5076,7 +5076,7 @@
      "book": "Polymarket",
      "cents": 48.0
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5108,13 +5108,13 @@
    },
    "last": {
     "dec": 1.8807,
-    "edge": -7.7,
+    "edge": -7.1,
     "point": 1.5,
     "price": {
      "book": "Polymarket",
      "cents": 51.9
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5198,7 +5198,7 @@
      "book": "Polymarket",
      "cents": 38.0
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5272,7 +5272,7 @@
     "price": {
      "odds": 100
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5307,13 +5307,13 @@
    },
    "last": {
     "dec": 3.9562,
-    "edge": 3.5,
+    "edge": 4.4,
     "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 24.0
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5347,14 +5347,14 @@
     "ts": "2026-10-24T22:15"
    },
    "last": {
-    "dec": 3.1182,
-    "edge": 8.8,
+    "dec": 3.2206,
+    "edge": -3.8,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 31.0
+     "cents": 30.0
     },
-    "ts": "2026-10-27T16:20"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5388,14 +5388,14 @@
     "ts": "2026-10-27T10:32"
    },
    "last": {
-    "dec": 5.648,
-    "edge": 3.4,
+    "dec": 6.8484,
+    "edge": 8.8,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 17.0
+     "cents": 14.0
     },
-    "ts": "2026-10-29T10:37"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -5466,14 +5466,14 @@
     "ts": "2026-10-27T16:20"
    },
    "last": {
-    "dec": 6.7373,
-    "edge": 8.9,
+    "dec": 5.9981,
+    "edge": -16.3,
     "point": null,
     "price": {
-     "book": "Kalshi",
-     "cents": 14.0
+     "book": "Polymarket",
+     "cents": 16.0
     },
-    "ts": "2026-10-27T16:20"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5514,7 +5514,7 @@
      "book": "Kalshi",
      "cents": 45.0
     },
-    "ts": "2026-10-29T22:29"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5551,7 +5551,7 @@
     "price": {
      "odds": -110
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5626,14 +5626,14 @@
     "ts": "2026-10-27T13:25"
    },
    "last": {
-    "dec": 2.8113,
-    "edge": -10.0,
+    "dec": 2.8945,
+    "edge": -7.3,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 34.0
+     "cents": 33.0
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5670,7 +5670,7 @@
     "price": {
      "odds": -110
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5711,7 +5711,7 @@
      "book": "Kalshi",
      "cents": 22.0
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5748,7 +5748,7 @@
     "price": {
      "odds": -105
     },
-    "ts": "2026-10-30T10:36"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5782,14 +5782,14 @@
     "ts": "2026-10-29T22:29"
    },
    "last": {
-    "dec": 2.0102,
-    "edge": 17.1,
+    "dec": 1.7627,
+    "edge": -0.1,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 48.0
+     "cents": 55.0
     },
-    "ts": "2026-10-29T22:29"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -5866,14 +5866,14 @@
     "ts": "2026-10-27T19:18"
    },
    "last": {
-    "dec": 5.5594,
-    "edge": 2.7,
+    "dec": 5.9029,
+    "edge": 7.6,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 17.0
+     "cents": 16.0
     },
-    "ts": "2026-10-27T19:18"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -5905,14 +5905,14 @@
     "ts": "2026-10-27T19:18"
    },
    "last": {
-    "dec": 2.1398,
-    "edge": 3.7,
+    "dec": 2.2364,
+    "edge": 8.4,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 45.0
+     "cents": 43.0
     },
-    "ts": "2026-10-30T07:25"
+    "ts": "2026-10-30T13:25"
    },
    "pick": {
     "edgeFrom": "gap",
