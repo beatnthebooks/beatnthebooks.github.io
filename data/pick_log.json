@@ -4917,13 +4917,13 @@
    },
    "last": {
     "dec": 2.4882,
-    "edge": -5.5,
+    "edge": -4.5,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 39.0
     },
-    "ts": "2026-11-01T15:22"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4997,7 +4997,7 @@
     "price": {
      "odds": -105
     },
-    "ts": "2026-11-01T15:22"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5615,14 +5615,14 @@
     "ts": "2026-10-27T16:20"
    },
    "last": {
-    "dec": 6.2923,
-    "edge": 4.4,
+    "dec": 6.7373,
+    "edge": -0.8,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 15.0
+     "cents": 14.0
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5656,14 +5656,14 @@
     "ts": "2026-10-27T19:18"
    },
    "last": {
-    "dec": 2.1378,
-    "edge": -8.4,
+    "dec": 2.4591,
+    "edge": -0.4,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 45.0
+     "cents": 39.0
     },
-    "ts": "2026-11-01T12:20"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5776,13 +5776,13 @@
    },
    "last": {
     "dec": 3.1776,
-    "edge": 1.7,
+    "edge": -3.4,
     "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 30.0
     },
-    "ts": "2026-11-01T12:20"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5813,13 +5813,14 @@
     "ts": "2026-10-27T16:20"
    },
    "last": {
-    "dec": 1.9091,
-    "edge": -7.1,
-    "point": 4.5,
+    "dec": 1.8632,
+    "edge": -9.3,
+    "point": 5.5,
     "price": {
-     "odds": -110
+     "book": "Kalshi",
+     "cents": 51.9
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5853,14 +5854,14 @@
     "ts": "2026-10-27T13:25"
    },
    "last": {
-    "dec": 4.9807,
-    "edge": 2.3,
+    "dec": 4.1255,
+    "edge": 1.8,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 19.0
+     "cents": 23.0
     },
-    "ts": "2026-11-01T12:20"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5931,14 +5932,14 @@
     "ts": "2026-10-29T22:29"
    },
    "last": {
-    "dec": 1.7324,
-    "edge": -1.8,
+    "dec": 1.8267,
+    "edge": -1.5,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 56.0
+     "cents": 53.0
     },
-    "ts": "2026-11-01T12:20"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -6043,6 +6044,45 @@
      "our model gives them 50% to win, the market 42%"
     ]
    }
+  },
+  "ml|home|": {
+   "first": {
+    "dec": 3.9562,
+    "edge": -7.5,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 24.0
+    },
+    "ts": "2026-11-01T17:38"
+   },
+   "last": {
+    "dec": 3.9562,
+    "edge": -7.5,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 24.0
+    },
+    "ts": "2026-11-01T17:38"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 11.7,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Ravens to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 34% to win, the market 24%"
+    ]
+   }
   }
  },
  "2026_09_LA_WAS": {
@@ -6058,14 +6098,14 @@
     "ts": "2026-11-01T12:20"
    },
    "last": {
-    "dec": 2.8945,
-    "edge": -5.8,
+    "dec": 3.1776,
+    "edge": 1.7,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 33.0
+     "cents": 30.0
     },
-    "ts": "2026-11-01T12:20"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -6177,14 +6217,14 @@
     "ts": "2026-10-27T13:25"
    },
    "last": {
-    "dec": 5.254,
-    "edge": -2.8,
+    "dec": 5.9029,
+    "edge": 11.0,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 18.0
+     "cents": 16.0
     },
-    "ts": "2026-11-01T09:21"
+    "ts": "2026-11-01T17:38"
    },
    "pick": {
     "edgeFrom": "lean",
