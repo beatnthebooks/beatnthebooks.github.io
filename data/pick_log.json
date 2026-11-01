@@ -4923,7 +4923,7 @@
      "book": "Polymarket",
      "cents": 39.0
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T12:20"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -4997,7 +4997,7 @@
     "price": {
      "odds": -105
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T12:20"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -5656,14 +5656,14 @@
     "ts": "2026-10-27T19:18"
    },
    "last": {
-    "dec": 2.187,
-    "edge": -7.2,
+    "dec": 2.1378,
+    "edge": -8.4,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 44.0
+     "cents": 45.0
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T12:20"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5775,14 +5775,14 @@
     "ts": "2026-10-27T13:25"
    },
    "last": {
-    "dec": 2.983,
-    "edge": -2.9,
+    "dec": 3.1776,
+    "edge": 1.7,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 32.0
+     "cents": 30.0
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T12:20"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5853,14 +5853,14 @@
     "ts": "2026-10-27T13:25"
    },
    "last": {
-    "dec": 4.5124,
-    "edge": 1.7,
+    "dec": 4.9807,
+    "edge": 2.3,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 21.0
+     "cents": 19.0
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T12:20"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -5938,7 +5938,7 @@
      "book": "Kalshi",
      "cents": 56.0
     },
-    "ts": "2026-10-31T07:22"
+    "ts": "2026-11-01T12:20"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -6045,6 +6045,47 @@
    }
   }
  },
+ "2026_09_LA_WAS": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.8945,
+    "edge": -5.8,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 33.0
+    },
+    "ts": "2026-11-01T12:20"
+   },
+   "last": {
+    "dec": 2.8945,
+    "edge": -5.8,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 33.0
+    },
+    "ts": "2026-11-01T12:20"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 6.5,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Commanders to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 41% to win, the market 34%"
+    ]
+   }
+  }
+ },
  "2026_09_LV_SF": {
   "ml|away|": {
    "first": {
@@ -6104,7 +6145,7 @@
      "book": "Kalshi",
      "cents": 46.0
     },
-    "ts": "2026-11-01T10:42"
+    "ts": "2026-11-01T12:20"
    },
    "pick": {
     "edgeFrom": "gap",
