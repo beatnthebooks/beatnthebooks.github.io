@@ -6762,13 +6762,13 @@
    },
    "last": {
     "dec": 4.8077,
-    "edge": 7.5,
+    "edge": 2.7,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 20.0
     },
-    "ts": "2026-11-09T15:39"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -6887,7 +6887,7 @@
      "book": "Polymarket",
      "cents": 33.0
     },
-    "ts": "2026-11-09T22:52"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -6918,14 +6918,13 @@
     "ts": "2026-11-03T15:27"
    },
    "last": {
-    "dec": 1.9697,
-    "edge": -6.3,
+    "dec": 1.9524,
+    "edge": -7.1,
     "point": 4.5,
     "price": {
-     "book": "Kalshi",
-     "cents": 49.0
+     "odds": -105
     },
-    "ts": "2026-11-09T22:52"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -6959,14 +6958,14 @@
     "ts": "2026-11-03T15:27"
    },
    "last": {
-    "dec": 5.3367,
-    "edge": 2.6,
+    "dec": 5.5594,
+    "edge": 2.1,
     "point": null,
     "price": {
-     "book": "Polymarket",
-     "cents": 18.0
+     "book": "Kalshi",
+     "cents": 17.0
     },
-    "ts": "2026-11-09T22:52"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7001,13 +7000,13 @@
    },
    "last": {
     "dec": 2.6202,
-    "edge": -4.2,
+    "edge": -3.4,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 37.0
     },
-    "ts": "2026-11-09T22:52"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7275,14 +7274,14 @@
     "ts": "2026-11-05T13:07"
    },
    "last": {
-    "dec": 2.5525,
-    "edge": -5.3,
+    "dec": 2.8472,
+    "edge": -6.6,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 38.0
+     "cents": 34.0
     },
-    "ts": "2026-11-09T15:39"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7313,13 +7312,14 @@
     "ts": "2026-11-03T15:27"
    },
    "last": {
-    "dec": 1.9091,
-    "edge": -7.1,
-    "point": 3.0,
+    "dec": 1.9146,
+    "edge": -6.8,
+    "point": 5.5,
     "price": {
-     "odds": -110
+     "book": "Polymarket",
+     "cents": 51.0
     },
-    "ts": "2026-11-08T11:16"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -7393,13 +7393,13 @@
    },
    "last": {
     "dec": 2.075,
-    "edge": -5.8,
+    "edge": -3.5,
     "point": 2.5,
     "price": {
      "book": "Polymarket",
      "cents": 46.9
     },
-    "ts": "2026-11-09T22:52"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -7472,14 +7472,14 @@
     "ts": "2026-11-08T16:51"
    },
    "last": {
-    "dec": 2.8945,
-    "edge": 9.7,
+    "dec": 2.8472,
+    "edge": -4.7,
     "point": null,
     "price": {
-     "book": "Kalshi",
-     "cents": 33.0
+     "book": "Polymarket",
+     "cents": 34.0
     },
-    "ts": "2026-11-08T16:51"
+    "ts": "2026-11-10T12:56"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7576,6 +7576,201 @@
     "units": 0.25,
     "why": [
      "our model has them winning by 5.1; the line says winning by 1.5"
+    ]
+   }
+  }
+ },
+ "2026_11_ARI_KC": {
+  "ml|away|": {
+   "first": {
+    "dec": 6.7373,
+    "edge": -18.4,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 14.0
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "last": {
+    "dec": 6.7373,
+    "edge": -18.4,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 14.0
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 15.5,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Cardinals to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 23% to win, the market 13%"
+    ]
+   }
+  },
+  "spread|away|13.5": {
+   "first": {
+    "dec": 1.9524,
+    "edge": -7.1,
+    "point": 13.5,
+    "price": {
+     "odds": -105
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "last": {
+    "dec": 1.9524,
+    "edge": -7.1,
+    "point": 13.5,
+    "price": {
+     "odds": -105
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "pick": {
+    "edgeFrom": "spread",
+    "mk": "spread",
+    "model": 12.2,
+    "point": 13.5,
+    "rec": "spread",
+    "side": "away",
+    "src": [
+     "spread"
+    ],
+    "suggested": true,
+    "text": "Cardinals +13.5",
+    "units": 0.25,
+    "why": [
+     "our model has them losing by 8.3; the line says losing by 13.5"
+    ]
+   }
+  }
+ },
+ "2026_11_JAX_NYG": {
+  "ml|home|": {
+   "first": {
+    "dec": 2.983,
+    "edge": -3.6,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 32.0
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "last": {
+    "dec": 2.983,
+    "edge": -3.6,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 32.0
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 17.7,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Giants to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 48% to win, the market 33%"
+    ]
+   }
+  },
+  "spread|home|4.5": {
+   "first": {
+    "dec": 1.9091,
+    "edge": -7.1,
+    "point": 4.5,
+    "price": {
+     "odds": -110
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "last": {
+    "dec": 1.9091,
+    "edge": -7.1,
+    "point": 4.5,
+    "price": {
+     "odds": -110
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "pick": {
+    "edgeFrom": "spread",
+    "mk": "spread",
+    "model": 6.1,
+    "point": 4.5,
+    "rec": "spread",
+    "side": "home",
+    "src": [
+     "spread"
+    ],
+    "suggested": true,
+    "text": "Giants +4.5",
+    "units": 0.25,
+    "why": [
+     "our model has them losing by 0.6; the line says losing by 4.5"
+    ]
+   }
+  }
+ },
+ "2026_11_TEN_DAL": {
+  "ml|away|": {
+   "first": {
+    "dec": 4.7,
+    "edge": -7.6,
+    "point": null,
+    "price": {
+     "odds": 370
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "last": {
+    "dec": 4.7,
+    "edge": -7.6,
+    "point": null,
+    "price": {
+     "odds": 370
+    },
+    "ts": "2026-11-10T12:56"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 6.4,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Titans to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 26% to win, the market 20%"
     ]
    }
   }
