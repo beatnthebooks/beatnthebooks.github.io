@@ -7548,14 +7548,14 @@
     "ts": "2026-11-14T03:33"
    },
    "last": {
-    "dec": 2.6176,
-    "edge": -5.8,
+    "dec": 2.6938,
+    "edge": -3.4,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 37.0
+     "cents": 36.0
     },
-    "ts": "2026-11-14T21:20"
+    "ts": "2026-11-15T12:03"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7665,14 +7665,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 1.9146,
-    "edge": -5.5,
+    "dec": 1.9893,
+    "edge": -3.2,
     "point": -6.5,
     "price": {
      "book": "Polymarket",
-     "cents": 51.0
+     "cents": 49.0
     },
-    "ts": "2026-11-13T19:05"
+    "ts": "2026-11-15T12:03"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -7821,14 +7821,14 @@
     "ts": "2026-11-10T12:56"
    },
    "last": {
-    "dec": 7.8498,
-    "edge": -4.6,
+    "dec": 8.5578,
+    "edge": 8.5,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 12.0
+     "cents": 11.0
     },
-    "ts": "2026-11-14T21:20"
+    "ts": "2026-11-15T12:03"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -8096,12 +8096,12 @@
    },
    "last": {
     "dec": 1.9091,
-    "edge": -9.2,
+    "edge": -7.1,
     "point": -8.5,
     "price": {
      "odds": -110
     },
-    "ts": "2026-11-14T21:20"
+    "ts": "2026-11-15T12:03"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -8176,14 +8176,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 2.983,
-    "edge": 5.4,
+    "dec": 2.8113,
+    "edge": -3.3,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 32.0
+     "cents": 34.0
     },
-    "ts": "2026-11-14T21:20"
+    "ts": "2026-11-15T12:03"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -8298,14 +8298,14 @@
     "ts": "2026-11-10T12:56"
    },
    "last": {
-    "dec": 4.7348,
-    "edge": -3.6,
+    "dec": 4.5124,
+    "edge": -3.1,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 20.0
+     "cents": 21.0
     },
-    "ts": "2026-11-14T03:33"
+    "ts": "2026-11-15T12:03"
    },
    "pick": {
     "edgeFrom": "lean",
