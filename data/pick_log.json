@@ -7140,6 +7140,43 @@
   }
  },
  "2026_10_LAC_BAL": {
+  "ml|away|": {
+   "first": {
+    "dec": 3.0175,
+    "edge": 2.1,
+    "point": null,
+    "price": {
+     "book": "Polymarket",
+     "cents": 32.1
+    },
+    "ts": "2026-11-16T04:14"
+   },
+   "last": {
+    "dec": 3.0175,
+    "edge": 2.1,
+    "point": null,
+    "price": {
+     "book": "Polymarket",
+     "cents": 32.1
+    },
+    "ts": "2026-11-16T04:14"
+   },
+   "pick": {
+    "edgeFrom": "gap",
+    "mk": "ml",
+    "point": null,
+    "side": "away",
+    "src": [
+     "gap"
+    ],
+    "suggested": false,
+    "text": "Chargers to win",
+    "units": 0.5,
+    "why": [
+     "2.1% cheaper than the sportsbooks\u2019 fair price"
+    ]
+   }
+  },
   "ml|home|": {
    "first": {
     "dec": 1.9324,
@@ -7861,13 +7898,13 @@
    },
    "last": {
     "dec": 10.4457,
-    "edge": 9.7,
+    "edge": 3.5,
     "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 9.0
     },
-    "ts": "2026-11-15T20:42"
+    "ts": "2026-11-16T04:14"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7981,14 +8018,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 5.0553,
-    "edge": -7.5,
+    "dec": 5.341,
+    "edge": -4.8,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 19.0
+     "cents": 18.0
     },
-    "ts": "2026-11-15T20:42"
+    "ts": "2026-11-16T04:14"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8102,14 +8139,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 5.254,
-    "edge": 6.2,
+    "dec": 5.341,
+    "edge": 2.7,
     "point": null,
     "price": {
-     "book": "Kalshi",
+     "book": "Polymarket",
      "cents": 18.0
     },
-    "ts": "2026-11-15T20:42"
+    "ts": "2026-11-16T04:14"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8177,13 +8214,13 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 1.9091,
-    "edge": -7.1,
-    "point": -9.5,
+    "dec": 1.9259,
+    "edge": -5.9,
+    "point": -10.0,
     "price": {
-     "odds": -110
+     "odds": -108
     },
-    "ts": "2026-11-15T20:42"
+    "ts": "2026-11-16T04:14"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -8217,14 +8254,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 11.7437,
-    "edge": -1.7,
+    "dec": 10.6265,
+    "edge": 2.0,
     "point": null,
     "price": {
-     "book": "Kalshi",
-     "cents": 8.0
+     "book": "Polymarket",
+     "cents": 9.0
     },
-    "ts": "2026-11-12T21:25"
+    "ts": "2026-11-16T04:14"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -8299,14 +8336,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 5.254,
-    "edge": 6.9,
+    "dec": 5.341,
+    "edge": 2.7,
     "point": null,
     "price": {
-     "book": "Kalshi",
+     "book": "Polymarket",
      "cents": 18.0
     },
-    "ts": "2026-11-14T21:20"
+    "ts": "2026-11-16T04:14"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8364,6 +8401,49 @@
     "units": 0.5,
     "why": [
      "2.3% cheaper than the sportsbooks\u2019 fair price"
+    ]
+   }
+  }
+ },
+ "2026_11_TB_DET": {
+  "ml|away|": {
+   "first": {
+    "dec": 3.2174,
+    "edge": 2.4,
+    "point": null,
+    "price": {
+     "book": "Polymarket",
+     "cents": 30.0
+    },
+    "ts": "2026-11-16T04:14"
+   },
+   "last": {
+    "dec": 3.2174,
+    "edge": 2.4,
+    "point": null,
+    "price": {
+     "book": "Polymarket",
+     "cents": 30.0
+    },
+    "ts": "2026-11-16T04:14"
+   },
+   "pick": {
+    "edgeFrom": "gap",
+    "mk": "ml",
+    "model": 2.8,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "gap",
+     "lean"
+    ],
+    "suggested": false,
+    "text": "Buccaneers to win",
+    "units": 0.75,
+    "why": [
+     "2.4% cheaper than the sportsbooks\u2019 fair price",
+     "our model gives them 32% to win, the market 32%"
     ]
    }
   }
