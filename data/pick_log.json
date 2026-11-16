@@ -7898,13 +7898,13 @@
    },
    "last": {
     "dec": 10.4457,
-    "edge": 3.5,
+    "edge": 3.1,
     "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 9.0
     },
-    "ts": "2026-11-16T04:14"
+    "ts": "2026-11-16T15:18"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7975,14 +7975,14 @@
     "ts": "2026-11-15T20:42"
    },
    "last": {
-    "dec": 3.285,
-    "edge": 15.3,
+    "dec": 3.4001,
+    "edge": -5.8,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 29.0
+     "cents": 28.0
     },
-    "ts": "2026-11-15T20:42"
+    "ts": "2026-11-16T15:18"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8018,14 +8018,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 5.341,
-    "edge": -4.8,
+    "dec": 5.9981,
+    "edge": -7.2,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 18.0
+     "cents": 16.0
     },
-    "ts": "2026-11-16T04:14"
+    "ts": "2026-11-16T15:18"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8214,13 +8214,13 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 1.9259,
-    "edge": -5.9,
+    "dec": 1.9091,
+    "edge": -7.1,
     "point": -10.0,
     "price": {
-     "odds": -108
+     "odds": -110
     },
-    "ts": "2026-11-16T04:14"
+    "ts": "2026-11-16T15:18"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -8255,13 +8255,13 @@
    },
    "last": {
     "dec": 10.6265,
-    "edge": 2.0,
+    "edge": 4.9,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 9.0
     },
-    "ts": "2026-11-16T04:14"
+    "ts": "2026-11-16T15:18"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -8278,6 +8278,45 @@
     "units": 0.25,
     "why": [
      "our model gives them 10% to win, the market 9%"
+    ]
+   }
+  },
+  "spread|home|-16.5": {
+   "first": {
+    "dec": 1.9512,
+    "edge": -5.1,
+    "point": -16.5,
+    "price": {
+     "book": "Polymarket",
+     "cents": 50.0
+    },
+    "ts": "2026-11-16T15:18"
+   },
+   "last": {
+    "dec": 1.9512,
+    "edge": -5.1,
+    "point": -16.5,
+    "price": {
+     "book": "Polymarket",
+     "cents": 50.0
+    },
+    "ts": "2026-11-16T15:18"
+   },
+   "pick": {
+    "edgeFrom": "spread",
+    "mk": "spread",
+    "model": 8.3,
+    "point": -16.5,
+    "rec": "spread",
+    "side": "home",
+    "src": [
+     "spread"
+    ],
+    "suggested": true,
+    "text": "Bills -16.5",
+    "units": 0.25,
+    "why": [
+     "our model has them winning by 20.3; the line says winning by 16.5"
     ]
    }
   }
