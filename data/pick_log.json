@@ -7860,14 +7860,14 @@
     "ts": "2026-11-10T12:56"
    },
    "last": {
-    "dec": 8.5578,
-    "edge": 8.5,
+    "dec": 10.4457,
+    "edge": 9.7,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 11.0
+     "cents": 9.0
     },
-    "ts": "2026-11-15T12:03"
+    "ts": "2026-11-15T20:42"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7925,6 +7925,49 @@
    }
   }
  },
+ "2026_11_CIN_WAS": {
+  "ml|home|": {
+   "first": {
+    "dec": 3.285,
+    "edge": 15.3,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 29.0
+    },
+    "ts": "2026-11-15T20:42"
+   },
+   "last": {
+    "dec": 3.285,
+    "edge": 15.3,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 29.0
+    },
+    "ts": "2026-11-15T20:42"
+   },
+   "pick": {
+    "edgeFrom": "gap",
+    "mk": "ml",
+    "model": 20.9,
+    "point": null,
+    "rec": "ml",
+    "side": "home",
+    "src": [
+     "gap",
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Commanders to win",
+    "units": 0.75,
+    "why": [
+     "15.3% cheaper than the sportsbooks\u2019 fair price",
+     "our model gives them 39% to win, the market 35%"
+    ]
+   }
+  }
+ },
  "2026_11_IND_HOU": {
   "ml|away|": {
    "first": {
@@ -7945,7 +7988,7 @@
      "book": "Polymarket",
      "cents": 19.0
     },
-    "ts": "2026-11-15T18:27"
+    "ts": "2026-11-15T20:42"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8059,14 +8102,14 @@
     "ts": "2026-11-10T18:56"
    },
    "last": {
-    "dec": 4.7348,
-    "edge": 3.3,
+    "dec": 5.254,
+    "edge": 6.2,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 20.0
+     "cents": 18.0
     },
-    "ts": "2026-11-14T03:33"
+    "ts": "2026-11-15T20:42"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8140,7 +8183,7 @@
     "price": {
      "odds": -110
     },
-    "ts": "2026-11-15T18:27"
+    "ts": "2026-11-15T20:42"
    },
    "pick": {
     "edgeFrom": "spread",
