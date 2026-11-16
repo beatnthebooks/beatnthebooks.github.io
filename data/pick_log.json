@@ -7548,14 +7548,14 @@
     "ts": "2026-11-14T03:33"
    },
    "last": {
-    "dec": 2.6938,
-    "edge": -3.4,
+    "dec": 2.7699,
+    "edge": -6.5,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 36.0
+     "cents": 35.0
     },
-    "ts": "2026-11-15T15:00"
+    "ts": "2026-11-15T18:27"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -7609,6 +7609,45 @@
     "units": 0.5,
     "why": [
      "3.6% cheaper than the sportsbooks\u2019 fair price"
+    ]
+   }
+  },
+  "spread|away|3.5": {
+   "first": {
+    "dec": 1.9893,
+    "edge": -5.5,
+    "point": 3.5,
+    "price": {
+     "book": "Polymarket",
+     "cents": 49.0
+    },
+    "ts": "2026-11-15T18:27"
+   },
+   "last": {
+    "dec": 1.9893,
+    "edge": -5.5,
+    "point": 3.5,
+    "price": {
+     "book": "Polymarket",
+     "cents": 49.0
+    },
+    "ts": "2026-11-15T18:27"
+   },
+   "pick": {
+    "edgeFrom": "spread",
+    "mk": "spread",
+    "model": 6.8,
+    "point": 3.5,
+    "rec": "spread",
+    "side": "away",
+    "src": [
+     "spread"
+    ],
+    "suggested": true,
+    "text": "Steelers +3.5",
+    "units": 0.25,
+    "why": [
+     "our model has them losing by 0.9; the line says losing by 3.5"
     ]
    }
   }
@@ -7900,13 +7939,13 @@
    },
    "last": {
     "dec": 5.0553,
-    "edge": 2.0,
+    "edge": -7.5,
     "point": null,
     "price": {
      "book": "Polymarket",
      "cents": 19.0
     },
-    "ts": "2026-11-13T19:05"
+    "ts": "2026-11-15T18:27"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8097,11 +8136,11 @@
    "last": {
     "dec": 1.9091,
     "edge": -7.1,
-    "point": -8.5,
+    "point": -9.5,
     "price": {
      "odds": -110
     },
-    "ts": "2026-11-15T12:03"
+    "ts": "2026-11-15T18:27"
    },
    "pick": {
     "edgeFrom": "spread",
