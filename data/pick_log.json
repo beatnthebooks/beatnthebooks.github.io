@@ -8019,7 +8019,7 @@
      "book": "Polymarket",
      "cents": 28.0
     },
-    "ts": "2026-11-22T12:43"
+    "ts": "2026-11-22T15:43"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -8058,7 +8058,7 @@
     "price": {
      "odds": -107
     },
-    "ts": "2026-11-22T12:43"
+    "ts": "2026-11-22T15:43"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -8956,14 +8956,14 @@
     "ts": "2026-11-17T14:07"
    },
    "last": {
-    "dec": 2.2653,
-    "edge": -6.3,
+    "dec": 2.2082,
+    "edge": -6.1,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 42.9
+     "cents": 44.1
     },
-    "ts": "2026-11-22T04:24"
+    "ts": "2026-11-22T15:43"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -8994,14 +8994,14 @@
     "ts": "2026-11-17T14:07"
    },
    "last": {
-    "dec": 1.9893,
-    "edge": -7.5,
+    "dec": 1.9512,
+    "edge": -5.1,
     "point": 2.5,
     "price": {
      "book": "Polymarket",
-     "cents": 49.0
+     "cents": 50.0
     },
-    "ts": "2026-11-22T04:24"
+    "ts": "2026-11-22T15:43"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -9078,14 +9078,14 @@
     "ts": "2026-11-19T19:55"
    },
    "last": {
-    "dec": 1.6604,
-    "edge": -5.0,
+    "dec": 1.6892,
+    "edge": -2.4,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 59.0
+     "cents": 58.0
     },
-    "ts": "2026-11-20T04:38"
+    "ts": "2026-11-22T15:43"
    },
    "pick": {
     "edgeFrom": "lean",
