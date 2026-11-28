@@ -8841,7 +8841,7 @@
      "book": "Kalshi",
      "cents": 25.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -9344,13 +9344,13 @@
    },
    "last": {
     "dec": 1.4384,
-    "edge": -4.9,
+    "edge": -4.7,
     "point": null,
     "price": {
      "book": "Kalshi",
      "cents": 68.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -9381,14 +9381,14 @@
     "ts": "2026-11-20T13:17"
    },
    "last": {
-    "dec": 1.9146,
-    "edge": -5.8,
+    "dec": 1.9512,
+    "edge": -4.0,
     "point": -4.5,
     "price": {
      "book": "Polymarket",
-     "cents": 51.0
+     "cents": 50.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -9422,14 +9422,14 @@
     "ts": "2026-11-17T14:07"
    },
    "last": {
-    "dec": 1.7489,
-    "edge": -5.4,
+    "dec": 1.6604,
+    "edge": -5.2,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 55.9
+     "cents": 59.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -9460,14 +9460,13 @@
     "ts": "2026-11-17T14:07"
    },
    "last": {
-    "dec": 1.9512,
+    "dec": 1.9901,
     "edge": -5.6,
-    "point": -2.5,
+    "point": -3.0,
     "price": {
-     "book": "Polymarket",
-     "cents": 50.0
+     "odds": -101
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -9544,14 +9543,14 @@
     "ts": "2026-11-17T14:07"
    },
    "last": {
-    "dec": 3.446,
-    "edge": -1.6,
+    "dec": 3.2174,
+    "edge": -5.3,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 28.0
+     "cents": 30.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -9582,13 +9581,14 @@
     "ts": "2026-11-20T04:38"
    },
    "last": {
-    "dec": 1.9174,
-    "edge": -6.8,
-    "point": 6.0,
+    "dec": 1.9324,
+    "edge": -4.4,
+    "point": 5.5,
     "price": {
-     "odds": -109
+     "book": "Kalshi",
+     "cents": 50.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -9852,14 +9852,14 @@
     "ts": "2026-11-22T04:24"
    },
    "last": {
-    "dec": 1.6892,
-    "edge": -5.5,
+    "dec": 2.0274,
+    "edge": -5.1,
     "point": null,
     "price": {
      "book": "Polymarket",
-     "cents": 58.0
+     "cents": 48.1
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -9890,13 +9890,14 @@
     "ts": "2026-11-22T04:24"
    },
    "last": {
-    "dec": 1.9804,
-    "edge": -7.1,
-    "point": -3.0,
+    "dec": 1.9146,
+    "edge": -4.6,
+    "point": 1.5,
     "price": {
-     "odds": -102
+     "book": "Polymarket",
+     "cents": 51.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -9937,7 +9938,7 @@
      "book": "Polymarket",
      "cents": 11.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "gap",
@@ -9980,7 +9981,7 @@
      "book": "Polymarket",
      "cents": 26.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -10018,7 +10019,7 @@
      "book": "Polymarket",
      "cents": 49.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -10052,14 +10053,14 @@
     "ts": "2026-11-24T15:36"
    },
    "last": {
-    "dec": 6.7373,
-    "edge": -5.1,
+    "dec": 7.2507,
+    "edge": 6.5,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 14.0
+     "cents": 13.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -10096,7 +10097,7 @@
     "price": {
      "odds": -110
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "spread",
@@ -10191,6 +10192,47 @@
     "units": 0.25,
     "why": [
      "our model has them losing by 2.2; the line says losing by 6"
+    ]
+   }
+  }
+ },
+ "2026_13_DAL_SEA": {
+  "ml|away|": {
+   "first": {
+    "dec": 3.4001,
+    "edge": -6.2,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 28.0
+    },
+    "ts": "2026-11-27T20:58"
+   },
+   "last": {
+    "dec": 3.4001,
+    "edge": -6.2,
+    "point": null,
+    "price": {
+     "book": "Kalshi",
+     "cents": 28.0
+    },
+    "ts": "2026-11-27T20:58"
+   },
+   "pick": {
+    "edgeFrom": "lean",
+    "mk": "ml",
+    "model": 5.7,
+    "point": null,
+    "rec": "ml",
+    "side": "away",
+    "src": [
+     "lean"
+    ],
+    "suggested": true,
+    "text": "Cowboys to win",
+    "units": 0.25,
+    "why": [
+     "our model gives them 35% to win, the market 29%"
     ]
    }
   }
@@ -10325,14 +10367,14 @@
     "ts": "2026-11-24T15:36"
    },
    "last": {
-    "dec": 1.9324,
-    "edge": -5.5,
+    "dec": 1.9705,
+    "edge": -3.8,
     "point": null,
     "price": {
      "book": "Kalshi",
-     "cents": 50.0
+     "cents": 49.0
     },
-    "ts": "2026-11-27T14:22"
+    "ts": "2026-11-27T20:58"
    },
    "pick": {
     "edgeFrom": "lean",
@@ -10349,6 +10391,43 @@
     "units": 0.25,
     "why": [
      "our model gives them 60% to win, the market 50%"
+    ]
+   }
+  },
+  "spread|home|-1.5": {
+   "first": {
+    "dec": 2.01,
+    "edge": -6.9,
+    "point": -1.5,
+    "price": {
+     "odds": 101
+    },
+    "ts": "2026-11-27T20:58"
+   },
+   "last": {
+    "dec": 2.01,
+    "edge": -6.9,
+    "point": -1.5,
+    "price": {
+     "odds": 101
+    },
+    "ts": "2026-11-27T20:58"
+   },
+   "pick": {
+    "edgeFrom": "spread",
+    "mk": "spread",
+    "model": 5.3,
+    "point": -1.5,
+    "rec": "spread",
+    "side": "home",
+    "src": [
+     "spread"
+    ],
+    "suggested": true,
+    "text": "Rams -1.5",
+    "units": 0.25,
+    "why": [
+     "our model has them winning by 3.2; the line says winning by 1.5"
     ]
    }
   }
